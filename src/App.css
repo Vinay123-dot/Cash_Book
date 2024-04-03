@@ -1,0 +1,46 @@
+.App {
+  text-align: center;
+}
+
+.tableCs{
+  width : 98vw;
+  height : 100vh
+}
+.btnStyle{
+  display:flex;
+  flex-direction:row-reverse;
+  gap:40;
+  margin-top:20;
+  position:absolute;
+  bottom:10;
+  right:10
+}
+/* @media screen and (max-width: 576px) {
+  .btnStyle{
+    display:flex;
+    flex-direction:row-reverse;
+    gap:40;
+    margin-top:20;
+    bottom:10;
+    right:10
+  }
+} */
+
+
+@media screen and (max-width: 576px) {
+  .grid-container {
+    grid-template-columns: 1fr /* For even smaller screens, further reduce the minimum width of each column */
+  }
+  .tools-container {
+    grid-template-columns: 1fr 
+  }
+}
+
+
+
+@media screen and (max-width: 768px) {
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+}
+

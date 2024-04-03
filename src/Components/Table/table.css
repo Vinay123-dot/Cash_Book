@@ -1,0 +1,34 @@
+/* Table.css */
+.table-container {
+    overflow-x: auto;
+  }
+  
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+  .responsive-table thead {
+    /* background-color : #6e6868; */
+    background-color: rgba(242, 243, 244, 0.8);
+  }
+  .headerTxt {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .responsive-table td {
+    padding: 2px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Adjust styles for smaller screens */
+  @media (max-width: 768px) {
+    .responsive-table th,
+    .responsive-table td {
+      padding: 6px;
+      font-size: 12px;
+    }
+  }
+  
