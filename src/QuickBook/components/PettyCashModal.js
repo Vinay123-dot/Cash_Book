@@ -1,10 +1,9 @@
 import React from "react";
-import { Input, Modal, Select, Button } from "antd";
-import { Options } from "../Constants";
-import { horizontalLine } from "../commonStyles";
+import { Input, Select} from "antd";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { btnClr } from "../commonStyles";
+import CButton from "../../ComponentsTest/Button";
+import { FaRupeeSign } from "react-icons/fa";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -19,18 +18,24 @@ const cashTypes = [
     { label: 'Credit', value: '1' }
 ];
 
-
+const prefix = (
+    <FaRupeeSign
+      style={{
+        fontSize: 12,
+      }}
+    />
+  );
 
 const validationSchema = Yup.object().shape({
     seelctedDay: Yup.string().required('Day is required'),
-    customerNum : Yup.string().required('Customer Name is required'),
+    remAmount : Yup.string().required('Remaining Amount is required'),
     amount : Yup.string().required('Amount is required'),
     reason: Yup.string().required('Reason is required'),
 });
 
 const initialValues = {
     seelctedDay : '',
-    customerNum : '',
+    remAmount : '',
     amount : '',
     reason: '',
 };
@@ -38,7 +43,7 @@ const initialValues = {
 const showInputBox = (text,value,ph) => (
     <div style={{width:200}}>
         <label htmlFor={value}>{text}</label>
-        <Field name={value} as={Input} placeholder={ph} />
+        <Field name={value} as={Input} placeholder={ph} prefix = {prefix} />
         <ErrorMessage name={value} component="div" style={{ color: 'red' }} />
     </div>
 )
@@ -53,7 +58,7 @@ const showSelectBox = (title,value,ph,Arr) => (
     </div>
 )
 const showTextArea = (text,value,ph) => (
-    <div style={{width:500}}>
+    <div>
         <label htmlFor={value}>{text}</label>
         <Field name={value} as={TextArea} placeholder={ph} rows ={4}  />
         <ErrorMessage name={value} component="div" style={{ color: 'red' }} />
@@ -62,12 +67,13 @@ const showTextArea = (text,value,ph) => (
 
 
 const PettyCashModal = (props) => {
+    const { showPettyCash } = props;
 
     const handleSubmit = (values) => {
         console.log("v", values)
     }
 
-
+    if(!showPettyCash) return null;
 
     return (
         <Formik
@@ -77,17 +83,19 @@ const PettyCashModal = (props) => {
         >
             {({ isSubmitting }) => (
                 <Form>
-                    <h3 style={{ color: "#5A87B2" }}>Details</h3>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 100 }}>
+                    <h1 style={{ color: "#5A87B2" ,marginBottom:20,padding:"4px"}}>Details</h1>
+                    {/* <div style={{ display: "flex", flexWrap: "wrap", gap: 100 }}> */}
+                    <div className="grid xl:grid-cols-3 lg:grid-cols-3 grid-cols-1 gap-10">
                         {
                             showSelectBox("Day",'seelctedDay',"Select Day",DaysArr)
                         }
                         {
-                            showInputBox('Customer Mobile Number','customerNum',"Enter Customer Mobile Number" )
+                            showInputBox('Amount','amount',"Enter Amount",true )
                         }
                         {
-                            showInputBox('Amount','amount',"Enter Amount" )
+                            showInputBox('Remaining Amount','remAmount',"Enter Remaining Amount",true)
                         }
+                        
                         {
                             showTextArea('Details','reason',"Enter Details" )
                         }
@@ -96,14 +104,14 @@ const PettyCashModal = (props) => {
 
 
                    
-                    <div style={{display:"flex",flexDirection:"row-reverse",gap:40,marginTop:20,position:"absolute",bottom:10,right:10}}>
-                        
-                    <Button style={btnClr} htmlType="submit" disabled={isSubmitting}>
-                        Submit
-                    </Button>
-                    <Button htmlType="cancel" disabled={isSubmitting}>
-                        Cancel
-                    </Button>
+                    {/* <div style={{display:"flex",flexDirection:"row-reverse",gap:40,marginTop:20,position:"absolute",bottom:10,right:10}}> */}
+                    <div className="flex flex-row-reverse gap-10 mt-20 xl:absolute bottom-10 right-10">
+                    <CButton  >
+                Save
+            </CButton>
+            <CButton onClick={()=> console.log("C")} type = "cancel">
+                Cancel
+            </CButton> 
                     </div>
 
                 </Form>

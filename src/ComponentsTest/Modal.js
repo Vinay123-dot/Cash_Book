@@ -1,6 +1,8 @@
 import React from "react";
 import { btnClr } from "../commonStyles";
 import { Button } from "antd";
+import CButton from "./Button";
+import SucessIcon from "../assets/SucessIcon.png";
 
 const mainDiv = {
   display: "flex",
@@ -17,25 +19,30 @@ const mainDiv = {
 
 const childrenDiv = {
   position: "relative",
-  // width: "80%",
+  display : 'flex',
+  flexDirection : 'column',
+  alignItems : "center",
+  width: 565,
   borderRadius: 8,
   backgroundColor: "white",
-  justifyContent: "center",
   padding: 16,
-  // height: "80%",
-  overflowY: "auto"
+  height: 327,
 }
 
 const Modal = (props) => {
 
-  const { openModal,width,height } = props;
+  const { openModal,width,height,header } = props;
 
   if (!openModal) return null;
 
   return (
-    <div style={mainDiv}>
-      <div style={{...childrenDiv,width:width,height:height}}>
-        {props.children}
+    <div  style={mainDiv}>
+      <div style={childrenDiv}>
+      <img src = {SucessIcon} style={{width:59,height:59,marginTop : 20}}/>
+      <p style={{fontSize:16,fontWeight:500,color:"#959595",marginTop : 20}}> Data Saved Sucessfully</p>
+      <CButton style ={{position:'absolute',bottom:10}}>
+        Ok
+      </CButton>
        
       </div>
     </div>

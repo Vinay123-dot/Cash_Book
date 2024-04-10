@@ -31,4 +31,15 @@ const HeaderSelectOptions = [
   { value: 4,label: 'Bank Deposit'}
 ];
 
-export {Options,HeaderSelectOptions};
+
+const DepositType = [
+  { label: 'Withdrawal', value: 'w0' },
+  { label: 'Deposit', value: 'd1' }
+];
+const DepostMode = [
+  { label: 'Bank', value: 'dm0' },
+  { label: 'Heade Office', value: 'dm1' }
+
+]
+const PERSIST_STORE_NAME = "quickBookRedux";
+export {Options,HeaderSelectOptions,DepositType,DepostMode,PERSIST_STORE_NAME};
