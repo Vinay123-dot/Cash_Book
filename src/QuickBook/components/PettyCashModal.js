@@ -2,7 +2,7 @@ import React from "react";
 import { Input, Select} from "antd";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import CButton from "../../ComponentsTest/Button";
+import CButton from "../../components/ui/Button";
 import { FaRupeeSign } from "react-icons/fa";
 
 const { Option } = Select;

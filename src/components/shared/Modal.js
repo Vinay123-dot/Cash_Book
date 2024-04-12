@@ -1,8 +1,6 @@
 import React from "react";
-import { btnClr } from "../commonStyles";
-import { Button } from "antd";
-import CButton from "./Button";
-import SucessIcon from "../assets/SucessIcon.png";
+import CButton from "../../components/ui/Button";
+import SucessIcon from "../../assets/SucessIcon.png";
 
 const mainDiv = {
   display: "flex",

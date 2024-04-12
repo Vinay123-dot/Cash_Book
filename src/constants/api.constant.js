@@ -1,0 +1,5 @@
+export const REQUEST_HEADER_SESSION_TOKEN = 'session-token'
+export const REQUEST_HEADER_CHANNEL = 'channel'
+export const REQUEST_HEADER_DEVICE_ID = 'device-id'
+export const REQUEST_HEADER_AUTH_TOKEN = 'auth_token'
+export const REQUEST_HEADER_CONTENT_TYPE = 'Content-Type'

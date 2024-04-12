@@ -3,7 +3,7 @@ import { Input, Select, DatePicker } from "antd";
 import { DepositType, DepostMode } from "../../Constants";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import CButton from "../../ComponentsTest/Button";
+import CButton from "../../components/ui/Button";
 import { FaRupeeSign } from "react-icons/fa";
 
 const { Option } = Select;
