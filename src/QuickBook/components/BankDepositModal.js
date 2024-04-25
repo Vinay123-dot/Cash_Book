@@ -1,130 +1,111 @@
 import React from "react";
-import { Input,Select,DatePicker } from "antd";
-import { DepositType,DepostMode } from "../../Constants";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import { DepositType, DepositMode } from "../../Constants";
+import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
-
-const { Option } = Select;
-
-const showDatePicker = (text,value,ph) => (
-    <div style={{display: "flex", flexDirection: "column", width:200}}>
-        <label htmlFor={value}>{text}</label>
-        <Field name={value} as={DatePicker} placeholder={ph} />
-        <ErrorMessage name={value} component="div" style={{ color: 'red' }} />
-    </div>
-)
-
-
-const validationSchema = Yup.object().shape({
-    depositType: Yup.string().required('Deposit type is required'),
-    date: Yup.string().required('Date is required'),
-    amount: Yup.string().required('Amount is required'),
-    remAmount: Yup.string().required('Remaining amout is required'),
-    depositMode: Yup.string().required('Deposit Mode is required'),
-});
+import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
+import AntdDatePicker from "../../components/ui/AntdDatePicker";
+import AntdInput from "../../components/ui/AntdInput";
+import { BankDepositTypeValidations } from "../../Validations";
+import { useDispatch,useSelector } from "react-redux";
+import {
+    setShowAddBookPage
+  } from '../store/stateSlice';
+import ParagraphTag from "../../constants/PTag";
 
 const initialValues = {
     depositType: null,
     date: '',
     amount: '',
     remAmount: '',
-    depositMode : ''
+    depositMode: null,
+    receiptNumber: '',
+    resAmount: '',
+    reason: ''
 };
-
-const showInputBox = (text, value, ph) => (
-    <div style={{display: "flex", flexDirection: "column", width: 200 }}>
-        <label htmlFor={value}>{text}</label>
-        <Field name={value} as={Input} placeholder={ph} />
-        <ErrorMessage name={value} component="div" style={{ color: 'red' }} />
-    </div>
-)
-
-
-
 
 const BankDepositModal = (props) => {
     const { showBankDeposit } = props;
-
+    const dispatch = useDispatch();
     if (!showBankDeposit) return null;
 
-    // const handleChange = (value) => initialValues.depositType = value;
-    const handleSelectChange = (name, value, setFieldValue) => {
-        setFieldValue(name, value);
-    };
-
-    const showSelectBox = (title, value, ph, Arr,handleChange, values, setFieldValue) => (
-        <div style={{ display: "flex", flexDirection: "column", width: 200 }}>
-            <label htmlFor={value}>{title}</label>
-            <Field name={value}>
-            {({ field }) => (
-                <Select
-                    {...field}
-                    placeholder={ph}
-                    onChange={(selectedValue) => {
-                        handleChange(value, selectedValue, setFieldValue);
-                        field.onChange(selectedValue);
-                    }}
-                >
-                    {Arr.map((eachOpt, i) => (
-                        <Option key={i} value={eachOpt.value}>
-                            {eachOpt.label}
-                        </Option>
-                    ))}
-                </Select>
-            )}
-        </Field>
-            <ErrorMessage name={value} component="div" style={{ color: 'red' }} />
-        </div>
-    )
-    
-
     const handleSubmit = (values) => {
+        console.log("submitted_values", values)
     }
-
-
 
     return (
         <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            validationSchema={BankDepositTypeValidations}
+            onSubmit={(values, { setSubmitting }) => {
+                delete values["date"];
+                handleSubmit(values)
+            }}
+            style={{ overflow: "auto" }}
         >
-            {({ isSubmitting,values,setFieldValue }) => {
-                console.log("v",values)
-                return(
-                <Form>
-                    <h1 style={{ color: "#5A87B2", marginBottom: 20 }}>Details</h1>
-                    <div className="grid xl:grid-cols-3 lg:grid-cols-3 grid-cols-1 gap-10">
-                        {
-                            showSelectBox("Type", 'depositType', "Select Type", DepositType,handleSelectChange,values, setFieldValue)
-                        }
-                        {
-                             values.depositType!= null && showDatePicker('Date','date',"Select Date" )
-                        }
-                        {
-                            values.depositType!= null && showInputBox('Amount', 'amount', "Enter Amount", true)
-                        }
-                        {
-                            values.depositType === "d1" && showSelectBox("Deposit Mode", 'depositMode', "Select Type",DepostMode )
-                        }
-                        {
-                            values.depositType!= null && showInputBox('Remaining Balance', 'remAmount', "Enter Remaining Amount", true)
-                        }
-
-                    </div>
-                    <div className="flex flex-row-reverse gap-10 mt-20 xl:absolute bottom-10 right-10">
-                        <CButton>
-                            Save
-                        </CButton>
-                        <CButton onClick={() => console.log("C")} type="cancel">
-                            Cancel
-                        </CButton>
-                    </div>
-
-                </Form>
-            )}}
-
+            {({ errors, touched, isSubmitting, setFieldValue, values }) => {
+                return (
+                    <Form>
+                         <ParagraphTag  label = "Details"/>
+                        <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                            <AntdFormikSelect
+                                labelText="Type"
+                                name="depositType"
+                                ph="Select Type"
+                                handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                Arr={DepositType}
+                            />
+                            <AntdDatePicker
+                                labelText="Date"
+                                name='date'
+                                ph="Select Date"
+                                handleChange={(name, value, dateString) => {
+                                    setFieldValue(name, value)
+                                    setFieldValue("dateString", dateString)
+                                }}
+                            />
+                            <AntdInput
+                                text={values.depositType !== "2" ? "Amount" : "Receipt Number"}
+                                value={values.depositType !== "2" ? 'amount' : 'receiptNumber'}
+                                ph={values.depositType !== "2" ? "Enter Amount" : "Enter Receipt Number"}
+                                showPrefix={values.depositType !== "2"}
+                            />
+                            {
+                                values.depositType === "1" &&
+                                <AntdFormikSelect
+                                    labelText="Deposit Mode"
+                                    name="depositMode"
+                                    ph="--- Select Deposit Mode---"
+                                    handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                    Arr={DepositMode}
+                                />
+                            }
+                            <AntdInput
+                                text={values.depositType === "2" ? "Receipt Amount" : "Remaing Amount"}
+                                value={values.depositType === "2" ? 'resAmount' : 'remAmount'}
+                                ph={values.depositType === "2" ? "Enter Receipt Amount" : "Enter Remaining Amount"}
+                                showPrefix={true}
+                            />
+                            {
+                                values.depositType === "2" &&
+                                <AntdInput
+                                text={"Reason"}
+                                value={'reason'}
+                                ph={"Enter Reason"}
+                            />
+                            }
+                            
+                        </div>
+                        <div className="relative flex flex-row-reverse gap-10 mt-20 xl:absolute bottom-10 right-10">
+                            <CButton btnType="submit">
+                                Save
+                            </CButton>
+                            <CButton onClick={() =>  dispatch(setShowAddBookPage(false))}type="cancel">
+                                Cancel
+                            </CButton>
+                        </div>
+                    </Form>
+                )
+            }}
         </Formik>
     )
 }

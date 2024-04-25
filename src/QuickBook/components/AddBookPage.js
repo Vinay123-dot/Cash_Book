@@ -6,9 +6,11 @@ import AdvanceBookModal from "./AdvanceBookModal";
 import BankDepositModal from "./BankDepositModal";
 import PettyCashModal from "./PettyCashModal";
 
+
 const AddBookPage = (props) => {
 
   const {openPage} = props;
+
   const [selectedValue, setSelectedValue] = useState(null);
   const handleChange = (value) => setSelectedValue(value);
   
@@ -30,10 +32,14 @@ const AddBookPage = (props) => {
           options={HeaderSelectOptions}
 
         />
-        <div className="flex flex-col">
+        {
+          selectedValue != 2 &&  
+          <div className="flex flex-col">
           <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
           <p>100,000,0</p>
         </div>
+        }
+        
 
       </div>
 

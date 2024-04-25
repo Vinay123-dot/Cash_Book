@@ -243,7 +243,7 @@ const DataTable = forwardRef((props, ref) => {
                     {!loading && data.length === 0 ? (
                         <Tr>
                             <Td colSpan="10">
-                                <h6 className="text-blue-600 font-medium text-center pt-2">
+                                <h6 className=" font-medium text-center pt-2" style={{ color: "#5A87B2" }}>
                                     No record found
                                 </h6>
                             </Td>

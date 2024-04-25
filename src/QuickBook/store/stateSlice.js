@@ -4,6 +4,7 @@ const stateSlice = createSlice({
     name: 'quickbookStore/state',
     initialState: {
         drawerOpen: false,
+        showAddBookPage : false,
         selectedCustomer: {},
         sortedColumn: () => {},
     },
@@ -20,6 +21,10 @@ const stateSlice = createSlice({
         setDrawerClose: (state) => {
             state.drawerOpen = false
         },
+        setShowAddBookPage : (state,action) => {
+            console.log("s",action)
+            state.showAddBookPage = action.payload;
+        }
     },
 })
 
@@ -28,6 +33,7 @@ export const {
     setDrawerOpen,
     setDrawerClose,
     setSortedColumn,
+    setShowAddBookPage
 } = stateSlice.actions
 
 export default stateSlice.reducer

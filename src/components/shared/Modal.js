@@ -1,10 +1,9 @@
 import React from "react";
-import CButton from "../../components/ui/Button";
-import SucessIcon from "../../assets/SucessIcon.png";
+
 
 const mainDiv = {
   display: "flex",
-  position: "absolute",
+  position: "fixed",
   backgroundColor: "rgba(52, 52, 52, 0.6)",
   justifyContent: "center",
   alignItems: "center",
@@ -29,19 +28,14 @@ const childrenDiv = {
 
 const Modal = (props) => {
 
-  const { openModal,width,height,header } = props;
+  const { openModal,width,height,header,children } = props;
 
   if (!openModal) return null;
 
   return (
     <div  style={mainDiv}>
       <div style={childrenDiv}>
-      <img src = {SucessIcon} style={{width:59,height:59,marginTop : 20}}/>
-      <p style={{fontSize:16,fontWeight:500,color:"#959595",marginTop : 20}}> Data Saved Sucessfully</p>
-      <CButton style ={{position:'absolute',bottom:10}}>
-        Ok
-      </CButton>
-       
+      {children}
       </div>
     </div>
 

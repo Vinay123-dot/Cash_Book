@@ -2,6 +2,7 @@
   "name": "aap_tool",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/cashbook",
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.15.3",

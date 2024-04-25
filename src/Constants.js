@@ -33,13 +33,37 @@ const HeaderSelectOptions = [
 
 
 const DepositType = [
-  { label: 'Withdrawal', value: 'w0' },
-  { label: 'Deposit', value: 'd1' }
+  { name: 'Withdrawal', id: '0' },
+  { name: 'Deposit', id: '1' },
+  { name : 'Order Cancel' ,  id : '2'}
 ];
-const DepostMode = [
-  { label: 'Bank', value: 'dm0' },
-  { label: 'Heade Office', value: 'dm1' }
+const DepositMode = [
+  { name: 'Bank', id: 'dm0' },
+  { name: 'Heade Office', id: 'dm1' }
 
 ]
+const DaysArr = [
+  { name: 'Today', value: '0' },
+  { name: 'Yesterday', value: '1' }
+]
+const SaleType = [
+  { name: 'Cash', value: '0' },
+  { name: 'Credit', value: '1' }
+]
+const PartyCode = [
+  { name: 'Walk-in', value: '0' },
+  { name: 'Dealer', value: '1' }
+]
+const PaymentsArray = [
+  { name: 'Cash', value: '0' },
+  { name: 'UPI', value: '1' },
+  { name: 'Card', value: '2' },
+  { name: 'Bank-NEFT', value: '3' },
+  { name: 'Cheque', value: '4' }
+];
+const UPIARRAY = [
+  { name: 'Swinkpay', value: '0' },
+]
 const PERSIST_STORE_NAME = "quickBookRedux";
-export {Options,HeaderSelectOptions,DepositType,DepostMode,PERSIST_STORE_NAME};
+export {Options,HeaderSelectOptions,DepositType,DepositMode,
+  PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY};

@@ -20,13 +20,14 @@ const cancelBtnStyle = {
 
 const CButton = (props) => {
     
-    const {onClick,isDisabled,className,type ="save",...rest} = props;
+    const {onClick,isDisabled,className,type ="save",btnType = "button",...rest} = props;
     
     return <button 
         style = {type != "cancel" ? {...btnStyle,...rest.style}:{...cancelBtnStyle,...rest.style}} 
         onClick = {onClick} 
         disabled = {isDisabled}
         className= {className}
+        type = {btnType}
     >
         {props.children}
     </button>

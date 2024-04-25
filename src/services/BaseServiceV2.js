@@ -23,7 +23,7 @@ const BaseServiceV2 = axios.create({
 
 BaseServiceV2.interceptors.request.use(
     (config) => {
-        const rawPersistData = sessionStorage.getItem(PERSIST_STORE_NAME)
+        const rawPersistData = localStorage.getItem(PERSIST_STORE_NAME)
         const persistData = deepParseJson(rawPersistData)
         const deviceId = persistData.auth.session.deviceId
         const token = persistData.auth.session.token
