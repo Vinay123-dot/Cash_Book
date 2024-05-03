@@ -307,17 +307,196 @@ const merchantLevelColumns = [
         enableSorting: false,
     },
     
+];
+
+
+const BankDepositColumns = [
+    {
+        header: 'Sl No',
+        accessorKey: 'terminal',
+        enableSorting: false,
+    },
+    {
+        header: 'Date',
+        accessorKey: 'orgtxnid',
+        // cell: (props) => <HandleEditInvoice row={props.row.original} />,
+        enableSorting: false,
+    },
+    {
+        header: 'Type',
+        accessorKey: 'transactionId',
+        enableSorting: false,
+    },
+    {
+        header: 'Amount',
+        accessorKey: 'amout',
+        cell: (props) => {
+            const row = props.row.original
+            // return <span>{amountFormatter(row?.amout)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Deposit Mode',
+        accessorKey: 'mosdate',
+        cell: (props) => {
+            const row = props.row.original
+            return ( "test"
+                // <span>
+                //     {getFormatDate(row?.mosdate, 'YYYY-MM-DD HH:mm:ss')}
+                // </span>
+            )
+        },
+        enableSorting: false,
+    },
+    {
+        header: "Remaining Balance",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    }
+    
+];
+
+const PettyCashColumns = [
+    {
+        header: 'Sl No',
+        accessorKey: 'terminal',
+        enableSorting: false,
+    },
+    {
+        header: 'Date',
+        accessorKey: 'Date',
+        // cell: (props) => <HandleEditInvoice row={props.row.original} />,
+        enableSorting: false,
+    },
+    {
+        header: 'Amount',
+        accessorKey: 'Amount',
+        enableSorting: false,
+    },
+    {
+        header: 'Balance',
+        accessorKey: 'Balance',
+        enableSorting: false,
+    },
+    {
+        header: "Reason",
+        accessorKey: 'Petty_Cash_Details',
+        enableSorting: false,
+    }
+    
+];
+const DayBookColumns= [
+    {
+        header: 'Sl No',
+        accessorKey: 'terminal',
+        enableSorting: false,
+    },
+    {
+        header: 'Bill No',
+        accessorKey: 'orgtxnid',
+        // cell: (props) => <HandleEditInvoice row={props.row.original} />,
+        enableSorting: false,
+    },
+    {
+        header: 'Date',
+        accessorKey: 'amout',
+        cell: (props) => {
+            const row = props.row.original
+            // return <span>{amountFormatter(row?.amout)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Party Code',
+        accessorKey: 'mosdate',
+        cell: (props) => {
+            const row = props.row.original
+            return ( "test"
+                // <span>
+                //     {getFormatDate(row?.mosdate, 'YYYY-MM-DD HH:mm:ss')}
+                // </span>
+            )
+        },
+        enableSorting: false,
+    },
+    {
+        header: "Bill Value",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    },
+    {
+        header: 'Cash',
+        accessorKey: 'terminal',
+        enableSorting: false,
+    },
+    {
+        header: 'UPI Type',
+        accessorKey: 'orgtxnid',
+        // cell: (props) => <HandleEditInvoice row={props.row.original} />,
+        enableSorting: false,
+    },
+    {
+        header: 'UPI Amount',
+        accessorKey: 'amout',
+        cell: (props) => {
+            const row = props.row.original
+            // return <span>{amountFormatter(row?.amout)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Card',
+        accessorKey: 'mosdate',
+        cell: (props) => {
+            const row = props.row.original
+            return ( "test"
+                // <span>
+                //     {getFormatDate(row?.mosdate, 'YYYY-MM-DD HH:mm:ss')}
+                // </span>
+            )
+        },
+        enableSorting: false,
+    },
+    {
+        header: "Bank",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    },
+    {
+        header: "Advanced Receipt No.",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    },
+    {
+        header: "Advanced Receipt Amount",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    },
+    {
+        header: "Pending Bill",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    }
+    
 ]
 
 const QuickBookTable = () => {
     let userType = localStorage.getItem("mType");
     const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
+    const data = useSelector((state) => state.quickbookStore.data.transactionList);
 
     console.log("CashBook",cashbookData);
-    console.log("userType",userType)
+    console.log("userType",userType, "d",data)
     // const dispatch = useDispatch()
     // const loading = useSelector((state) => state.transactions.data.loading)
-    // const data = useSelector((state) => state.transactions.data.transactionList)
+    // 
     // const totalRecords = useSelector(
     //     (state) => state.transactions.data.totalRecords
     // )
@@ -346,13 +525,19 @@ const QuickBookTable = () => {
         // dispatch(getTransactions(payload))
     }
     const getTableColumns = (uType,cbData) => {
+        console.log("Cb",cbData)
         return (uType=== "4" || cbData?.book_type === 5)?merchantLevelColumns:
-            terminalLevelColumns;
+            cbData?.book_type === 1 ? "advanceBook":
+            cbData?.book_type === 2 ? BankDepositColumns :
+            cbData?.book_type === 3 ? DayBookColumns :
+            cbData?.book_type === 4 ? PettyCashColumns : terminalLevelColumns
+            
     }
+    console.log("DATA",data)
     return (
         <>
             <DataTable
-                columns={getTableColumns(userType,cashbookData)}
+                columns={PettyCashColumns}
                 data={[]}
                 // pagingData={{
                 //     pageIndex: pageNumber + 1,
