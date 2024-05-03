@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Select, Input } from 'antd';
-import { Options } from "../../Constants";
+import {Input } from 'antd';
 import CButton from "../../components/ui/Button";
-// import Input from "../../components/ui/Input";
 import AntdSelectFilter from "../../components/ui/AntdSelect/AntdSelect";
 import { viewBtnPrefix, dwnBtnPrefix, searchPrefix } from "../../Prefixes/QuickBookToolsPrefix";
 import useTransactionUpdate from "../../utils/hooks/useTransactionUpdate";
@@ -15,28 +13,43 @@ import {
 } from '../store/dataSlice';
 import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
-import { CashBookFilter, TimePeriod } from "../../constants/options.constant";
-
-
-
-
+import { apiGetBookTypeInfo, apiGetDayInfo } from "../../services/TransactionService";
 
 const QuickBookTools = () => {
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { getTerminalList } = useTransactionUpdate();
 
   const [outletList, setOutletList] = useState([]);
-  let userType = localStorage.getItem("mType");
+  const [daysList,setDaysList] = useState([]);
+  const[bookTypeList,setBookTypeList] = useState([]);
   const tableData = useSelector((state) => state.quickbookStore.data.tableData);
   const filterData = useSelector((state) => state.quickbookStore.data.filterData);
-  const outletData = useSelector((state) => state.quickbookStore.data.outletData);
+  // const outletData = useSelector((state) => state.quickbookStore.data.outletData);
   const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
+  let userType = localStorage.getItem("mType");
 
-console.log("CASHBook",cashbookData)
+
   useEffect(() => {
     userType === '4' && getOutletsList();
+    getBookTypeInfo();
+    getDayInfo();
   }, [userType]);
+
+  
+  const getBookTypeInfo = async() => {
+    try{
+      let response = await apiGetBookTypeInfo();
+      setBookTypeList(response?.data || []);
+    }catch(e){}
+  }
+
+  const getDayInfo = async() => {
+    try{
+      let response = await apiGetDayInfo();
+      setDaysList(response?.data || []);
+    }catch(e){}
+  }
 
   const getOutletsList = async () => {
     let options = [{ value: 0, label: "All" }];
@@ -49,28 +62,33 @@ console.log("CASHBook",cashbookData)
 
 
   const handleView = async () => {
-    const payload = cloneDeep(tableData)
+    const payload = cloneDeep(tableData);
+    console.log("pp",payload)
+  
     // if (payload?.historyType <= 0) {
     //     setMessage('Please select duration')
     //     return
     // }
-    const newTableData = cloneDeep(payload)
-    const newFilterData = cloneDeep(filterData)
-    const newOutletData = cloneDeep(outletData)
-    
-    dispatch(getTransactions({ ...newTableData, ...newFilterData, ...newOutletData }))
+    const newTableData = cloneDeep(payload);
+    const newFilterData = cloneDeep(filterData);
+    const newCashBookData = cloneDeep(cashbookData);
+    // const newOutletData = cloneDeep(outletData);
+    let bookTypeInStrng = bookTypeList.find((eachDoc)=>eachDoc.Id === newCashBookData.book_type);
+
+    // dispatch(getTransactions({ ...newTableData, ...newFilterData, ...newOutletData }))
+    dispatch(getTransactions({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type}));
   }
-  const handleInputChange = (e) => {
-    const {value : val} = e.target;
-    const newTableData = cloneDeep(tableData)
-    newTableData.searchData = val
-    if (typeof val === 'string' && val.length > 1) {
-      dispatch(setTableData(newTableData))
-    }
-    if (typeof val === 'string' && val.length === 0) {
-      dispatch(setTableData(newTableData))
-    }
-  }
+  // const handleInputChange = (e) => {
+  //   const {value : val} = e.target;
+  //   const newTableData = cloneDeep(tableData)
+  //   newTableData.searchData = val
+  //   if (typeof val === 'string' && val.length > 1) {
+  //     dispatch(setTableData(newTableData))
+  //   }
+  //   if (typeof val === 'string' && val.length === 0) {
+  //     dispatch(setTableData(newTableData))
+  //   }
+  // }
 
   // const handleDateChange = (val) => {
   //   const newTableData = cloneDeep(tableData)
@@ -87,25 +105,25 @@ console.log("CASHBook",cashbookData)
     newTableData.pageNumber = 0;
     dispatch(setTableData(newTableData));
     const newFilterData = cloneDeep(filterData);
-    newFilterData.status = val
+    newFilterData.history_type = val;
     dispatch(setFilterData(newFilterData))
   }
 
-  const handleOutletStatusChange = (val) => {
-    const newTableData = cloneDeep(tableData);
-    newTableData.pageNumber = 0;
-    dispatch(setTableData(newTableData));
-    const newOutletData = cloneDeep(outletData);
-    newOutletData.terminalID = val;
-    dispatch(setOutletData(newOutletData));
-  }
+  // const handleOutletStatusChange = (val) => {
+  //   const newTableData = cloneDeep(tableData);
+  //   newTableData.pageNumber = 0;
+  //   dispatch(setTableData(newTableData));
+  //   const newOutletData = cloneDeep(outletData);
+  //   newOutletData.terminalID = val;
+  //   dispatch(setOutletData(newOutletData));
+  // }
 
   const handleCashBookChange = (val) => {
     const newTableData = cloneDeep(tableData);
     newTableData.pageNumber = 0;
     dispatch(setTableData(newTableData));
     const newCashbookData = cloneDeep(cashbookData);
-    newCashbookData.cId = val;
+    newCashbookData.book_type = val;
     dispatch(setCashBookData(newCashbookData));
   }
 
@@ -131,7 +149,7 @@ console.log("CASHBook",cashbookData)
   //   }
   //   const newTableData = cloneDeep(payload)
   //   const newFilterData = cloneDeep(filterData)
-  //   const newOutletData = cloneDeep(outletData)
+  //   // const newOutletData = cloneDeep(outletData)
   //   dispatch(getTransactions({ ...newTableData, ...newFilterData, ...newOutletData }))
   // }
 
@@ -141,21 +159,21 @@ console.log("CASHBook",cashbookData)
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"
-            options={CashBookFilter}
+            options={bookTypeList}
             onStatusChange={handleCashBookChange}
-            value = {cashbookData.cId}
+            value = {cashbookData.book_type}
           />
         </div>
 
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Duration"
-            options={TimePeriod}
+            options={daysList}
             onStatusChange={handleTimeperiodChange}
-            value = {filterData.status}
+            value = {filterData.history_type}
           />
         </div>
-        {
+        {/* {
           userType === "4" &&
           <div className="flex flex-col">
             <AntdSelectFilter
@@ -165,13 +183,13 @@ console.log("CASHBook",cashbookData)
               value = {outletData.terminalID}
             />
           </div>
-        }
+        } */}
         <div className="flex flex-col">
           <Input
             prefix={searchPrefix}
             placeholder="Search"
             className="w-full md:w-44"
-            onChange = {handleInputChange}
+            // onChange = {handleInputChange}
           />
         </div>
       </div>

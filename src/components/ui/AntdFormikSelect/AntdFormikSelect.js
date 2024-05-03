@@ -5,7 +5,7 @@ import { Field, ErrorMessage } from "formik";
 const { Option } = Select;
 
 const AntdFormikSelect = (props) => {
-    const {labelText,name,ph,handleChange,Arr,error,validation = false,validateField} = props;
+    const {labelText,name,ph,handleChange,Arr,error,validation = false,validateField,key} = props;
 
     if(Arr.length === 0) return null;
     return (
@@ -15,6 +15,7 @@ const AntdFormikSelect = (props) => {
                 name={name} 
                 error={error}
                 validate = {validation && validateField}
+                key = {key}
             >
                 {({ field }) => (
                     <Select
@@ -25,8 +26,8 @@ const AntdFormikSelect = (props) => {
                         }}
                     >
                         {(Arr || []).map((eachOpt, i) => (
-                            <Option key={i} value={eachOpt.id}>
-                                {eachOpt.name || eachOpt.category || eachOpt.value}
+                            <Option key={i} value={eachOpt.id || eachOpt.Id}>
+                                {eachOpt.name || eachOpt.category || eachOpt.value || eachOpt.Type}
                             </Option>
                         ))}
                     </Select>

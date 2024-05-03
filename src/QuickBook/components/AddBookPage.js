@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import { useDispatch,useSelector } from "react-redux";
 import { Select } from "antd";
 import { HeaderSelectOptions } from "../../Constants";
 import DayBookModal from "./DayBookModal";
 import AdvanceBookModal from "./AdvanceBookModal";
 import BankDepositModal from "./BankDepositModal";
 import PettyCashModal from "./PettyCashModal";
+import { apiGetPettyCashCommonBalance } from "../../services/TransactionService";
+import { getToday } from "../../utils/dateFormatter";
+import {
+  setPettyCashBalance
+} from '../store/stateSlice';
 
 
 const AddBookPage = (props) => {
@@ -13,8 +19,30 @@ const AddBookPage = (props) => {
 
   const [selectedValue, setSelectedValue] = useState(null);
   const handleChange = (value) => setSelectedValue(value);
+  const dispatch = useDispatch();
+  const pettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+  const bankBalance = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+
+
+
+  useEffect(() => {
+    getPettyCashCommBalance();
+},[])
+
+const getPettyCashCommBalance = async() => {
+    try{
+        let today_date = getToday();
+        let response = await apiGetPettyCashCommonBalance(today_date);
+        dispatch(setPettyCashBalance(response?.opening_balance));
+        // setPettyCash(response?.opening_balance);
+    }catch(e){
+
+    }
+}
   
   if(!openPage) return null;
+
+  const handleCancelSelectedVal = () => setSelectedValue(null);
 
   return (
     <div className="fixed inset-0 flex  flex-col  z-50" style={{ backgroundColor: "#e5e7eb" }}>
@@ -33,22 +61,27 @@ const AddBookPage = (props) => {
 
         />
         {
-          selectedValue != 2 &&  
+          selectedValue === 3 &&  
           <div className="flex flex-col">
           <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
-          <p>100,000,0</p>
+          <p>{pettyCash}</p>
         </div>
         }
-        
-
+        {
+          selectedValue === 4 &&  
+          <div className="flex flex-col">
+          <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
+          <p>{bankBalance}</p>
+        </div>
+        }
       </div>
 
       <div className="w-100 h-full bg-white rounded-lg relative mx-3 mb-3 overflow-y-auto" >
  
-        <PettyCashModal showPettyCash = {selectedValue === 3}/>
-        <BankDepositModal showBankDeposit = {selectedValue === 4}/>
-        <AdvanceBookModal showAdvanceBook = {selectedValue === 2}/>
-        <DayBookModal  showDaybookModal = {selectedValue === 1}/>
+        <PettyCashModal showPettyCash = {selectedValue === 3} onCancel ={handleCancelSelectedVal}/>
+        <BankDepositModal showBankDeposit = {selectedValue === 4} onCancel ={handleCancelSelectedVal}/>
+        <AdvanceBookModal showAdvanceBook = {selectedValue === 2} onCancel ={handleCancelSelectedVal}/>
+        <DayBookModal  showDaybookModal = {selectedValue === 1} onCancel ={handleCancelSelectedVal}/>
 
       </div>
 

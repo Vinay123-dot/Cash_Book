@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
@@ -7,42 +7,83 @@ import { DaysArr } from "../../Constants";
 import CustomizedTable from "../../components/ui/CustomizedTable";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    setShowAddBookPage
+    setShowAddBookPage,
+    setDataSavedModal
 } from '../store/stateSlice';
 import Modal from "../../components/shared/Modal";
 import { PettyCashValidations } from "../../Validations";
 import ParagraphTag from "../../constants/PTag";
+import { apiStorePettyCashInfo } from "../../services/TransactionService";
 
 const initialValues = {
-    seelctedDay: null,
-    remAmount: '',
+    id : 0,
+    date: null,
+    balance: '',
     amount: '',
-    reason: '',
+    petty_cash_details: '',
 };
 
 const columns = [
     {id:"day",name:"Day"},
     {id:"amount",name:"Amount"},
-    {id:"remAmount",name:"Remaining Amount"},
-    {id:"reason",name:"Reason"},
+    {id:"balance",name:"Remaining Amount"},
+    {id:"petty_cash_details",name:"Reason"},
     {id:"actions",name:"Actions"},
-]
+];
 
+const ShowInputBoxInPC = (label,value,ph,disableInput = false,isShowPrefix = true,showOnlyNumbers = true) => (
+    <AntdInput
+        text = {label}
+        value = {value}
+        ph = {ph}
+        disableInput = {disableInput}
+        showPrefix={isShowPrefix}
+        acceptOnlyNum={showOnlyNumbers}
+    />
+)
 
 const PettyCashModal = (props) => {
+
+    const { showPettyCash,onCancel } = props;
     const dispatch = useDispatch();
-    const { showPettyCash } = props;
+    const editFormikRef = useRef();
+    
     const [pettyCashArr, setPettyCashArr] = useState([]);
-    const [hasClickedPCBtn, setHasClickedPCBtn] = useState(false);
     const [selectObjDetails,setSelectedObjDetails] = useState({
         showModal : false,selectedObj:{}
     })
-  
+    const pettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+
     if (!showPettyCash) return null;
 
-    const handleSubmit = (values) => {
-        delete values["date"];
-        console.log("v", values)
+    const handleSubmit = async(values,setErrors,resetForm) => {
+        console.log("INHANDLESUBMT");
+        const {date,balance,amount,petty_cash_details} = values;
+        let isAllValuesPresent = date && balance && amount && petty_cash_details ;
+        values.amount = Number(values.amount);
+        if(isAllValuesPresent) {
+            setPettyCashArr((prev) => [...prev, values]); 
+            setErrors({});
+            setTimeout(() => {
+                console.log("TestTImeout")
+                resetForm();
+            }, 0);
+         }
+      
+    }
+
+    const handleSavePettyCash = async() => {
+        if(pettyCashArr?.length <= 0) {
+            console.log("NO PETTYCASH");
+            return ;
+        }
+        let response = await apiStorePettyCashInfo(pettyCashArr);
+        if(response.message){
+            dispatch(setShowAddBookPage(false));
+            onCancel();
+            dispatch(setDataSavedModal(true));
+            
+        }
     }
    
     const handleEditClick = (key,obj) => {
@@ -67,81 +108,74 @@ const PettyCashModal = (props) => {
         pettyCashArr[val.key] = val;
         setPettyCashArr(pettyCashArr);
     }
-    
+
+    const getButtonStatus = (pArr) => pArr.length <= 0 ? true : false;
+
     return ( <>
         <Formik
             initialValues={initialValues}
             validationSchema={PettyCashValidations}
-            onSubmit={(values, { setSubmitting, resetForm }) => {
-                console.log("isP",hasClickedPCBtn);
-                !hasClickedPCBtn && handleSubmit(values);
+            onSubmit={(values, { setSubmitting,setErrors,resetForm }) => {
+                console.log("IN OnSumbit")
+                handleSubmit(values,setErrors,resetForm);
             }}
             style={{ overflow: "auto" }}
         >
-            {({ setFieldValue, values, resetForm}) => (
+            {({ setFieldValue, values,errors,setErrors}) => {
+                // console.log("erros",errors);
+                values.balance = pettyCash - Number(values.amount)
+                return(
                 <Form>
                     <ParagraphTag  label = "Details"/>
                     <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
                         <AntdFormikSelect
-                            labelText="Type"
-                            name="seelctedDay"
+                            labelText="Day"
+                            name="date"
                             ph="--- Select Day ---"
                             handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                             Arr={DaysArr}
                         />
-                        <AntdInput
-                            text="Amount"
-                            value='amount'
-                            ph="Enter Amount"
-                            showPrefix={true}
-                            acceptOnlyNum = {true}
-                        />
-                        <AntdInput
-                            text=" Remaing Amount"
-                            value='remAmount'
-                            ph="Enter Remaining Amount"
-                            showPrefix={true}
-                            acceptOnlyNum = {true}
-                        />
-
-                        <AntdInput
-                            text="Reason"
-                            value='reason'
-                            ph="Enter Reason"
-                        />
+                        {
+                            ShowInputBoxInPC("Amount",'amount',"Enter Amount")
+                        }
+                        {
+                            ShowInputBoxInPC("Remaing Amount",'balance',"Enter Remaining Amount",true)
+                        }
+                        {
+                            ShowInputBoxInPC("Reason","petty_cash_details","Enter Reason",false,false,false)
+                        }
                         <div className="flex flex-col w-full md:w-60 py-7">
-                            <CButton btnType="submit" onClick={() => {
-                                const {seelctedDay,remAmount,amount,reason} = values;
-                                setHasClickedPCBtn(true);
-                                if(seelctedDay && remAmount && amount && reason) {
-                                    setPettyCashArr((prev) => [...prev, values]); 
-                                    resetForm();
-                                }
-                            }}>
+                            <CButton btnType="submit">
                                 Add
                             </CButton>
-
                         </div>
-
-
                     </div>
-                    <hr style={{ border: "5px solid #F4F6F9" }} />
-                    <p className="font-roboto text-lg font-medium leading-6 tracking-wide text-left px-4 pt-2 px-4 pt-2" style={{ color: "#5A87B2" }}>
-                        Details list
-                    </p>
+                   
+
+                </Form>
+                
+            )}}
+        </Formik>
+        <hr style={{ border: "5px solid #F4F6F9" }} />
+                    <ParagraphTag  label ="Details list"/>
+                    <div className="mb-10">
                     <CustomizedTable 
                         data = {pettyCashArr} 
                         columns = {columns}
                         handleEditClick = {handleEditClick}
                         handleDeleteClick = {handleDeleteClick}
                     />
-
-                    <div className=" relative flex flex-row-reverse gap-10  bottom-5 right-10">
-                        <CButton btnType="submit" >
+                    </div>
+                 
+                       <div className=" relative flex flex-row-reverse gap-10  bottom-5 right-10">
+                        <CButton 
+                            onClick ={handleSavePettyCash} 
+                            isDisabled={getButtonStatus(pettyCashArr)}>
                             Save
                         </CButton>
                         <CButton onClick={() => {
-                                setHasClickedPCBtn(false);
+                                setPettyCashArr([]);
+                                onCancel();
                                 dispatch(setShowAddBookPage(false))}
                             } 
                             type="cancel"
@@ -149,16 +183,15 @@ const PettyCashModal = (props) => {
                             Cancel
                         </CButton>
                     </div>
+        
 
-                </Form>
-            )}
-        </Formik>
+     
         <Modal openModal = {selectObjDetails.showModal}>
         <Formik
             initialValues={selectObjDetails.selectedObj}
             validationSchema={PettyCashValidations}
+            innerRef={editFormikRef}
             onSubmit={(values, { setSubmitting, resetForm }) => {
-                console.log("isP",hasClickedPCBtn);
                 handleEditDetails(values)
             }}
             style={{ overflow: "auto",position:"relative" }}
@@ -169,7 +202,7 @@ const PettyCashModal = (props) => {
                     <div className="grid grid-cols-2 px-4 py-2 gap-10">
                         <AntdFormikSelect
                             labelText="Type"
-                            name="seelctedDay"
+                            name="date"
                             ph="--- Select Day ---"
                             handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                             Arr={DaysArr}
@@ -183,7 +216,7 @@ const PettyCashModal = (props) => {
                         />
                         <AntdInput
                             text=" Remaing Amount"
-                            value='remAmount'
+                            value='balance'
                             ph="Enter Remaining Amount"
                             showPrefix={true}
                             acceptOnlyNum = {true}
@@ -191,17 +224,16 @@ const PettyCashModal = (props) => {
 
                         <AntdInput
                             text="Reason"
-                            value='reason'
+                            value='petty_cash_details'
                             ph="Enter Reason"
                         />
                     </div>
 
                     <div className=" absolute flex flex-row-reverse gap-10  bottom-5 right-5">
-                        <CButton btnType="submit" >
+                        <CButton btnType="submit" onClick = {() => console.log("CAncel")}>
                             Save
                         </CButton>
                         <CButton onClick={() => {
-                                setHasClickedPCBtn(false);
                                 dispatch(setShowAddBookPage(false))}
                             } 
                             type="cancel"

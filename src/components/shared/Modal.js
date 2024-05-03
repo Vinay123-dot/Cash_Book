@@ -19,22 +19,22 @@ const childrenDiv = {
   display : 'flex',
   flexDirection : 'column',
   alignItems : "center",
-  width: 565,
+  // width: 565,
   borderRadius: 8,
   backgroundColor: "white",
   padding: 16,
-  height: 327,
+  // height: 327,
 }
 
 const Modal = (props) => {
 
-  const { openModal,width,height,header,children } = props;
+  const { openModal,width = 565,height = 327,header,children } = props;
 
   if (!openModal) return null;
 
   return (
     <div  style={mainDiv}>
-      <div style={childrenDiv}>
+      <div style={{...childrenDiv,width:width,height:height}}>
       {children}
       </div>
     </div>

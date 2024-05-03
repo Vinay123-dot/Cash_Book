@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useRef } from 'react'
 import DataTable from '../../components/shared/DataTable'
+import { useSelector } from 'react-redux'
 
 
 // const columns = [
@@ -108,9 +109,109 @@ import DataTable from '../../components/shared/DataTable'
 //     },    
     
 // ]
-const dayBookColumns = [
+const terminalLevelColumns = [
     {
         header: 'Sl No',
+        accessorKey: 'terminal',
+        enableSorting: false,
+    },
+    {
+        header: 'Bill No.',
+        accessorKey: 'orgtxnid',
+        // cell: (props) => <HandleEditInvoice row={props.row.original} />,
+        enableSorting: false,
+    },
+    {
+        header: 'Date',
+        accessorKey: 'transactionId',
+        enableSorting: false,
+    },
+    {
+        header: 'Party Code',
+        accessorKey: 'amout',
+        cell: (props) => {
+            const row = props.row.original
+            // return <span>{amountFormatter(row?.amout)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Bill Value',
+        accessorKey: 'mosdate',
+        cell: (props) => {
+            const row = props.row.original
+            return ( "test"
+                // <span>
+                //     {getFormatDate(row?.mosdate, 'YYYY-MM-DD HH:mm:ss')}
+                // </span>
+            )
+        },
+        enableSorting: false,
+    },
+    {
+        header: "Cash",
+        accessorKey: 'action',
+        cell: (props) =>  props?.row?.original?.cName || "--",
+        enableSorting: false,
+    },
+    {
+        header: 'UPI Type',
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    
+    {
+        header: () => (
+                <span>
+                    UPI <br/>
+                    Amount
+                </span>
+        ),
+        accessorKey: 'description',
+        enableSorting: false,
+    },    
+    {
+        header: 'Card',
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    {
+        header: 'Bank',
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    
+    {
+        header: () => (
+            <span>
+                Advanced <br/>
+                Receipt No.
+            </span>
+        ),
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    {
+        header: () => (
+            <span>
+                Advanced <br/>
+                Receipt Amount
+            </span>
+        ),
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    {
+        header: 'Pending Bill',
+        accessorKey: 'description',
+        enableSorting: false,
+    },
+    
+];
+
+const merchantLevelColumns = [
+    {
+        header: 'Sl No11',
         accessorKey: 'terminal',
         enableSorting: false,
     },
@@ -209,6 +310,11 @@ const dayBookColumns = [
 ]
 
 const QuickBookTable = () => {
+    let userType = localStorage.getItem("mType");
+    const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
+
+    console.log("CashBook",cashbookData);
+    console.log("userType",userType)
     // const dispatch = useDispatch()
     // const loading = useSelector((state) => state.transactions.data.loading)
     // const data = useSelector((state) => state.transactions.data.transactionList)
@@ -239,10 +345,14 @@ const QuickBookTable = () => {
         // dispatch(setTableData(payload1))
         // dispatch(getTransactions(payload))
     }
+    const getTableColumns = (uType,cbData) => {
+        return (uType=== "4" || cbData?.book_type === 5)?merchantLevelColumns:
+            terminalLevelColumns;
+    }
     return (
         <>
             <DataTable
-                columns={dayBookColumns}
+                columns={getTableColumns(userType,cashbookData)}
                 data={[]}
                 // pagingData={{
                 //     pageIndex: pageNumber + 1,

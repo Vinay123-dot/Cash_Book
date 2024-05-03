@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CButton from "../../components/ui/Button";
 import AddBookPage from "./AddBookPage";
 import Modal from "../../components/shared/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    setShowAddBookPage
+    setShowAddBookPage,
+    setDataSavedModal,
+    setCommonCashBalance,
 } from '../store/stateSlice';
 import SucessIcon from "../../assets/SucessIcon.png";
+import { apiGetCommonOpeningBalance } from "../../services/TransactionService";
 
 const Header = () => {
 
@@ -15,16 +18,29 @@ const Header = () => {
     const handleClick = () => setShowModal(!showModal);
     let userType = localStorage.getItem("mType");
     const totalTxn = useSelector(state => state.quickbookStore.data.totalTxn)
-    const showAddBookPage = useSelector(state => state.quickbookStore.state.showAddBookPage)
+    const showDataSavedModal = useSelector(state => state.quickbookStore.state.dataSavedModalOpen)
+    const showAddBookPage = useSelector(state => state.quickbookStore.state.showAddBookPage);
+    const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
 
-    // const totalTxn = useSelector(state => state)
-    // console.log("TT",totalTxn)
+    useEffect(() => {
+        getCommonOpeningBalance();
+    },[])
+    console.log("dataSavedModalOpen..",showDataSavedModal)
+
+    const getCommonOpeningBalance = async() => {
+        try{
+            let response = await apiGetCommonOpeningBalance();
+            dispatch(setCommonCashBalance(response?.opening_balance));
+        }catch(e){
+
+        }
+    }
 
     return (
         <>
             <div className="flex flex-col lg:ml-32 xl:ml-0">
                 <label className="text-lg font-medium tracking-wide mb-1 opBalance">Opening Balance</label>
-                <h4 className="text-2xl">₹ 100,000,0</h4>
+                <h4 className="text-2xl">₹{commOpeningBal}</h4>
             </div>
             {
                 userType === "7" &&
@@ -34,10 +50,13 @@ const Header = () => {
             }
 
             <AddBookPage openPage={showAddBookPage} />
-            <Modal>
+            <Modal openModal= {showDataSavedModal} height = {250} width={350}>
                 <img src={SucessIcon} style={{ width: 59, height: 59, marginTop: 20 }} />
                 <p style={{ fontSize: 16, fontWeight: 500, color: "#959595", marginTop: 20 }}> Data Saved Sucessfully</p>
-                <CButton style={{ position: 'absolute', bottom: 10 }}>
+                <CButton 
+                    onClick={() => dispatch(setDataSavedModal(false))}
+                    style={{ position: 'absolute', bottom: 20 }}
+                >
                     Ok
                 </CButton>
 

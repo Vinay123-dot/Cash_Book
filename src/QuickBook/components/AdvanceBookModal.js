@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DepositType, DepositMode } from "../../Constants";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
@@ -11,6 +11,7 @@ import {
     setShowAddBookPage
   } from '../store/stateSlice';
   import ParagraphTag from "../../constants/PTag";
+import { apiGetBookTypeInfo, apiGetCustomerTypeInfo, apiGetPaymentTypeInfo } from "../../services/TransactionService";
 
 
 const initialValues = {
@@ -27,11 +28,37 @@ const initialValues = {
 const AdvanceBookModal = (props) => {
     const { showAdvanceBook } = props;
     const dispatch = useDispatch();
-    if (!showAdvanceBook) return null;
+    const [paymentType,setPaymentType] = useState([]);
+    const[customerType,setCustomerType] = useState([]);
 
-    const handleSubmit = (values) => {
+     const handleSubmit = (values) => {
         console.log("v", values)
     }
+
+    useEffect(() => {
+        getCustomerType();
+        getPaymentType();
+    },[])
+    const getCustomerType = async() => {
+        try{
+            let cType = await apiGetCustomerTypeInfo();
+            setCustomerType(cType?.data || []);
+
+        }catch(e){
+
+        }
+    }
+    const getPaymentType = async() => {
+        try{
+            let pType = await apiGetPaymentTypeInfo();
+            setPaymentType(pType?.data || []);
+        }catch(e){
+
+        }
+    }
+
+
+    if (!showAdvanceBook) return null;
 
     return (
         <Formik
@@ -70,7 +97,7 @@ const AdvanceBookModal = (props) => {
                                 name="depositMode"
                                 ph="Select Type"
                                 handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                Arr={DepositMode}
+                                Arr={customerType}
                                 error={errors.depositMode && touched.depositMode}
                             />
 
@@ -102,7 +129,7 @@ const AdvanceBookModal = (props) => {
                             name="depositType"
                             ph="Select Type"
                             handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                            Arr={DepositType}
+                            Arr={paymentType}
                             error={errors.depositType && touched.depositType}
                         />
                         </div>

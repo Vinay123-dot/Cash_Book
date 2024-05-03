@@ -1,3 +1,4 @@
+import { getToday,getYesterDay } from "./utils/dateFormatter";
 const Options = [
     {
       value: '1',
@@ -43,8 +44,8 @@ const DepositMode = [
 
 ]
 const DaysArr = [
-  { name: 'Today', value: '0' },
-  { name: 'Yesterday', value: '1' }
+  { Type: 'Today', Id: getToday() },
+  { Type: 'Yesterday', Id: getYesterDay() }
 ]
 const SaleType = [
   { name: 'Cash', value: '0' },
@@ -65,5 +66,6 @@ const UPIARRAY = [
   { name: 'Swinkpay', value: '0' },
 ]
 const PERSIST_STORE_NAME = "quickBookRedux";
+
 export {Options,HeaderSelectOptions,DepositType,DepositMode,
   PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY};

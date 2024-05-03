@@ -1,5 +1,5 @@
 const appConfig = {
-    apiPrefix: 'https://sandbox.swinkpay-fintech.com/api', //merchants
+    apiPrefix: 'https://web.rampeylabs.com/api/', //merchants
     authenticatedEntryPath: '/transactions',
     unAuthenticatedEntryPath: '/signin',
     tourPath: '/',

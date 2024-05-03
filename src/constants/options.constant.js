@@ -9,10 +9,10 @@ const CashBookFilter = [
 const TimePeriod = [
     { value: 1, label: 'Today' },
     { value: 2, label: 'Yesterday' },
-    { value: 4, label: 'This Week' },
-    { value: 3, label: 'This Month' },
-    { value: 5, label: 'This Year' },
-    { value: 6, label: 'Custom Range' },
+    // { value: 4, label: 'This Week' },
+    // { value: 3, label: 'This Month' },
+    // { value: 5, label: 'This Year' },
+    // { value: 6, label: 'Custom Range' },
 ]
 
 export {CashBookFilter,TimePeriod};

@@ -1,6 +1,6 @@
 import React from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
-
+import { DaysArr } from "../../../Constants";
 
 const tableStyle = {
     borderCollapse: 'collapse',
@@ -15,9 +15,13 @@ const thTdStyle = {
 const CTable = (props) => {
     const { columns, data,handleEditClick,handleDeleteClick } = props;
 
+    const getSelectedDay = (selectedVal) => {
+       let res = DaysArr.find((eachDoc)=> eachDoc.Id === selectedVal);
+       return res?.Type;
+    }
    
     return (
-        <div className="w-full px-5 h-[300px]">
+        <div className = "w-full px-5 min-h-[80px] h-full">
 
             <table style={tableStyle}>
                 <thead>
@@ -33,10 +37,10 @@ const CTable = (props) => {
                     {
                         (data || []).map((eachDoc,index) => (
                             <tr>
-                                <td style={thTdStyle} key={eachDoc.seelctedDay}>{eachDoc.seelctedDay}</td>
-                                <td style={thTdStyle} key={eachDoc.remAmount}>{eachDoc.remAmount}</td>
+                                <td style={thTdStyle} key={eachDoc.date}>{getSelectedDay(eachDoc.date)}</td>
+                                <td style={thTdStyle} key={eachDoc.balance}>{eachDoc.balance}</td>
                                 <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.amount}</td>
-                                <td style={thTdStyle} key={eachDoc.reason}>{eachDoc.reason}</td>
+                                <td style={thTdStyle} key={eachDoc.petty_cash_details}>{eachDoc.petty_cash_details}</td>
                                 <td style={thTdStyle}>
                                     <button>
                                         <AiOutlineEdit 

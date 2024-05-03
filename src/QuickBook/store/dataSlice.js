@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { apiGetTransactions } from '../../services/TransactionService';
+import { apiGetBookTypeServices } from '../../services/TransactionService';
 import { getFromDate, getToDate } from "../../utils/dateFormatter";
 import deepParseJson from '../../utils/deepParseJson';
 import { PERSIST_STORE_NAME } from '../../Constants';
@@ -16,47 +16,49 @@ historyType = persistData?.auth?.session?.transactions
 export const getTransactions = createAsyncThunk(
     'quickbook/data/getTransactions',
     async (data) => {
-        let temp = {
-            fromDate : "2024-4-10 0:00:00",
-            historyType : 5,
-            pageNumber  : 0,
-            recordsPerPage :10,
-            searchData : "",
-            sort : 1,
-            status : -1,
-            terminalID : 0,
-            toDate : "2024-4-10 23:59:59",
-            type : 0
-        }
-        const response = await apiGetTransactions(temp)
-        console.log("res",response);
-        return response.data.data
+        console.log("DATA",data)
+        // let temp = {
+        //     fromDate : "2024-4-10 0:00:00",
+        //     historyType : 5,
+        //     pageNumber  : 0,
+        //     recordsPerPage :10,
+        //     searchData : "",
+        //     sort : 1,
+        //     status : -1,
+        //     terminalID : 0,
+        //     toDate : "2024-4-10 23:59:59",
+        //     type : 0
+        // }
+        const response = await apiGetBookTypeServices(data);
+        console.log("OUTPUT,,",response)
+        return response.data;
     }
 )
 
 export const initialTableData = {
-    type: 0,
-    historyType: historyType,
-    pageNumber: 0,
-    recordsPerPage: 10,
-    searchData: '',
-    sort: 1,
-    cId : 1,
-    terminalID : 0,
-    fromDate: getFromDate(),
-    toDate: getToDate(),
+    // type: 0,
+    // history_type: historyType,
+    history_type: 0,
+    // pageNumber: 0,
+    // recordsPerPage: 10,
+    // searchData: '',
+    // sort: 1,
+    book_type : 0,
+    // terminalID : 0,
+    // fromDate: getFromDate(),
+    // toDate: getToDate(),
 }
 
 export const initialFilterData = {
-    status: -1,
+    history_type: 0,
 }
 
-export const intialOutletData = {
-    terminalID: 0,
-}
+// export const intialOutletData = {
+//     terminalID: 0,
+// }
 
 export const intialCashBookData = {
-    cId : 1
+    book_type : 0
 }
 
 const dataSlice = createSlice({
@@ -69,7 +71,7 @@ const dataSlice = createSlice({
         transactionList: [],
         tableData: initialTableData,
         filterData: initialFilterData,
-        outletData : intialOutletData,
+        // outletData : intialOutletData,
         cashbookData : intialCashBookData,
     },
     reducers: {
@@ -80,7 +82,7 @@ const dataSlice = createSlice({
             state.toatalAmount = 0
             state.transactionList = []
             state.filterData = { ...initialFilterData }
-            state.outletData = {...intialOutletData }
+            // state.outletData = {...intialOutletData }
             state.tableData = { ...initialTableData, ...action.payload }
             state.cashbookData = {...intialCashBookData}
         },
@@ -94,7 +96,6 @@ const dataSlice = createSlice({
             state.outletData = action.payload
         },
         setCashBookData: (state,action) => {
-            console.log("STATE",state,"ACTION",action)
             state.cashbookData = action.payload
         },
         setTransactionsLoading: (state, action) => {

@@ -23,18 +23,18 @@ const BaseServiceV2 = axios.create({
 
 BaseServiceV2.interceptors.request.use(
     (config) => {
-        const rawPersistData = localStorage.getItem(PERSIST_STORE_NAME)
-        const persistData = deepParseJson(rawPersistData)
-        const deviceId = persistData.auth.session.deviceId
-        const token = persistData.auth.session.token
+        // const rawPersistData = localStorage.getItem(PERSIST_STORE_NAME) u
+        // const persistData = deepParseJson(rawPersistData) u
+        // const deviceId = persistData.auth.session.deviceId u
+        // const token = persistData.auth.session.token uu
+ 
+        // config.headers[REQUEST_HEADER_CHANNEL] = 14 u
+        // config.headers[REQUEST_HEADER_AUTH_TOKEN] = appConfig.authToken u
+        config.headers[REQUEST_HEADER_CONTENT_TYPE] = 'application/json'
 
-        config.headers[REQUEST_HEADER_CHANNEL] = 14
-        config.headers[REQUEST_HEADER_AUTH_TOKEN] = appConfig.authToken
-        //config.headers[REQUEST_HEADER_CONTENT_TYPE] = 'multipart/form-data'
+        // if (deviceId) config.headers[REQUEST_HEADER_DEVICE_ID] = deviceId u
 
-        if (deviceId) config.headers[REQUEST_HEADER_DEVICE_ID] = deviceId
-
-        if (token) config.headers[REQUEST_HEADER_SESSION_TOKEN] = token;
+        // if (token) config.headers[REQUEST_HEADER_SESSION_TOKEN] = token; u
         return config
     },
     (error) => {

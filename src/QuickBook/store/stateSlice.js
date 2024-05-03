@@ -3,8 +3,10 @@ import { createSlice } from '@reduxjs/toolkit'
 const stateSlice = createSlice({
     name: 'quickbookStore/state',
     initialState: {
-        drawerOpen: false,
+        dataSavedModalOpen: false,
         showAddBookPage : false,
+        pettyCashBalance : 0,
+        commonCashBanalce : 0,
         selectedCustomer: {},
         sortedColumn: () => {},
     },
@@ -15,15 +17,17 @@ const stateSlice = createSlice({
         setSortedColumn: (state, action) => {
             state.sortedColumn = action.payload
         },
-        setDrawerOpen: (state) => {
-            state.drawerOpen = true
-        },
-        setDrawerClose: (state) => {
-            state.drawerOpen = false
+        setDataSavedModal : (state,action) => {
+            state.dataSavedModalOpen = action.payload;
         },
         setShowAddBookPage : (state,action) => {
-            console.log("s",action)
             state.showAddBookPage = action.payload;
+        },
+        setPettyCashBalance : (state,action) => {
+            state.pettyCashBalance = action.payload;
+        },
+        setCommonCashBalance: (state,action) => {
+            state.commonCashBanalce = action.payload;
         }
     },
 })
@@ -33,7 +37,10 @@ export const {
     setDrawerOpen,
     setDrawerClose,
     setSortedColumn,
-    setShowAddBookPage
+    setShowAddBookPage,
+    setDataSavedModal,
+    setPettyCashBalance,
+    setCommonCashBalance
 } = stateSlice.actions
 
 export default stateSlice.reducer

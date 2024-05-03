@@ -6,7 +6,11 @@ import RupeePrefix from "../../../Prefixes/RupeeSign";
 
 
 const AntdInput = (props) => {
-    const { error,text,value , ph, showPrefix = false,acceptOnlyNum = false,validation = false,validateField } = props;
+    const { 
+        error,text,value , ph, 
+        showPrefix = false,acceptOnlyNum = false,
+        validation = false,disableInput  = false,
+        validateField } = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
@@ -15,7 +19,8 @@ const AntdInput = (props) => {
                 name={value} 
                 as={Input} 
                 placeholder={ph} 
-                error={error}
+                readOnly={disableInput}
+                // error={error}
                 prefix = {showPrefix && RupeePrefix}
                 onKeyPress={(event) => {
                     if (!/^[0-9.]+$/.test(event.key) && acceptOnlyNum) {

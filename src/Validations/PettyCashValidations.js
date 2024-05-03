@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
 
 const PettyCashValidations = Yup.object().shape({
-    seelctedDay: Yup.string().required('Day is required'),
-    remAmount: Yup.string().required('Remaining Amount is required'),
+    date: Yup.string().required('Day is required'),
+    balance: Yup.string().required('Remaining Amount is required'),
     amount: Yup.string().required('Amount is required'),
-    reason: Yup.string().required('Reason is required'),
+    petty_cash_details: Yup.string().required('Reason is required'),
 });
 
 export default PettyCashValidations;

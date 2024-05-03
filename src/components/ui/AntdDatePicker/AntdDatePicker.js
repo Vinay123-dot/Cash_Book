@@ -2,7 +2,7 @@ import React from "react";
 import { DatePicker } from "antd";
 import { Field, ErrorMessage } from "formik";
 
-const dateFormat = 'DD-MM-YYYY';
+const dateFormat = 'YYYY-MM-DD';
 
 const AntdDatePicker = (props) => {
     const { error,ph,labelText,name,handleChange } = props;
