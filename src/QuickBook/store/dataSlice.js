@@ -101,7 +101,6 @@ const dataSlice = createSlice({
             state.loading = action.payload
         },
         setTransactionArray: (state, action) => {
-            console.log("cc")
             state.transactionList = [];
         },
     },

@@ -10,6 +10,7 @@ import {
 } from '../store/stateSlice';
 import SucessIcon from "../../assets/SucessIcon.png";
 import { apiGetCommonOpeningBalance } from "../../services/TransactionService";
+import { getToday } from "../../utils/dateFormatter";
 
 const Header = () => {
 
@@ -21,19 +22,16 @@ const Header = () => {
     const showDataSavedModal = useSelector(state => state.quickbookStore.state.dataSavedModalOpen)
     const showAddBookPage = useSelector(state => state.quickbookStore.state.showAddBookPage);
     const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+    let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
-        getCommonOpeningBalance();
-    },[])
+        userType == 7 && getCommonOpeningBalance();
+    },[userType])
    
 
     const getCommonOpeningBalance = async() => {
         try{
-            let data = {
-                date: '2024-04-24',
-                id : 7
-            }
-            let response = await apiGetCommonOpeningBalance(data);
+            let response = await apiGetCommonOpeningBalance({uniqueId,date:getToday()});
             dispatch(setCommonCashBalance(response?.opening_balance));
         }catch(e){
 
@@ -42,10 +40,12 @@ const Header = () => {
 
     return (
         <>
-            <div className="flex flex-col lg:ml-32 xl:ml-0">
-                <label className="text-lg font-medium tracking-wide mb-1 opBalance">Opening Balance</label>
-                <h4 className="text-2xl">₹{commOpeningBal}</h4>
-            </div>
+            {
+                userType === "7" && <div className="flex flex-col lg:ml-32 xl:ml-0">
+                    <label className="text-lg font-medium tracking-wide mb-1 opBalance">Opening Balance</label>
+                    <h4 className="text-2xl">₹{commOpeningBal}</h4>
+                </div>
+            }
             {
                 userType === "7" &&
                 <CButton onClick={() => dispatch(setShowAddBookPage(true))} className="xl:col-span-1">

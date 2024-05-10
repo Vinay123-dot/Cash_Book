@@ -3,7 +3,7 @@ import DataTable from '../../components/shared/DataTable'
 import { useSelector } from 'react-redux';
 
 const BankDepositColumns = [
-    { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
+    // { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
     {header: 'Date',accessorKey: 'Date',enableSorting: false},
     { header: 'Type',accessorKey: 'Type',enableSorting: false },
     { header: 'Amount',accessorKey: 'Amount',enableSorting: false },
@@ -13,7 +13,7 @@ const BankDepositColumns = [
 ];
 
 const pettyCashColumns = [
-    { header: 'Sl No', accessorKey: 'serial_no', enableSorting: false },
+    // { header: 'Sl No', accessorKey: 'serial_no', enableSorting: false },
     { header: 'Date', accessorKey: 'Date', enableSorting: false },
     { header: 'Amount', accessorKey: 'Amount',enableSorting: false},
     { header: 'Balance', accessorKey: 'Balance',enableSorting: false},
@@ -22,24 +22,26 @@ const pettyCashColumns = [
 ];
 
 const DayBookColumns = [
-    { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
+    // { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
     { header: 'Bill No',accessorKey: 'Bill_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
-    { header: 'Party Code',accessorKey: 'Customer_Type',enableSorting: false },
+    { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
     { header: "Bill Value", accessorKey: 'Bill_Value', enableSorting: false},
     { header: 'Cash',accessorKey: 'Cash_Amount',enableSorting: false },
     { header: 'UPI Type',accessorKey: 'UPI_Type', enableSorting: false },
     { header: 'UPI Amount',accessorKey: 'UPI_Amount', enableSorting: false },
-    { header: 'Card', accessorKey: 'Credit_Card',enableSorting: false },
-    { header: "Bank",accessorKey: 'Online_Bank', enableSorting: false },
-    { header: "Advanced Receipt No.",accessorKey: 'Advance_Receipt_No',enableSorting: false },
-    { header: "Advanced Receipt Amount",accessorKey: 'Advance_Receipt_Amount',enableSorting: false },
+    { header: 'Debit Card', accessorKey: 'Debit_Card_Amount',enableSorting: false },
+    { header: 'Credit Card', accessorKey: 'Credit_Card_Amount',enableSorting: false },
+    { header: "Bank",accessorKey: 'Online_Bank_Amount', enableSorting: false },
+    { header: "Cheque",accessorKey: 'Bank_Cheque_Amount', enableSorting: false },
+    // { header: "Advanced Receipt No.",accessorKey: 'Advance_Receipt_No',enableSorting: false },
+    // { header: "Advanced Receipt Amount",accessorKey: 'Advance_Receipt_Amount',enableSorting: false },
     { header: "Pending Bill",accessorKey: 'Pending_Balance',enableSorting: false,}
     
 ];
 
 const AdvanceBookColumns = [
-    { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
+    // { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
     { header: 'Receipt No.',accessorKey: 'Receipt_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
@@ -51,7 +53,7 @@ const AdvanceBookColumns = [
 ];
 
 const TerminalLevelColumns = [
-    { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
+    // { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
     { header: 'Bill No.',accessorKey: 'bill_no', enableSorting: false },
     { header: 'Date',accessorKey: 'date',enableSorting: false},
     { header: 'Party Code',accessorKey: 'party_code',enableSorting: false },
@@ -229,7 +231,7 @@ const getTableColumns = (userType, bookType) => {
     }
 }
 
-
+  console.log("T",data);
     return (
         <>
             <DataTable

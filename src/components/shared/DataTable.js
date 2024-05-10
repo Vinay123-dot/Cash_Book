@@ -203,8 +203,8 @@ const DataTable = forwardRef((props, ref) => {
                     {table.getHeaderGroups().map((headerGroup) => {
                     return(
                         // <Tr key={headerGroup.id} style={{display:"flex",justifyContent:"space-around",alignItems:'center'}}>
-                        // <Tr key={headerGroup.id}  className = "flex justify-evenly items-center">
                         <Tr key={headerGroup.id}>
+                        {/* // <Tr key={headerGroup.id}> */}
                             {headerGroup.headers.map((header) => {
                                 return (
                                     <Th
@@ -258,7 +258,7 @@ const DataTable = forwardRef((props, ref) => {
                             .rows.slice(0, pagingData.pageSize)
                             .map((row) => {
                                 return (
-                                    <Tr key={row.id}>
+                                    <Tr key={row.id} >
                                         {row.getVisibleCells().map((cell) => {
                                             return (
                                                 <Td

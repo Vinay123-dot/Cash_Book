@@ -40,7 +40,7 @@ const validationSchema = Yup.object().shape({
 
 
 });
-const iconStyle = {color:"red",width:20,height:20,position: "absolute", right: 10 };
+const iconStyle = {color:"red",width:20,height:20,position: "absolute", right: 10,bottom:5};
 const selectedValType = {
     "cash_amount": "Cash",
     "upi_amount": "UPI",
@@ -248,8 +248,7 @@ const DayBookModal = (props) => {
            
             convertedObj.key = uniqueId;
             convertedObj.bill_no = billNum+"/"+ convertedObj.sales_code+"/"+convertedObj.bill_no;
-            
-console.log("c",convertedObj)
+
             let response = await apiStoreDayBookInfo([convertedObj]);
             console.log ("RES",response)
             if (response.message) {
@@ -325,6 +324,7 @@ console.log("c",convertedObj)
             style={{ overflow: "auto" }}
         >
             {({ errors, touched, isSubmitting, setFieldValue, values, setErrors }) => {
+                console.log("VALUES",values)
                 return (
                     <Form>
                         <ParagraphTag label="Details" />

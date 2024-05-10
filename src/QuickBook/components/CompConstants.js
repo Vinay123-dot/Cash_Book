@@ -6,8 +6,7 @@ const getTotalMoney = (allData) => {
                     ConvertToNum(allData.online_bank_amount)+
                     ConvertToNum(allData.bank_cheque_amount)+
                     ConvertToNum(allData.credit_card_amount)+
-                    ConvertToNum(allData.debit_card_amount)+
-                    ConvertToNum(allData.used_receipt_amount)
+                    ConvertToNum(allData.debit_card_amount)
    
     return totalVal;
 }

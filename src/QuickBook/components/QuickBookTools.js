@@ -32,6 +32,8 @@ const QuickBookTools = () => {
   const [outletList, setOutletList] = useState([]);
   const [daysList,setDaysList] = useState([]);
   const[bookTypeList,setBookTypeList] = useState([]);
+  const [errorMessage,setErrorMessage] = useState("");
+  const [durationErrMsg,setDurationErrMsg] = useState("");
   const tableData = useSelector((state) => state.quickbookStore.data.tableData);
   const filterData = useSelector((state) => state.quickbookStore.data.filterData);
   // const outletData = useSelector((state) => state.quickbookStore.data.outletData);
@@ -64,7 +66,6 @@ const QuickBookTools = () => {
   const getOutletsList = async () => {
     // let options = [{ value: 0, label: "All" }];
     let response = await apiGetTerminalList();
-    console.log("R}E+DS",response)
     // response?.data?.listObj.map((data) => {
     //   options.push({ value: data?.id, label: data?.value.split(" ").pop() })
     // })
@@ -74,15 +75,23 @@ const QuickBookTools = () => {
 
   const handleView = async () => {
     const payload = cloneDeep(tableData);
-    console.log("pp",payload)
-  
-    // if (payload?.historyType <= 0) {
-    //     setMessage('Please select duration')
-    //     return
-    // }
-    const newTableData = cloneDeep(payload);
     const newFilterData = cloneDeep(filterData);
     const newCashBookData = cloneDeep(cashbookData);
+
+    if(newCashBookData?.book_type <= 0){
+      setErrorMessage('Please select cashbook')
+      return;
+    }
+  
+    if (newFilterData?.history_type <= 0) {
+      console.log("TEST")
+        setDurationErrMsg('Please select duration')
+        return;
+    }
+    setErrorMessage("");
+    setDurationErrMsg("");
+    const newTableData = cloneDeep(payload);
+    // const newFilterData = cloneDeep(filterData);
     // const newOutletData = cloneDeep(outletData);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
     let newObj = { 
@@ -123,7 +132,8 @@ const QuickBookTools = () => {
     dispatch(setTableData(newTableData));
     const newFilterData = cloneDeep(filterData);
     newFilterData.history_type = val;
-    dispatch(setFilterData(newFilterData))
+    dispatch(setFilterData(newFilterData));
+    setDurationErrMsg("");
   }
 
   // const handleOutletStatusChange = (val) => {
@@ -143,6 +153,7 @@ const QuickBookTools = () => {
     const newCashbookData = cloneDeep(cashbookData);
     newCashbookData.book_type = val;
     dispatch(setCashBookData(newCashbookData));
+    setErrorMessage("");
   }
 
   // const handleDownload = async () => {
@@ -159,31 +170,64 @@ const QuickBookTools = () => {
   //   await getTransactionHistory(payload)
   // }
 
+  // const handleDownload = async () => {
+  //   const payload = cloneDeep(tableData);
+  //   console.log("pp",payload)
+  
+  //   // if (payload?.historyType <= 0) {
+  //   //     setMessage('Please select duration')
+  //   //     return
+  //   // }
+  //   const newTableData = cloneDeep(payload);
+  //   const newFilterData = cloneDeep(filterData);
+  //   const newCashBookData = cloneDeep(cashbookData);
+  //   // const newOutletData = cloneDeep(outletData);
+  //   let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+  //   getTransactionHistory({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type})
+
+  // }
   const handleDownload = async () => {
     const payload = cloneDeep(tableData);
-    console.log("pp",payload)
-  
-    // if (payload?.historyType <= 0) {
-    //     setMessage('Please select duration')
-    //     return
-    // }
-    const newTableData = cloneDeep(payload);
     const newFilterData = cloneDeep(filterData);
     const newCashBookData = cloneDeep(cashbookData);
+
+    if(newCashBookData?.book_type <= 0){
+      setErrorMessage('Please select cashbook')
+      return;
+    }
+  
+    if (newFilterData?.history_type <= 0) {
+      console.log("TEST")
+        setDurationErrMsg('Please select duration')
+        return;
+    }
+    setErrorMessage("");
+    setDurationErrMsg("");
+    const newTableData = cloneDeep(payload);
+    // const newFilterData = cloneDeep(filterData);
     // const newOutletData = cloneDeep(outletData);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
-    getTransactionHistory({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type})
-
+    let newObj = { 
+      ...newTableData, 
+      ...newFilterData,
+      ...newCashBookData,
+      book_type:bookTypeInStrng?.Type,
+      terminal_id:uniqueId,
+      key: uniqueId
+      }
+      getTransactionHistory(newObj);
   }
-console.log("outletList",outletList)
+
   const getTransactionHistory = async (values) => {
     try {
      
         const resp = await apiGetTransactionHistory(values,uniqueId);
         if (resp.data) {
-            // dispatch(setTransactionsLoading(true))
+          console.log("resData",resp)
+            dispatch(setTransactionsLoading(true))
             let data = new Blob([resp.data], {
                 type: 'application/vnd.ms-excel;charset=charset=utf-8',
+                // type: 'application/vnd.ms-excel'
             })
 
             FileSaver.saveAs(
@@ -193,14 +237,21 @@ console.log("outletList",outletList)
                     'DD_MM_YYYY_HH_mm_ss'
                 )}.xls`
             )
-            // setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
+            // const blob = new Blob([resp.data], {
+            //   type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            // });
+            // FileSaver.saveAs(
+            //   blob,
+            //   `Transaction_Report_${getFormatDate(new Date(), 'DD_MM_YYYY_HH_mm_ss')}.xlsx`
+            // );
+            setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
             return {
                 status: 'success',
                 message: '',
             }
         }
     } catch (errors) {
-        // setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
+        setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
         return {
             status: 'failed',
             message:
@@ -210,17 +261,6 @@ console.log("outletList",outletList)
     }
 }
 
-  // const handleView = async () => {
-  //   const payload = cloneDeep(tableData)
-  //   if (payload?.historyType <= 0) {
-  //     setMessage('Please select duration')
-  //     return
-  //   }
-  //   const newTableData = cloneDeep(payload)
-  //   const newFilterData = cloneDeep(filterData)
-  //   // const newOutletData = cloneDeep(outletData)
-  //   dispatch(getTransactions({ ...newTableData, ...newFilterData, ...newOutletData }))
-  // }
 
   return (
     <div className="xl:flex justify-between py-4 px-10">
@@ -231,7 +271,7 @@ console.log("outletList",outletList)
             options={bookTypeList}
             onStatusChange={handleCashBookChange}
             value = {cashbookData.book_type}
-            message = {message}
+            message = {errorMessage}
           />
         </div>
 
@@ -241,7 +281,7 @@ console.log("outletList",outletList)
             options={daysList}
             onStatusChange={handleTimeperiodChange}
             value = {filterData.history_type}
-            message ={message}
+            message = {durationErrMsg}
           />
         </div>
         {/* {
@@ -255,14 +295,14 @@ console.log("outletList",outletList)
             />
           </div>
         } */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <Input
             prefix={searchPrefix}
             placeholder="Search"
             className="w-full md:w-44"
             // onChange = {handleInputChange}
           />
-        </div>
+        </div> */}
       </div>
       <CButton
         onClick={handleView}

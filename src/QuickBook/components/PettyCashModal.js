@@ -78,13 +78,10 @@ const PettyCashModal = (props) => {
         let isAllValuesPresent = date && balance && amount && petty_cash_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
-        console.log("AMOUNT",values);
-        console.log("TYPE OF BALANCE",typeof balance)
         if (isAllValuesPresent) {
             setPettyCashArr((prev) => [...prev, values]);
             setErrors({});
             setTimeout(() => {
-                console.log("TestTImeout")
                 resetForm();
             }, 0);
         }
@@ -92,14 +89,11 @@ const PettyCashModal = (props) => {
     }
 
     const handleSavePettyCash = async () => {
-        console.log("pettyCashArr", pettyCashArr);
         if (pettyCashArr?.length <= 0) {
-            console.log("NO PETTYCASH");
             return;
         }
         setShowLoader(true);
         let response = await apiStorePettyCashInfo(pettyCashArr);
-        console.log("response",response);
         if (response.message) {
             setShowLoader(false);
             dispatch(setShowAddBookPage(false));
@@ -127,24 +121,32 @@ const PettyCashModal = (props) => {
             showModal: false,
             selectedObj: val
         })
-        pettyCashArr[val.key] = val;
-        setPettyCashArr(pettyCashArr);
+        let newTemp = JSON.parse(JSON.stringify(pettyCashArr));
+        let newObj = JSON.parse(JSON.stringify(val));
+        newObj.key = uniqueId;
+        newObj.amount = Number(newObj.amount);
+        newTemp[val.key] = newObj;
+        setPettyCashArr(newTemp);
     }
 
     const getButtonStatus = (pArr) => pArr.length <= 0 ? true : false;
+    const handleCancelModInPC = () => {
+        setSelectedObjDetails({
+            showModal: false,
+            selectedObj: {}
+        })
+    }
 
     return (<>
         <Formik
             initialValues={initialValues}
             validationSchema={PettyCashValidations}
             onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                console.log("IN OnSumbit")
                 handleSubmit(values, setErrors, resetForm);
             }}
             style={{ overflow: "auto" }}
         >
             {({ setFieldValue, values, errors, setErrors }) => {
-                // console.log("erros",errors);
                 values.balance = pettyCash - Number(values.amount);
                 if(values.petty_cash_details) {
                     let reasonStng = values.petty_cash_details;
@@ -265,13 +267,10 @@ const PettyCashModal = (props) => {
                         </div>
 
                         <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
-                            <CButton btnType="submit" onClick={() => console.log("CAncel")}>
+                            <CButton btnType="submit" >
                                 Save
                             </CButton>
-                            <CButton onClick={() => {
-                                dispatch(setShowAddBookPage(false))
-                            }
-                            }
+                            <CButton onClick={handleCancelModInPC}
                                 type="cancel"
                             >
                                 Cancel

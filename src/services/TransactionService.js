@@ -93,7 +93,6 @@ export async function apiStoreBankDepositInfo(data){
     
 }
 export async function apiStoreDayBookInfo(data){
-    console.log("S",data)
 
     let url = `${appConfig.apiPrefix}/v21/day_book/save_DayBook`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
@@ -101,7 +100,6 @@ export async function apiStoreDayBookInfo(data){
 }
 
 export async function apiStorePettyCashInfo(data){
-    console.log("DATA",data);
     let url = `${appConfig.apiPrefix}/v21/petty_cash/save_PettyCash`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
@@ -143,19 +141,15 @@ export async function apiVerifyAdvancedBookReceipt(data){
 
 
 
-export async function apiGetCommonOpeningBalance(data){
-    const {date,id} = data;
-    //   const data = {
-    //     input_date: '2024-04-24',
-    //   }; //Not working
-    console.log("DD",data)
-    let url = `${appConfig.apiPrefix}/v21/opening_balancecommon_opening_balance?input_date=${date}&key=${id}`;
+export async function apiGetCommonOpeningBalance({uniqueId,date}){
+  
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/common_opening_balance?input_date=${date}&key=${uniqueId}`;
     const response = await axios.get(url,{headers});
     return response.data;
 }
 
-export async function apiGetPettyCashCommonBalance(date){
-    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_opening_balance?input_date=${date}`;
+export async function apiGetPettyCashCommonBalance({uniqueId,date}){
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_opening_balance?input_date=${date}&key=${uniqueId}`;
     const response = await axios.get(url,{headers});
     return response.data;
 }
@@ -216,7 +210,6 @@ export async function apiGetTerminal(id){
 // }
 
 export async function apiCreateSession(data){
-    console.log("DATA",data);
     let url = `${appConfig.apiPrefix}/v21/session/add_Session`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;

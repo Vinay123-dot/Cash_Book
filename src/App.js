@@ -24,7 +24,6 @@ function App() {
     try{
       let data = {id : uniqueId,type: userType}
       let response = await apiCreateSession(data);
-      console.log("r",response)
     }catch(e){
 
     }

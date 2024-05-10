@@ -24,17 +24,18 @@ const AddBookPage = (props) => {
   const handleChange = (value) => setSelectedValue(value);
   const pettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
   const bankBalance = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+  let uniqueId = localStorage.getItem("uniqueId");
+  let userType = localStorage.getItem("mType");
 
 
 
   useEffect(() => {
-    getPettyCashCommBalance();
-},[])
+    userType == 7 &&getPettyCashCommBalance();
+},[userType])
 
 const getPettyCashCommBalance = async() => {
     try{
-        let today_date = getToday();
-        let response = await apiGetPettyCashCommonBalance(today_date);
+        let response = await apiGetPettyCashCommonBalance({uniqueId,date:getToday()});
         dispatch(setPettyCashBalance(response?.opening_balance));
         // setPettyCash(response?.opening_balance);
     }catch(e){
@@ -63,7 +64,7 @@ const getPettyCashCommBalance = async() => {
 
         />
         {
-          selectedValue === 3 &&  
+          selectedValue === 3 &&  userType!= 7 &&
           <div className="flex flex-col">
           <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
           <p>{pettyCash}</p>
