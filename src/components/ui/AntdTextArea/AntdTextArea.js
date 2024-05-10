@@ -1,34 +1,24 @@
 import React from "react";
 import { Input } from "antd";
 import { Field, ErrorMessage } from "formik";
-import RupeePrefix from "../../../Prefixes/RupeeSign";
 
-
+const { TextArea } = Input;
 
 const AntdInput = (props) => {
     const { 
         error,text,value , ph, 
         showPrefix = false,acceptOnlyNum = false,
         validation = false,disableInput  = false,
-        validateField,showAddBefore = false,
-        showAddBeforeValue ="" } = props;
+        validateField,showAddBefore = false } = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
             <label htmlFor={value} className="my-2">{text}</label>
             <Field 
                 name={value} 
-                as={Input} 
+                as={TextArea} 
                 placeholder={ph} 
                 readOnly={disableInput}
-                addonBefore= {showAddBefore &&showAddBeforeValue}
-                // error={error}
-                prefix = {showPrefix && RupeePrefix}
-                onKeyPress={(event) => {
-                    if (!/^[0-9.]+$/.test(event.key) && acceptOnlyNum) {
-                        event.preventDefault()
-                    }
-                }}
                 validate = {validation && validateField}
                 
             />

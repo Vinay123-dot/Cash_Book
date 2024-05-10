@@ -200,7 +200,10 @@ const DataTable = forwardRef((props, ref) => {
         <Loading loading={loading} type="cover">
             <Table>
                 <THead className="z-10 sticky top-0">
-                    {table.getHeaderGroups().map((headerGroup) => (
+                    {table.getHeaderGroups().map((headerGroup) => {
+                    return(
+                        // <Tr key={headerGroup.id} style={{display:"flex",justifyContent:"space-around",alignItems:'center'}}>
+                        // <Tr key={headerGroup.id}  className = "flex justify-evenly items-center">
                         <Tr key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
@@ -208,7 +211,8 @@ const DataTable = forwardRef((props, ref) => {
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         style={{
-                                            maxWidth: 100,
+                                            minWidth : 90,
+                                            maxWidth: 120
                                         }}
                                     >
                                         {header.isPlaceholder ? null : (
@@ -237,7 +241,7 @@ const DataTable = forwardRef((props, ref) => {
                                 )
                             })}
                         </Tr>
-                    ))}
+                    )})}
                 </THead>
                 <TBody>
                     {!loading && data.length === 0 ? (
@@ -278,7 +282,7 @@ const DataTable = forwardRef((props, ref) => {
                     ) : null}
                 </TBody>
             </Table>
-             <div className="flex  items-center justify-end">
+             {/* <div className="flex  items-center justify-end">
                 <Pagination
                     // pageSize={pageSize}
                     // currentPage={pageIndex}
@@ -289,7 +293,7 @@ const DataTable = forwardRef((props, ref) => {
                     total={100}
                     onChange={handlePaginationChange}
                 />
-            </div> 
+            </div>  */}
         </Loading>
     )
 })

@@ -25,11 +25,15 @@ const Header = () => {
     useEffect(() => {
         getCommonOpeningBalance();
     },[])
-    console.log("dataSavedModalOpen..",showDataSavedModal)
+   
 
     const getCommonOpeningBalance = async() => {
         try{
-            let response = await apiGetCommonOpeningBalance();
+            let data = {
+                date: '2024-04-24',
+                id : 7
+            }
+            let response = await apiGetCommonOpeningBalance(data);
             dispatch(setCommonCashBalance(response?.opening_balance));
         }catch(e){
 
@@ -44,7 +48,7 @@ const Header = () => {
             </div>
             {
                 userType === "7" &&
-                <CButton onClick={() => dispatch(setShowAddBookPage(true))} className="xl:col-end-6 col-span-1">
+                <CButton onClick={() => dispatch(setShowAddBookPage(true))} className="xl:col-span-1">
                     Add Book
                 </CButton>
             }

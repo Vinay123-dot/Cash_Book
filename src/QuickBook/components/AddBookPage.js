@@ -9,17 +9,19 @@ import PettyCashModal from "./PettyCashModal";
 import { apiGetPettyCashCommonBalance } from "../../services/TransactionService";
 import { getToday } from "../../utils/dateFormatter";
 import {
-  setPettyCashBalance
+  setPettyCashBalance,
+  setShowAddBookPage
 } from '../store/stateSlice';
+import CButton from "../../components/ui/Button";
 
 
 const AddBookPage = (props) => {
 
   const {openPage} = props;
-
+  
+  const dispatch = useDispatch();
   const [selectedValue, setSelectedValue] = useState(null);
   const handleChange = (value) => setSelectedValue(value);
-  const dispatch = useDispatch();
   const pettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
   const bankBalance = useSelector(state => state.quickbookStore.state.commonCashBanalce);
 
@@ -84,12 +86,26 @@ const getPettyCashCommBalance = async() => {
         <DayBookModal  showDaybookModal = {selectedValue === 1} onCancel ={handleCancelSelectedVal}/>
 
       </div>
-
-
-
-
-
-
+      {
+        !selectedValue &&
+        <div className=" absolute flex flex-row-reverse gap-10  bottom-10 right-10">
+          <CButton 
+            btnType = "submit" 
+            isDisabled = {true}
+          >
+            Save
+          </CButton>
+          <CButton 
+            onClick={() =>{
+              setSelectedValue(null);
+              dispatch(setShowAddBookPage(false))
+            }}
+            type="cancel"
+          >
+            Cancel
+          </CButton>
+        </div>
+      }
     </div>
   )
 

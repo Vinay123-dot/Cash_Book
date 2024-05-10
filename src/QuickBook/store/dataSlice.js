@@ -28,8 +28,9 @@ export const getTransactions = createAsyncThunk(
         //     toDate : "2024-4-10 23:59:59",
         //     type : 0
         // }
+        console.log("DATA",data)
         const response = await apiGetBookTypeServices(data);
-        return response.data;
+        return response;
     }
 )
 
@@ -99,11 +100,15 @@ const dataSlice = createSlice({
         setTransactionsLoading: (state, action) => {
             state.loading = action.payload
         },
+        setTransactionArray: (state, action) => {
+            console.log("cc")
+            state.transactionList = [];
+        },
     },
     extraReducers: (builder) => {
         builder
           .addCase(getTransactions.fulfilled, (state, action) => {
-            state.transactionList = action.payload?.transactionHistoryList;
+            state.transactionList = action.payload?.data || [];
             state.totalTxn = action.payload?.totalTxn;
             state.totalRecords = action.payload?.totalRecords;
             // state.totalAmount = action.payload?.totalAmount; // Fixed typo in 'totalAmount'
@@ -139,7 +144,8 @@ export const {
     setFilterData,
     setTransactionsLoading,
     setOutletData,
-    setCashBookData
+    setCashBookData,
+    setTransactionArray
 } = dataSlice.actions
 
 export default dataSlice.reducer

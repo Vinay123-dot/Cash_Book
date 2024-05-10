@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Input } from 'antd';
+import {Input, message } from 'antd';
 import CButton from "../../components/ui/Button";
 import AntdSelectFilter from "../../components/ui/AntdSelect/AntdSelect";
 import { viewBtnPrefix, dwnBtnPrefix, searchPrefix } from "../../Prefixes/QuickBookToolsPrefix";
@@ -9,11 +9,20 @@ import {
   setFilterData,
   getTransactions,
   setOutletData,
-  setCashBookData
+  setCashBookData,
+  setTransactionsLoading,
+  setTransactionArray
 } from '../store/dataSlice';
 import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
-import { apiGetBookTypeInfo, apiGetDayInfo } from "../../services/TransactionService";
+import { 
+  apiGetBookTypeInfo, 
+  apiGetDayInfo, 
+  apiGetTransactionHistory ,
+  apiGetTerminalList
+} from "../../services/TransactionService";
+import FileSaver from 'file-saver';
+import { getFormatDate} from "../../utils/dateFormatter"
 
 const QuickBookTools = () => {
 
@@ -28,6 +37,7 @@ const QuickBookTools = () => {
   // const outletData = useSelector((state) => state.quickbookStore.data.outletData);
   const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
   let userType = localStorage.getItem("mType");
+  let uniqueId = localStorage.getItem("uniqueId");
 
 
   useEffect(() => {
@@ -52,12 +62,13 @@ const QuickBookTools = () => {
   }
 
   const getOutletsList = async () => {
-    let options = [{ value: 0, label: "All" }];
-    let response = await getTerminalList();
-    response?.data?.listObj.map((data) => {
-      options.push({ value: data?.id, label: data?.value.split(" ").pop() })
-    })
-    setOutletList(options);
+    // let options = [{ value: 0, label: "All" }];
+    let response = await apiGetTerminalList();
+    console.log("R}E+DS",response)
+    // response?.data?.listObj.map((data) => {
+    //   options.push({ value: data?.id, label: data?.value.split(" ").pop() })
+    // })
+    setOutletList(response?.data || []);
   }
 
 
@@ -73,10 +84,16 @@ const QuickBookTools = () => {
     const newFilterData = cloneDeep(filterData);
     const newCashBookData = cloneDeep(cashbookData);
     // const newOutletData = cloneDeep(outletData);
-    let bookTypeInStrng = bookTypeList.find((eachDoc)=>eachDoc.Id === newCashBookData.book_type);
-
-    // dispatch(getTransactions({ ...newTableData, ...newFilterData, ...newOutletData }))
-    dispatch(getTransactions({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type}));
+    let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+    let newObj = { 
+      ...newTableData, 
+      ...newFilterData,
+      ...newCashBookData,
+      book_type:bookTypeInStrng?.Type,
+      terminal_id:uniqueId,
+      key: uniqueId
+      }
+    dispatch(getTransactions(newObj));
   }
   // const handleInputChange = (e) => {
   //   const {value : val} = e.target;
@@ -119,6 +136,7 @@ const QuickBookTools = () => {
   // }
 
   const handleCashBookChange = (val) => {
+    dispatch(setTransactionArray());
     const newTableData = cloneDeep(tableData);
     newTableData.pageNumber = 0;
     dispatch(setTableData(newTableData));
@@ -141,6 +159,57 @@ const QuickBookTools = () => {
   //   await getTransactionHistory(payload)
   // }
 
+  const handleDownload = async () => {
+    const payload = cloneDeep(tableData);
+    console.log("pp",payload)
+  
+    // if (payload?.historyType <= 0) {
+    //     setMessage('Please select duration')
+    //     return
+    // }
+    const newTableData = cloneDeep(payload);
+    const newFilterData = cloneDeep(filterData);
+    const newCashBookData = cloneDeep(cashbookData);
+    // const newOutletData = cloneDeep(outletData);
+    let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+    getTransactionHistory({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type})
+
+  }
+console.log("outletList",outletList)
+  const getTransactionHistory = async (values) => {
+    try {
+     
+        const resp = await apiGetTransactionHistory(values,uniqueId);
+        if (resp.data) {
+            // dispatch(setTransactionsLoading(true))
+            let data = new Blob([resp.data], {
+                type: 'application/vnd.ms-excel;charset=charset=utf-8',
+            })
+
+            FileSaver.saveAs(
+                data,
+                `Transaction_Report_${getFormatDate(
+                    new Date(),
+                    'DD_MM_YYYY_HH_mm_ss'
+                )}.xls`
+            )
+            // setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
+            return {
+                status: 'success',
+                message: '',
+            }
+        }
+    } catch (errors) {
+        // setTimeout(() => dispatch(setTransactionsLoading(false)), 50)
+        return {
+            status: 'failed',
+            message:
+                errors?.response?.data?.error?.errorMessage ||
+                errors.toString(),
+        }
+    }
+}
+
   // const handleView = async () => {
   //   const payload = cloneDeep(tableData)
   //   if (payload?.historyType <= 0) {
@@ -162,6 +231,7 @@ const QuickBookTools = () => {
             options={bookTypeList}
             onStatusChange={handleCashBookChange}
             value = {cashbookData.book_type}
+            message = {message}
           />
         </div>
 
@@ -171,6 +241,7 @@ const QuickBookTools = () => {
             options={daysList}
             onStatusChange={handleTimeperiodChange}
             value = {filterData.history_type}
+            message ={message}
           />
         </div>
         {/* {
@@ -199,7 +270,7 @@ const QuickBookTools = () => {
       >
         {viewBtnPrefix} View
       </CButton>
-      <CButton onClick={() => console.log("clicked Download")}>
+      <CButton onClick={handleDownload}>
         {dwnBtnPrefix} Download
       </CButton>
     </div>

@@ -6,7 +6,7 @@ const {Option} = Select;
 
 const AntdSelectFilter = (props) => {
 
-    const { onStatusChange,placeholder,options,value:selectedValue } = props;
+    const { onStatusChange,placeholder,options,value:selectedValue,message } = props;
 
     const onStatusFilterChange = (value) => onStatusChange?.(value);
 

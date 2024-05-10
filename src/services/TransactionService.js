@@ -78,6 +78,14 @@ export async function apiGetBankDepositInfo(){
     })
 }
 
+export async function apiGetTerminalList(){
+    return ApiServiceV2.fetchData({
+        url: '/v21/get_AAPTerminal`',
+        method: 'get',
+    })
+}
+
+
 export async function apiStoreBankDepositInfo(data){
     let url = `${appConfig.apiPrefix}/v21/bank_deposit/save_BankDeposit`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
@@ -98,6 +106,7 @@ export async function apiStorePettyCashInfo(data){
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
 }
+
 
 
 // export async function apiStoreDayBookInfo(data){
@@ -125,8 +134,8 @@ export async function apiStoreAdvancedBookInfo(data){
 //     })
 // }
 export async function apiVerifyAdvancedBookReceipt(data){
-    console.log("DATA",data);
-    let url = `${appConfig.apiPrefix}/v21/advance_book/verify_advanceReceipt`;
+    const {key,id} = data;
+    let url = `${appConfig.apiPrefix}/v21/advance_book/verify_advanceReceipt?key=${key}&Advanced_Receipt_No=${id}`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
 }
@@ -134,12 +143,13 @@ export async function apiVerifyAdvancedBookReceipt(data){
 
 
 
-export async function apiGetCommonOpeningBalance(){
+export async function apiGetCommonOpeningBalance(data){
+    const {date,id} = data;
     //   const data = {
     //     input_date: '2024-04-24',
     //   }; //Not working
-    const date = '2024-04-24';
-    let url = `${appConfig.apiPrefix}/v21/opening_balancecommon_opening_balance?input_date=${date}`;
+    console.log("DD",data)
+    let url = `${appConfig.apiPrefix}/v21/opening_balancecommon_opening_balance?input_date=${date}&key=${id}`;
     const response = await axios.get(url,{headers});
     return response.data;
 }
@@ -151,8 +161,8 @@ export async function apiGetPettyCashCommonBalance(date){
 }
 
 export async function apiGetBookTypeServices(data) {
-    const {book_type,history_type} = data;
-    let url = `${appConfig.apiPrefix}/v21/book_type/get_BookType?book_type=${book_type}&history_type=${history_type}`;
+    const {book_type,history_type,terminal_id,key} = data;
+    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
     const response = await axios.get(url,{headers});
     return response;
 }
@@ -160,7 +170,6 @@ export async function apiGetBookTypeServices(data) {
 export async function apiGetSalesTypeInfo(){
     let url = `${appConfig.apiPrefix}/v21/master/get_SalesType`;
     const response = await axios.get(url,{headers});
-    console.log("RES..",response)
     return response;
  
 }
@@ -172,6 +181,31 @@ export async function apiGetSalesTypeInfo(){
 //         data,
 //     })
 // }
+// export async function apiGetTransactionHistory(data) {
+//     return ApiService.fetchData({
+//         url: '/v1/mos/transactionhistory',
+//         method: 'post',
+//         responseType: 'arraybuffer',
+//         data,
+//     })
+// }
+
+export async function apiGetTransactionHistory(values,Id){
+    // let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${values.book_type}&history_type=${values.history_type}&terminal_id=${Id}&key=${Id}`;
+   let url = `https://web.rampeylabs.com/api/v21/book_type/download_book?book_type=DayBook&history_type=5&terminal_id=SF7DB8&key=SF7DB8`
+    const response = await axios.get(url,
+        { 
+            headers,
+        });
+    return response;
+
+}
+
+export async function apiGetTerminal(id){
+    let url = `${appConfig.apiPrefix}/v21/master/get_Terminal?key=${id}`;
+    const response = await axios.get(url,{headers});
+    return response.data;
+}
 
 // export async function apiGetBookTypeServices(data) {
 //     return ApiService.fetchData({
@@ -180,4 +214,12 @@ export async function apiGetSalesTypeInfo(){
 //         data,
 //     })
 // }
+
+export async function apiCreateSession(data){
+    console.log("DATA",data);
+    let url = `${appConfig.apiPrefix}/v21/session/add_Session`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
+}
+
 

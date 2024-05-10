@@ -12,7 +12,13 @@ import {
   } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import { DaysArr } from "../../Constants";
-import { apiGetDepositModeInfo, apiGetDepositTypeInfo,apiStoreBankDepositInfo } from "../../services/TransactionService";
+import { 
+    apiGetDepositModeInfo, 
+    apiGetDepositTypeInfo,
+    apiStoreBankDepositInfo 
+    } from "../../services/TransactionService";
+import Loader from "../../components/shared/Loader";
+
 
 const initialValues = {
     id : 0,
@@ -25,12 +31,27 @@ const initialValues = {
     advance_receipt_no: '', //string
 };
 
+const mainDiv = {
+    display: "flex",
+    position: "fixed",
+    backgroundColor: "rgba(52, 52, 52, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+    top: 0,
+    left: 0,
+    height: "100vh",
+    width: "100vw",
+};
+
 const BankDepositModal = (props) => {
     const { showBankDeposit,onCancel } = props;
     const dispatch = useDispatch();
     const [depositList,setDepositList] = useState([]);
     const [depositModeList,setDepositModeList] = useState([]);
     const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+    const [startLoading,setStartLoading] = useState(false);
+    let uniqueId = localStorage.getItem("uniqueId");
  
 
     useEffect(() => {
@@ -42,6 +63,7 @@ const BankDepositModal = (props) => {
         try{
             let response = await apiGetDepositTypeInfo();
             setDepositList(response?.data || []);
+            return () => console.log("Leaving Bakdeposit page")
         }catch(e){}
     }
 
@@ -54,23 +76,23 @@ const BankDepositModal = (props) => {
     
     if (!showBankDeposit) return null;
 
+  
     const handleSubmit = async(values,setSubmitting) => {
         try{
+            setStartLoading(true);
             let newObj = JSON.parse(JSON.stringify(values));
-            let depositMode = depositModeList.find((eachDoc)=> eachDoc.Id === newObj.deposit_mode);
-            let depositType = depositList.find((eachDoc) => eachDoc.Id === newObj.type)
-            newObj.deposit_mode = depositMode?.Type || "";
-            newObj.type = depositType?.Type || "";
             newObj.amount = Number(newObj.amount);
-            console.log("n",newObj);
+            newObj.key = uniqueId;
             let response = await apiStoreBankDepositInfo([newObj]);
             setSubmitting(false);
             if(response.message){
                 dispatch(setShowAddBookPage(false));
                 onCancel();
                 dispatch(setDataSavedModal(true));
+                setStartLoading(false);
                 
             }
+           
 
         }catch(e){
 
@@ -87,8 +109,12 @@ const BankDepositModal = (props) => {
         setFieldValue("remaining_balance",null);
         setFieldValue("advance_receipt_no","");
     }
+    const handleCancelBankDeposit = () => {
+        dispatch(setShowAddBookPage(false));
+        onCancel();
+    }
 
-    return (
+    return (<>
         <Formik
             initialValues={initialValues}
             validationSchema={BankDepositTypeValidations}
@@ -96,7 +122,7 @@ const BankDepositModal = (props) => {
                 setSubmitting(true);
                 handleSubmit(values,setSubmitting);
             }}
-            style={{ overflow: "auto" }}
+            style={{ overflow: "auto",position:"relative" }}
         >
             {({ errors, touched, isSubmitting, setFieldValue, values }) => {
                 if(values.amount){
@@ -186,11 +212,16 @@ const BankDepositModal = (props) => {
                             }
                             
                         </div>
-                        <div className="relative flex flex-row-reverse gap-10 mt-20 xl:absolute bottom-10 right-10">
-                            <CButton btnType="submit" isLoading={isSubmitting}>
+                        <div className="flex flex-row-reverse gap-10 bottom-10 right-10  md:absolute">
+                            <CButton 
+                                btnType = "submit"
+                            >
                                 Save
                             </CButton>
-                            <CButton onClick={() =>  dispatch(setShowAddBookPage(false))}type="cancel">
+                            <CButton 
+                                onClick={handleCancelBankDeposit}
+                                type="cancel"
+                            >
                                 Cancel
                             </CButton>
                         </div>
@@ -198,6 +229,12 @@ const BankDepositModal = (props) => {
                 )
             }}
         </Formik>
+        {
+            startLoading && <Loader showLoading = {true}/>
+        }
+        
+       
+        </>
     )
 }
 

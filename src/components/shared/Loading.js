@@ -1,5 +1,5 @@
 import React from 'react'
-import { Spinner } from "../ui/Spinner";
+import Spinner from "../ui/Spinner";
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -12,7 +12,7 @@ const DefaultLoading = (props) => {
         asElement: Component,
         customLoader,
     } = props
-
+console.log("PROPS",props)
     return loading ? (
         <Component
             className={classNames(

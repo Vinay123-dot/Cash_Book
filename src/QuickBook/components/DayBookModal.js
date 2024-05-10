@@ -22,9 +22,11 @@ import {
     apiGetSalesTypeInfo,
     apiGetUPITypeInfo,
     apiStoreDayBookInfo,
-    apiVerifyAdvancedBookReceipt
+    apiVerifyAdvancedBookReceipt,
+    apiGetTerminal
 } from "../../services/TransactionService";
 import { getTotalMoney} from "./CompConstants";
+import Loader from "../../components/shared/Loader";
 
 
 
@@ -55,8 +57,6 @@ const selectedValType = {
 
 
 const initialObj = {
-    Terminal_Id: 1720, //NOT REQUIRED FROM HERE
-    Merchant_Id: 554, //NOT REQUIRED FROM HERE
     id: 0,
     advance_customer_name: "", //string
     advance_receipt_amount: null, //number
@@ -69,7 +69,7 @@ const initialObj = {
     pending_balance: 0, //number
     paymentType0: null,
 
-    upi: "", //string newly added from here //UPI DETAILS
+    upi: null, //string newly added from here //UPI DETAILS
     upi_amount: null, //number
     upi_type: null, //string
     upi_trans_no: "", //DOUBT
@@ -77,21 +77,21 @@ const initialObj = {
     sales_code: null, //string //DOUBT SALES CODE
     sales_type: null, //stirng
 
-    cash: "", //CASH DETAILS (string why this)
+    cash: null, //CASH DETAILS (string why this)
     cash_amount: null, //number
 
-    debit_card: "", //DEBIT CARD DETAILS (string why this)
+    debit_card:null, //DEBIT CARD DETAILS (string why this)
     debit_card_amount: null, //number
 
-    credit_card: "",  //(string why this)
+    credit_card: null,  //(string why this)
     credit_card_amount: null, //number
 
-    bank_cheque: "",   //(string why this)
+    bank_cheque: null,   //(string why this)
     bank_cheque_amount: null, //number
     bank_cheque_name: "", //string
     bank_cheque_no: "", //string
 
-    online_bank: "", //(string Why this)
+    online_bank: null, //(string Why this)
     online_bank_amount: null,
     online_bank_name: "", //string
     online_bank_trans_no: "", //string
@@ -121,13 +121,27 @@ const DayBookModal = (props) => {
     const [upiTypeInfo, setUpiTypeInfo] = useState([]);
     const [customerListInfo, setCustomerListInfo] = useState([]);
     const [showBillModal,setShowBillModal] = useState(false);
+    const [showLoader,setShowLoader] = useState(false);
+    const [billNum,setBillNum] = useState("");
+    let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
         getSalesType();
         getPaymentTypeInfo();
         getUpiTypeInfo();
         getCustomerTypeInfo();
+        getTerminal();
     }, [])
+
+    const getTerminal = async() => {
+        try{
+            let response = await apiGetTerminal(uniqueId);
+            setBillNum(response?.[0]?.Sequence_No);
+        }
+        catch(e){
+
+        }
+    }
 
     const getSalesType = async () => {
         try {
@@ -173,6 +187,7 @@ const DayBookModal = (props) => {
     };
 
     const handleRemoveFromList = (selectedItem,setFieldValue,valObj) => {
+        setFieldValue(`paymentType${selectedItem}`,null);
         let selectedVal = valObj?.[`paymentType${selectedItem}`];
         if(selectedVal === "UPI"){
             
@@ -199,46 +214,52 @@ const DayBookModal = (props) => {
         if(selectedVal === "Debit Card"){
             setFieldValue("debit_card_amount",null)
         }
-        setFieldValue(`paymentType${selectedItem}`,null);
+       
         // const updatedInitialValues = { ...intialValues };
         // delete updatedInitialValues[`paymentType${selectedItem}`];
-        clickCount.splice(selectedItem, 1);
-        setClickCount(JSON.parse(JSON.stringify(clickCount)));
+        let filteredCount = clickCount.filter(item => item !== selectedItem);
+        // clickCount.splice(selectedItem, 1);
+        console.log("AFTER",filteredCount)
+        setClickCount(JSON.parse(JSON.stringify(filteredCount)));
         // setIntialValues(JSON.parse(JSON.stringify(updatedInitialValues)));
     }
-// console.log("INTIALVALIES",intialValues)
+
+    const convertTONumbers = (newObj) => {
+
+        newObj.bill_value = Number(newObj.bill_value);
+        newObj.cash_amount = Number(newObj.cash_amount);
+        newObj.credit_card_amount = Number(newObj.credit_card_amount);
+        newObj.debit_card_amount = Number(newObj.debit_card_amount);
+        newObj.bank_cheque_amount = Number(newObj.bank_cheque_amount);
+        newObj.online_bank_amount = Number(newObj.online_bank_amount);
+        newObj.upi_amount = Number(newObj.upi_amount);
+        return newObj;
+    }
+
     const handleSubmit = async (values) => {
         try {
-            if(values.sales_type === 1 && Number(values.bill_value) != getTotalMoney(values)){
+            if(values.sales_type === 1 && Number(values.bill_value) !== getTotalMoney(values)){
                 setShowBillModal(true);
                 return;
             }
+            setShowLoader(true);
             let newObj = JSON.parse(JSON.stringify(values));
-            let customerType = customerListInfo.find((eachDoc) => eachDoc.Id === newObj.customer_type);
-            let salesObj = salesType.find((eachDoc) => eachDoc.Id === newObj.sales_type);
-            let upiObj = upiTypeInfo.find((eachItem) => eachItem.Id === newObj?.upi_type);
-
-            newObj.bill_value = Number(newObj.bill_value);
-            newObj.cash_amount = Number(newObj.cash_amount);
-            newObj.credit_card_amount = Number(newObj.credit_card_amount);
-            newObj.debit_card_amount = Number(newObj.debit_card_amount);
-            newObj.bank_cheque_amount = Number(newObj.bank_cheque_amount);
-            newObj.online_bank_amount = Number(newObj.online_bank_amount);
-            newObj.upi_amount = Number(newObj.upi_amount);
-            newObj.customer_type = customerType?.Type || "";
-            newObj.sales_type = salesObj?.Type || "";
-            newObj.sales_code = salesObj?.Code || "";
-            newObj.upi_type = upiObj?.Type || "";
-
-
-            let response = await apiStoreDayBookInfo([newObj]);
+            let convertedObj = convertTONumbers(newObj);
+           
+            convertedObj.key = uniqueId;
+            convertedObj.bill_no = billNum+"/"+ convertedObj.sales_code+"/"+convertedObj.bill_no;
+            
+console.log("c",convertedObj)
+            let response = await apiStoreDayBookInfo([convertedObj]);
+            console.log ("RES",response)
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
                 onCancel();
                 dispatch(setDataSavedModal(true));
+                setBillNum("");
 
             }
-
+            setShowLoader(false);
         } catch (e) {
 
         }
@@ -276,6 +297,23 @@ const DayBookModal = (props) => {
 
     }
 
+    const handleChangeSalesType = (name,sValue,setFieldValue,sArr) => {
+        setFieldValue(name,sValue);
+        let salesObj = sArr.find((eachDoc) => eachDoc.Id === sValue);
+        setFieldValue("sales_code",salesObj?.Code || "");
+    }
+
+    const handleVerifyAdvanceMoney = async(advanceReceiptNo) => {
+        console.log("a",advanceReceiptNo);
+        if(!advanceReceiptNo) return console.log("test")
+            const data = {
+                key : uniqueId,
+                id : advanceReceiptNo
+            };
+        let response = await apiVerifyAdvancedBookReceipt(data);
+        console.log("response",response);
+    }
+
 
     return ( <>
         <Formik
@@ -294,16 +332,25 @@ const DayBookModal = (props) => {
                             {
                                 showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
                             }
-                            {
-                                showSelectBox("Sale Type", "sales_type", "--Select Sale Type--", salesType, setFieldValue)
-                            }
+                            <AntdFormikSelect
+                                labelText = "Sale Type"
+                                name = "sales_type"
+                                ph = "--Select Sale Type--"
+                                handleChange={(name, selectedValue) => handleChangeSalesType(name,selectedValue,setFieldValue,salesType)}
+                                Arr={salesType}
+                            />
                             <AntdInput
                                 text="Bill Number"
                                 value='bill_no'
                                 ph="Enter Bill Number"
+                                showAddBefore = {true}
+                                showAddBeforeValue = {
+                                    billNum+"/"+ (values.sales_code?values.sales_code+"/":"")
+                                }
+                                disableInput = {!values.sales_type && true}
                             />
                             {
-                                showSelectBox("Party Code", "customer_type", "--Select PartyCode--", customerListInfo, setFieldValue)
+                                showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
                             }
                             <AntdInput
                                 text="Bill Total Value"
@@ -365,7 +412,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "upi_amount")}
                                                 />
                                                  {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -384,7 +431,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "cash_amount")}
                                                 />
                                                  {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -426,7 +473,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "online_bank_name")}
                                                 />
                                                 {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -468,7 +515,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "bank_cheque_name")}
                                                 />
                                                 {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -485,7 +532,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "credit_card_amount")}
                                                 />
                                                 {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -504,7 +551,7 @@ const DayBookModal = (props) => {
                                                     validateField={(value) => validateInputField(value, values, "debit_card_amount")}
                                                 />
                                                {
-                                                index != 0 && 
+                                                index !== 0 && 
                                                 <AiOutlineDelete style = {iconStyle} onClick = {()=>handleRemoveFromList(eachItem,setFieldValue,values)}/>
                                                }
                                             </div>
@@ -521,7 +568,10 @@ const DayBookModal = (props) => {
                                         value='advance_receipt_no'
                                         ph="Enter AdvanceReceiptNumber"
                                     />
-                                    <CButton className="h-44 mt-5 ml-10" >
+                                    <CButton 
+                                        className="h-44 mt-10 ml-10" 
+                                        onClick={ () =>handleVerifyAdvanceMoney(values.advance_receipt_no)}
+                                    >
                                         Verify
                                     </CButton>
 
@@ -532,7 +582,7 @@ const DayBookModal = (props) => {
                                     <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3">
                                         <div className="flex flex-col">
                                             <p>Advanced Receipt Amount</p>
-                                            <p>{"values.adva"}</p>
+                                            <p>{values.advance_receipt_amount}</p>
                                         </div>
                                         <div>
                                             <p>Customer Name</p>
@@ -592,7 +642,7 @@ const DayBookModal = (props) => {
                             </div>
                         }
 
-                        <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24">
+                        <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24" style={{marginBottom:20}}>
                             <CButton btnType="submit">
                                 Save
                             </CButton>
@@ -608,7 +658,9 @@ const DayBookModal = (props) => {
 
         </Formik>
         <Modal openModal= {showBillModal} height = {250} width={350}>
-        <p style={{ fontSize: 16, fontWeight: 500, color: "#959595", marginTop: 20 }}> Both the values Should match</p>
+        <p style={{ fontSize: 16, fontWeight: 500, color: "#959595", marginTop: 20,textAlign:"center" }}>
+            Bill amount not matching with the payable amount.
+        </p>
         <CButton 
             onClick={() => setShowBillModal(false)}
             style={{ position: 'absolute', bottom: 20 }}
@@ -617,6 +669,9 @@ const DayBookModal = (props) => {
         </CButton>
 
     </Modal>
+    {
+        showLoader && <Loader showLoading = {true}/>
+    }
     </>
     )
 }

@@ -4,24 +4,37 @@ import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from './store';
 import './App.css';
 import QuickBookPage from "../src/QuickBook";
-import EditMerchantPAge from "./EditMerchantPage";
+import { apiCreateSession } from './services/TransactionService';
 
 function App() {
   const searchParams = new URLSearchParams(window.location.search);
-const userType = searchParams.get('mType');
-const rawPersistData = searchParams.get('sessionData');
+  const userType = searchParams.get('mType');
+  const rawPersistData = searchParams.get('sessionData');
+  const uniqueId = searchParams.get('uniqueId');
 
-localStorage.setItem("mType",userType);
-localStorage.setItem("whoami",rawPersistData);
-localStorage.setItem("developer","vinay");
+  localStorage.setItem("mType",userType);
+  localStorage.setItem("whoami",rawPersistData);
+  localStorage.setItem("uniqueId",uniqueId);
 
+  useEffect(() => {
+    AddCreateSession();
+  },[])
+
+  const AddCreateSession = async() => {
+    try{
+      let data = {id : uniqueId,type: userType}
+      let response = await apiCreateSession(data);
+      console.log("r",response)
+    }catch(e){
+
+    }
+  }
 
 
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <QuickBookPage />
-        {/* <EditMerchantPAge/> */}
       </PersistGate>
     </Provider>
 

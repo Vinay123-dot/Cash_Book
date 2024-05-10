@@ -36,10 +36,10 @@ const CTable = (props) => {
                 <tbody>
                     {
                         (data || []).map((eachDoc,index) => (
-                            <tr>
+                            <tr key = {index}>
                                 <td style={thTdStyle} key={eachDoc.date}>{getSelectedDay(eachDoc.date)}</td>
-                                <td style={thTdStyle} key={eachDoc.balance}>{eachDoc.balance}</td>
-                                <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.amount}</td>
+                                <td style={thTdStyle} key={eachDoc.balance}>{eachDoc.amount}</td>
+                                <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.balance}</td>
                                 <td style={thTdStyle} key={eachDoc.petty_cash_details}>{eachDoc.petty_cash_details}</td>
                                 <td style={thTdStyle}>
                                     <button>
