@@ -31,7 +31,7 @@ export const initialTableData = {
     // searchData: '',
     // sort: 1,
     book_type : 0,
-    terminalID : -1,
+    terminal_id : -1,
     // fromDate: getFromDate(),
     // toDate: getToDate(),
 }
@@ -41,7 +41,7 @@ export const initialFilterData = {
 }
 
 export const intialOutletData = {
-    terminalID: -1,
+    terminal_id: -1,
 }
 
 export const intialCashBookData = {

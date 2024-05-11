@@ -72,8 +72,7 @@ const QuickBookTools = () => {
     
     setOutletList([options,...response] || []);
   }
-  console.log("r",outletList)
-
+ 
   const handleView = async () => {
     const payload = cloneDeep(tableData);
     const newFilterData = cloneDeep(filterData);
@@ -89,7 +88,7 @@ const QuickBookTools = () => {
         setDurationErrMsg('Please select duration')
         return;
     }
-    if(newOutletData?.terminalID < 0) {
+    if( userType == 4 && newOutletData?.terminal_id < 0) {
       setTerminalErrMsg('Please Select terminal')
       return;
     }
@@ -104,7 +103,7 @@ const QuickBookTools = () => {
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType == 7? uniqueId : newOutletData.terminalID ,
+      terminal_id: userType == 7? uniqueId : newOutletData.terminal_id ,
       key: uniqueId
       }
     dispatch(getTransactions(newObj));
@@ -147,7 +146,7 @@ const QuickBookTools = () => {
     newTableData.pageNumber = 0;
     dispatch(setTableData(newTableData));
     const newOutletData = cloneDeep(outletData);
-    newOutletData.terminalID = val;
+    newOutletData.terminal_id = val;
     dispatch(setOutletData(newOutletData));
     setTerminalErrMsg("");
   }
@@ -177,7 +176,7 @@ const QuickBookTools = () => {
         setDurationErrMsg('Please select duration')
         return;
     }
-    if (newOutletData?.terminalID < 0) {
+    if (userType == 4 && newOutletData?.terminal_id < 0) {
       setDurationErrMsg('Please select terminal')
       return;
   }
@@ -192,14 +191,13 @@ const QuickBookTools = () => {
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType == 7 ? uniqueId : newOutletData.terminalID ,
+      terminal_id: userType == 7 ? uniqueId : newOutletData.terminal_id ,
       key: uniqueId
       }
       getTransactionHistory(newObj);
   }
 
   const getTransactionHistory = async (allData) => {
-    console.log("inside")
     const {book_type,history_type} = allData;
     const tId = userType == 4? 0 : uniqueId;
     // dispatch(setTransactionsLoading(true));
@@ -247,7 +245,7 @@ const QuickBookTools = () => {
               placeholder="Select Outlet"
               options={outletList}
               onStatusChange={handleOutletStatusChange}
-              value = {outletData.terminalID}
+              value = {outletData.terminal_id}
               message = {terminalErrMsg}
             />
           </div>

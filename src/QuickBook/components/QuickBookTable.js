@@ -70,6 +70,24 @@ const TerminalLevelColumns = [
     
 ];
 
+const MerchantLevelColumns = [
+    // { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
+    { header: 'Bill No.',accessorKey: 'bill_no', enableSorting: false },
+    { header: 'Date',accessorKey: 'date',enableSorting: false},
+    { header: 'Party Code',accessorKey: 'party_code',enableSorting: false },
+    { header: 'Bill Value',accessorKey: 'bill_values',enableSorting: false },
+    { header: "Cash", accessorKey: 'cash', enableSorting: false },
+    { header: 'UPI Type',accessorKey: 'upi_type',enableSorting: false },   
+    { header: () => (
+            <span>
+                Advanced <br/>
+                Receipt No.
+            </span>
+        ),accessorKey: 'tewmp',enableSorting: false },
+    { header: 'Pending Bill',accessorKey: 'description',enableSorting: false},
+    
+];
+
 
 
 // // const columns = [
@@ -216,7 +234,7 @@ const QuickBookTable = () => {
         // dispatch(getTransactions(payload))
     }
 
-const getTableColumns = (userType, bookType) => {
+const getTableColumns = (bookType) => {
     switch (bookType) {
         case 1:
             return AdvanceBookColumns;
@@ -230,12 +248,12 @@ const getTableColumns = (userType, bookType) => {
             return TerminalLevelColumns;
     }
 }
+console.log("DATA..",data);
 
-  console.log("T",data);
     return (
         <>
             <DataTable
-                columns={getTableColumns(userType,cashbookData?.book_type)}
+                columns={userType ==4 ? MerchantLevelColumns : getTableColumns(cashbookData?.book_type)}
                 data={data}
                 // pagingData={{
                 //     pageIndex: pageNumber + 1,
@@ -268,11 +286,6 @@ export default QuickBookTable
 //         // Add other terminal level columns here
 //     ];
 
-//     const merchantLevelColumns = [
-//         { header: 'Sl No', accessorKey: 'terminal', enableSorting: false },
-//         { header: 'Bill No.', accessorKey: 'orgtxnid', enableSorting: false },
-//         // Add other merchant level columns here
-//     ];
 
  
     
