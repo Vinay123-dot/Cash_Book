@@ -78,12 +78,12 @@ export async function apiGetBankDepositInfo(){
     })
 }
 
-export async function apiGetTerminalList(){
-    return ApiServiceV2.fetchData({
-        url: '/v21/get_AAPTerminal`',
-        method: 'get',
-    })
-}
+// export async function apiGetTerminalList(){
+//     return ApiServiceV2.fetchData({
+//         url: '/v21/get_AAPTerminal`',
+//         method: 'get',
+//     })
+// }
 
 
 export async function apiStoreBankDepositInfo(data){

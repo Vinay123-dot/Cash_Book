@@ -25,8 +25,8 @@ import {
     apiVerifyAdvancedBookReceipt,
     apiGetTerminal
 } from "../../services/TransactionService";
-import { getTotalMoney} from "./CompConstants";
 import Loader from "../../components/shared/Loader";
+import { FaRupeeSign } from "react-icons/fa";
 
 
 
@@ -40,6 +40,20 @@ const validationSchema = Yup.object().shape({
 
 
 });
+
+const ConvertToNum = (val) => Number(val);
+
+const getTotalMoneyInDayBook = (allData) => {
+    let totalVal =  ConvertToNum(allData.upi_amount)+
+                    ConvertToNum(allData.cash_amount)+
+                    ConvertToNum(allData.online_bank_amount)+
+                    ConvertToNum(allData.bank_cheque_amount)+
+                    ConvertToNum(allData.credit_card_amount)+
+                    ConvertToNum(allData.debit_card_amount) +
+                    ConvertToNum(allData.advance_receipt_amount)
+   
+    return totalVal;
+}
 const iconStyle = {color:"red",width:20,height:20,position: "absolute", right: 10,bottom:5};
 const selectedValType = {
     "cash_amount": "Cash",
@@ -123,6 +137,7 @@ const DayBookModal = (props) => {
     const [showBillModal,setShowBillModal] = useState(false);
     const [showLoader,setShowLoader] = useState(false);
     const [billNum,setBillNum] = useState("");
+    const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -238,7 +253,7 @@ const DayBookModal = (props) => {
 
     const handleSubmit = async (values) => {
         try {
-            if(values.sales_type === 1 && Number(values.bill_value) !== getTotalMoney(values)){
+            if(values.sales_type === 1 && Number(values.bill_value) !== getTotalMoneyInDayBook(values)){
                 setShowBillModal(true);
                 return;
             }
@@ -302,15 +317,19 @@ const DayBookModal = (props) => {
         setFieldValue("sales_code",salesObj?.Code || "");
     }
 
-    const handleVerifyAdvanceMoney = async(advanceReceiptNo) => {
-        console.log("a",advanceReceiptNo);
-        if(!advanceReceiptNo) return console.log("test")
+    const handleVerifyAdvanceMoney = async(allVal,setFieldValue) => {
+        const {advance_receipt_no} = allVal;
+        if(!advance_receipt_no) return console.log("test")
+            setVerifyBtnLdng(true);
             const data = {
                 key : uniqueId,
-                id : advanceReceiptNo
+                id : advance_receipt_no
             };
         let response = await apiVerifyAdvancedBookReceipt(data);
-        console.log("response",response);
+        console.log("r",response);
+        setFieldValue("advance_receipt_amount",response?.Advance_Receipt_Amount || 0);
+        setFieldValue("advance_customer_name",response?.Customer_Name || "");
+        setVerifyBtnLdng(false);
     }
 
 
@@ -569,8 +588,9 @@ const DayBookModal = (props) => {
                                         ph="Enter AdvanceReceiptNumber"
                                     />
                                     <CButton 
-                                        className="h-44 mt-10 ml-10" 
-                                        onClick={ () =>handleVerifyAdvanceMoney(values.advance_receipt_no)}
+                                        className="h-44 mt-10 ml-10"
+                                        isLoading = {verifyBtnLdng} 
+                                        onClick={ () =>handleVerifyAdvanceMoney(values,setFieldValue)}
                                     >
                                         Verify
                                     </CButton>
@@ -588,11 +608,11 @@ const DayBookModal = (props) => {
                                             <p>Customer Name</p>
                                             <p>{values.advance_customer_name}</p>
                                         </div>
-                                        <AntdInput
+                                        {/* <AntdInput
                                             text="Amount"
                                             value='used_receipt_amount'
                                             ph="Enter Amount"
-                                        />
+                                        /> */}
                                     </div>
                                 }
 
@@ -603,7 +623,12 @@ const DayBookModal = (props) => {
                         <ParagraphTag label="Summary" />
                         <div className="flex flex-col px-4 py-2">
                             <p>Total Bill Amount</p>
-                            <p>$ <span className="px-0.5">{values.bill_value || 0}</span></p>
+                            <div className="flex items-center">
+                                <FaRupeeSign
+                                    style={{ fontSize: 16,marginRight:2}}
+                                /> 
+                                <p>{values.bill_value || 0}</p>
+                            </div>
                         </div>
                         {
                             values.sales_type === 1 &&
@@ -633,11 +658,12 @@ const DayBookModal = (props) => {
                                 </div>
                                 <div>
                                     <p>Advanced Used Amount</p>
-                                    <p>{values.used_receipt_amount}</p>
+                                    {/* <p>{values.used_receipt_amount}</p> */}
+                                    {<p>{values.advance_receipt_amount}</p>}
                                 </div>
                                 <div>
                                     <p> Pending Amount</p>
-                                    <p>{Number(values.bill_value) - getTotalMoney(values)}</p>
+                                    <p>{Number(values.bill_value) - getTotalMoneyInDayBook(values)}</p>
                                 </div>
                             </div>
                         }

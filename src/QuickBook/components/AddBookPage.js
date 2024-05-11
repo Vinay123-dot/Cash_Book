@@ -6,11 +6,12 @@ import DayBookModal from "./DayBookModal";
 import AdvanceBookModal from "./AdvanceBookModal";
 import BankDepositModal from "./BankDepositModal";
 import PettyCashModal from "./PettyCashModal";
-import { apiGetPettyCashCommonBalance } from "../../services/TransactionService";
+import { apiGetCommonOpeningBalance, apiGetPettyCashCommonBalance } from "../../services/TransactionService";
 import { getToday } from "../../utils/dateFormatter";
 import {
   setPettyCashBalance,
-  setShowAddBookPage
+  setShowAddBookPage,
+  setCommonCashBalance
 } from '../store/stateSlice';
 import CButton from "../../components/ui/Button";
 
@@ -45,7 +46,19 @@ const getPettyCashCommBalance = async() => {
   
   if(!openPage) return null;
 
-  const handleCancelSelectedVal = () => setSelectedValue(null);
+  const handleCancelSelectedVal = () => {
+    setSelectedValue(null);
+    getCommonOpeningBalance();
+  };
+
+  const getCommonOpeningBalance = async() => {
+    try{
+        let response = await apiGetCommonOpeningBalance({uniqueId,date:getToday()});
+        dispatch(setCommonCashBalance(response?.opening_balance));
+    }catch(e){
+
+    }
+}
 
   return (
     <div className="fixed inset-0 flex  flex-col  z-50" style={{ backgroundColor: "#e5e7eb" }}>
@@ -64,14 +77,14 @@ const getPettyCashCommBalance = async() => {
 
         />
         {
-          selectedValue === 3 &&  userType!= 7 &&
+          selectedValue === 3 &&  userType == 7 &&
           <div className="flex flex-col">
           <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
           <p>{pettyCash}</p>
         </div>
         }
         {
-          selectedValue === 4 &&  
+          selectedValue === 4 &&  userType == 7 &&
           <div className="flex flex-col">
           <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
           <p>{bankBalance}</p>

@@ -29,7 +29,7 @@ const CButton = (props) => {
         className= {className}
         type = {btnType}
     >
-        {isLoading ? 'Saving...' :props.children}
+        {isLoading ? 'Verifying...' :props.children}
     </button>
 }
 

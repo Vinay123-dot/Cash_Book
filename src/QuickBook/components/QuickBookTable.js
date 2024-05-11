@@ -35,8 +35,8 @@ const DayBookColumns = [
     { header: "Bank",accessorKey: 'Online_Bank_Amount', enableSorting: false },
     { header: "Cheque",accessorKey: 'Bank_Cheque_Amount', enableSorting: false },
     // { header: "Advanced Receipt No.",accessorKey: 'Advance_Receipt_No',enableSorting: false },
-    // { header: "Advanced Receipt Amount",accessorKey: 'Advance_Receipt_Amount',enableSorting: false },
-    { header: "Pending Bill",accessorKey: 'Pending_Balance',enableSorting: false,}
+    { header: "Advanced Receipt Amount",accessorKey: 'Advance_Receipt_Amount',enableSorting: false },
+    // { header: "Pending Bill",accessorKey: 'Pending_Balance',enableSorting: false,}
     
 ];
 
@@ -47,7 +47,7 @@ const AdvanceBookColumns = [
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
     { header: "Customer Name", accessorKey: 'Customer_Name', enableSorting: false},
     { header: 'Customer Mobile Number',accessorKey: 'Phone_No',enableSorting: false },
-    { header: 'Amount',accessorKey: 'Amount', enableSorting: false },
+    { header: 'Amount',accessorKey: 'Bill_Value', enableSorting: false },
     { header: 'Status',accessorKey: 'Status', enableSorting: false },
     
 ];

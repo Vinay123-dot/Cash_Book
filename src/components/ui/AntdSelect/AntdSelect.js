@@ -30,7 +30,7 @@ const AntdSelectFilter = (props) => {
             >
                 {(options || []).map((eachOpt, i) => (
                             <Option key={i} value={eachOpt.Id}>
-                                {eachOpt.Type}
+                                {eachOpt.Type || eachOpt.Terminal}
                             </Option>
                 ))}
             </Select>

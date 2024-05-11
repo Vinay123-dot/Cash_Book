@@ -30,7 +30,7 @@ const validationSchema = Yup.object().shape({
     customer_type: Yup.string().required('This field is required.'),
     customer_name : Yup.string().required('This field is required.'),
     phone_no : Yup.string().required('This field is required.'),
-    amount: Yup.string().required('This field is required.'),
+    bill_value : Yup.string().required('This field is required.'),
     // advance_receipt_no: Yup.string().required('This field is required.'),
 
 
@@ -57,7 +57,7 @@ const initialObj = {
     receipt_no: "",
     customer_name: "", 
     phone_no : "",
-    amount : null,
+    bill_value : null,
     customer_type: null,
     paymentType0: null,
     status : "Pending",
@@ -188,7 +188,7 @@ const AdvanceBookModal = (props) => {
 
     const convertTONumbers = (newObj) => {
 
-        newObj.amount = Number(newObj.amount);
+        newObj.bill_value = Number(newObj.bill_value);
         newObj.cash_amount = Number(newObj.cash_amount);
         newObj.credit_card_amount = Number(newObj.credit_card_amount);
         newObj.debit_card_amount = Number(newObj.debit_card_amount);
@@ -200,7 +200,7 @@ const AdvanceBookModal = (props) => {
 
     const handleSubmit = async (values) => {
         try {
-            if (Number(values.amount) !== getTotalMoney(values)) {
+            if (Number(values.bill_value) !== getTotalMoney(values)) {
                 setShowBillModal(true);
                 return;
             }
@@ -296,7 +296,7 @@ const AdvanceBookModal = (props) => {
                             />
                             <AntdInput
                                 text="Amount"
-                                value='amount'
+                                value='bill_value'
                                 ph="Enter Amount"
                                 acceptOnlyNum={true}
                                 showPrefix={true}
@@ -507,7 +507,7 @@ const AdvanceBookModal = (props) => {
                                 <FaRupeeSign
                                     style={{ fontSize: 16,marginRight:2}}
                                 /> 
-                                <p>{values.amount || 0}</p>
+                                <p>{values.bill_value || 0}</p>
                             </div>
                            
                         </div>
@@ -535,14 +535,14 @@ const AdvanceBookModal = (props) => {
                                     }
 
                                 </div>
-                                <div>
+                                {/* <div> Not Required As per Niranjan's suggestion
                                     <p>Advanced Used Amount</p>
                                     <p>0</p>
                                 </div>
                                 <div>
                                     <p> Pending Amount</p>
                                     <p>{Number(values.amount) - getTotalMoney(values)}</p>
-                                </div>
+                                </div> */}
                             </div>
 
                         <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24" style={{ marginBottom: 20 }}>

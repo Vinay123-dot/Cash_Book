@@ -16,18 +16,6 @@ historyType = persistData?.auth?.session?.transactions
 export const getTransactions = createAsyncThunk(
     'quickbook/data/getTransactions',
     async (data) => {
-        // let temp = {
-        //     fromDate : "2024-4-10 0:00:00",
-        //     historyType : 5,
-        //     pageNumber  : 0,
-        //     recordsPerPage :10,
-        //     searchData : "",
-        //     sort : 1,
-        //     status : -1,
-        //     terminalID : 0,
-        //     toDate : "2024-4-10 23:59:59",
-        //     type : 0
-        // }
         console.log("DATA",data)
         const response = await apiGetBookTypeServices(data);
         return response;
@@ -43,7 +31,7 @@ export const initialTableData = {
     // searchData: '',
     // sort: 1,
     book_type : 0,
-    // terminalID : 0,
+    terminalID : -1,
     // fromDate: getFromDate(),
     // toDate: getToDate(),
 }
@@ -52,9 +40,9 @@ export const initialFilterData = {
     history_type: 0,
 }
 
-// export const intialOutletData = {
-//     terminalID: 0,
-// }
+export const intialOutletData = {
+    terminalID: -1,
+}
 
 export const intialCashBookData = {
     book_type : 0
@@ -70,7 +58,7 @@ const dataSlice = createSlice({
         transactionList: [],
         tableData: initialTableData,
         filterData: initialFilterData,
-        // outletData : intialOutletData,
+        outletData : intialOutletData,
         cashbookData : intialCashBookData,
     },
     reducers: {
@@ -81,7 +69,7 @@ const dataSlice = createSlice({
             state.toatalAmount = 0
             state.transactionList = []
             state.filterData = { ...initialFilterData }
-            // state.outletData = {...intialOutletData }
+            state.outletData = {...intialOutletData }
             state.tableData = { ...initialTableData, ...action.payload }
             state.cashbookData = {...intialCashBookData}
         },
