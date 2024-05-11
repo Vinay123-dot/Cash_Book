@@ -248,7 +248,7 @@ const getTableColumns = (bookType) => {
             return TerminalLevelColumns;
     }
 }
-console.log("DATA..",data);
+
 
     return (
         <>

@@ -10,7 +10,7 @@ function App() {
   const searchParams = new URLSearchParams(window.location.search);
   const userType = searchParams.get('mType');
   const rawPersistData = searchParams.get('sessionData');
-  const uniqueId = searchParams.get('uniqueId');
+  const uniqueId = searchParams.get('uniqueId') || "0000000000053575";
 
   localStorage.setItem("mType",userType);
   localStorage.setItem("whoami",rawPersistData);

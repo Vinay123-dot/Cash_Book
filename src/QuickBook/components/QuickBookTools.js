@@ -214,7 +214,24 @@ const QuickBookTools = () => {
   
   };
 
-
+  const getBookTypeList = (booksArr,terminalObj) => {
+    let temp = [];
+    if(terminalObj.terminal_id == 0){
+      temp = (booksArr || []).filter((eachItem) => eachItem.Id != 5);
+    }else {
+      temp = JSON.parse(JSON.stringify(booksArr));
+    }
+    return temp;
+  }
+  const getTerminalList = (terArr,bookObj) => {
+    let temp = [];
+    if(bookObj.book_type== 5){
+      temp = (terArr || []).filter((eachItem) => eachItem.Id != 0);
+    }else {
+      temp = JSON.parse(JSON.stringify(terArr));
+    }
+    return temp;
+  }
 
   return (
     <div className="xl:flex justify-between py-4 px-10">
@@ -222,7 +239,7 @@ const QuickBookTools = () => {
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"
-            options={bookTypeList}
+            options={getBookTypeList(bookTypeList,outletData)}
             onStatusChange={handleCashBookChange}
             value = {cashbookData.book_type}
             message = {errorMessage}
@@ -243,7 +260,7 @@ const QuickBookTools = () => {
           <div className="flex flex-col">
             <AntdSelectFilter
               placeholder="Select Outlet"
-              options={outletList}
+              options={getTerminalList(outletList,cashbookData)}
               onStatusChange={handleOutletStatusChange}
               value = {outletData.terminal_id}
               message = {terminalErrMsg}
