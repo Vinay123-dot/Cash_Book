@@ -64,8 +64,29 @@ const PaymentsArray = [
 ];
 const UPIARRAY = [
   { name: 'Swinkpay', value: '0' },
-]
+];
+const UPI = "UPI";
+const CASH = "Cash";
+const BANK = "Bank";
+const CHEQUE = "Cheque";
+const DEBIT_CARD = "Debit Card";
+const CREDIT_CARD = "Credit Card";
+
+const selectedValType = {
+  "cash_amount": CASH,
+  "upi_amount": UPI,
+  "upi_type": UPI,
+  "online_bank_amount": BANK,
+  "online_bank_trans_no": BANK,
+  "online_bank_name": BANK,
+  "bank_cheque_amount": CHEQUE,
+  "bank_cheque_no": CHEQUE,
+  "bank_cheque_name": CHEQUE,
+  "credit_card_amount": CREDIT_CARD,
+  "debit_card_amount": DEBIT_CARD
+}
+
 const PERSIST_STORE_NAME = "quickBookRedux";
 
 export {Options,HeaderSelectOptions,DepositType,DepositMode,
-  PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY};
+  PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY,selectedValType};

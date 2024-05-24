@@ -5,7 +5,7 @@ const BankDepositTypeValidations = Yup.object({
   date: Yup.string().required('This field is required'),
   amount: Yup.string()
     .when("type", {
-      is: (val) => val == 1 || val == 2,
+      is: (val) => val == 1 || val == 2 || val == 3,
       then: (schema) => schema.required('This field is required'),
       otherwise: (schema) => schema.notRequired()
     }),
@@ -17,19 +17,19 @@ const BankDepositTypeValidations = Yup.object({
     }),
   deposit_mode: Yup.string()
     .when("type", {
-      is: (val) => val === 2,
+      is: (val) => val == 2,
       then: (schema) => schema.required('This field is required'),
       otherwise: (schema) => schema.notRequired()
     }),
   advance_receipt_no : Yup.string()
     .when("type", {
-      is: (val) => val === 3,
+      is: (val) => val == 3,
       then: (schema) => schema.required('This field is required'),
       otherwise: (schema) => schema.notRequired()
     }),
   reason: Yup.string()
     .when("type", {
-      is: (val) => val === 3,
+      is: (val) => val == 3,
       then: (schema) => schema.required('This field is required'),
       otherwise: (schema) => schema.notRequired()
     }),

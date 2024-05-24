@@ -10,6 +10,18 @@ const getTotalMoney = (allData) => {
    
     return totalVal;
 }
+
+const getTotalMoneyInDayBook = (allData) => {
+    let totalVal =  ConvertToNum(allData.upi_amount)+
+                    ConvertToNum(allData.cash_amount)+
+                    ConvertToNum(allData.online_bank_amount)+
+                    ConvertToNum(allData.bank_cheque_amount)+
+                    ConvertToNum(allData.credit_card_amount)+
+                    ConvertToNum(allData.debit_card_amount) +
+                    ConvertToNum(allData.advance_receipt_amount)
+   
+    return totalVal;
+}
 // const validatePaymentType = (value) => {
 //     let error;
 //     if (!value) {
@@ -41,4 +53,4 @@ const getTotalMoney = (allData) => {
 //     return error;
 
 // }
-export {getTotalMoney};
+export {getTotalMoney,getTotalMoneyInDayBook};

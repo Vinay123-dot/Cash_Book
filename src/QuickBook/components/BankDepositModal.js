@@ -2,7 +2,6 @@ import React, { useEffect,useState } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
-import AntdDatePicker from "../../components/ui/AntdDatePicker";
 import AntdInput from "../../components/ui/AntdInput";
 import { BankDepositTypeValidations } from "../../Validations";
 import { useDispatch,useSelector } from "react-redux";
@@ -31,19 +30,6 @@ const initialValues = {
     advance_receipt_no: '', //string
 };
 
-const mainDiv = {
-    display: "flex",
-    position: "fixed",
-    backgroundColor: "rgba(52, 52, 52, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999,
-    top: 0,
-    left: 0,
-    height: "100vh",
-    width: "100vw",
-};
-
 const BankDepositModal = (props) => {
     const { showBankDeposit,onCancel } = props;
     const dispatch = useDispatch();
@@ -55,23 +41,20 @@ const BankDepositModal = (props) => {
  
 
     useEffect(() => {
-        getDepositTypeInfo();
-        getDepositModeInfo();
+        fetchDepositInfo();
     },[])
 
-    const getDepositTypeInfo = async() => {
+    const fetchDepositInfo = async() => {
         try{
-            let response = await apiGetDepositTypeInfo();
-            setDepositList(response?.data || []);
-            return () => console.log("Leaving Bakdeposit page")
-        }catch(e){}
-    }
+            const [depositTypeResponse,depositModeResponse] = await Promise.all([
+                apiGetDepositTypeInfo(),
+                apiGetDepositModeInfo()
+            ])
+            setDepositList(depositTypeResponse?.data || []);
+            setDepositModeList(depositModeResponse?.data || []);
+        }catch(e){
 
-    const getDepositModeInfo = async() => {
-        try{
-            let response = await apiGetDepositModeInfo();
-            setDepositModeList(response?.data || []);
-        }catch(e){}
+        }
     }
     
     if (!showBankDeposit) return null;
@@ -90,10 +73,7 @@ const BankDepositModal = (props) => {
                 onCancel();
                 dispatch(setDataSavedModal(true));
                 setStartLoading(false);
-                
             }
-           
-
         }catch(e){
 
         }
@@ -124,7 +104,7 @@ const BankDepositModal = (props) => {
             }}
             style={{ overflow: "auto",position:"relative" }}
         >
-            {({ errors, touched, isSubmitting, setFieldValue, values }) => {
+            {({ setFieldValue, values }) => {
                 if(values.amount){
                     values.remaining_balance =  commOpeningBal - Number(values.amount);
                 }
@@ -239,3 +219,4 @@ const BankDepositModal = (props) => {
 }
 
 export default BankDepositModal;
+

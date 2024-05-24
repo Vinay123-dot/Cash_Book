@@ -7,6 +7,7 @@ import {
     setShowAddBookPage,
     setDataSavedModal,
     setCommonCashBalance,
+    setMainPageLoader
 } from '../store/stateSlice';
 import SucessIcon from "../../assets/SucessIcon.png";
 import { apiGetCommonOpeningBalance } from "../../services/TransactionService";
@@ -16,9 +17,7 @@ const Header = () => {
 
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
-    const handleClick = () => setShowModal(!showModal);
     let userType = localStorage.getItem("mType");
-    const totalTxn = useSelector(state => state.quickbookStore.data.totalTxn)
     const showDataSavedModal = useSelector(state => state.quickbookStore.state.dataSavedModalOpen)
     const showAddBookPage = useSelector(state => state.quickbookStore.state.showAddBookPage);
     const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
@@ -31,10 +30,12 @@ const Header = () => {
 
     const getCommonOpeningBalance = async() => {
         try{
+            dispatch(setMainPageLoader(true));
             let response = await apiGetCommonOpeningBalance({uniqueId,date:getToday()});
             dispatch(setCommonCashBalance(response?.opening_balance));
+            dispatch(setMainPageLoader(false));
         }catch(e){
-
+            dispatch(setMainPageLoader(false));
         }
     }
 
@@ -49,7 +50,7 @@ const Header = () => {
             {
                 userType === "7" &&
                 <CButton onClick={() => dispatch(setShowAddBookPage(true))} className="xl:col-span-1">
-                    Add Book
+                    Select Book
                 </CButton>
             }
 

@@ -9,12 +9,13 @@ import CustomizedTable from "../../components/ui/CustomizedTable";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal
+    setDataSavedModal,
+    setPettyCashBalance
 } from '../store/stateSlice';
 import Modal from "../../components/shared/Modal";
 import { PettyCashValidations } from "../../Validations";
 import ParagraphTag from "../../constants/PTag";
-import { apiStorePettyCashInfo } from "../../services/TransactionService";
+import { apiStorePettyCashInfo,apiGetPettyCashCommonBalance } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 
 const initialValues = {
@@ -55,6 +56,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
     />
 )
 
+
 const PettyCashModal = (props) => {
 
     const { showPettyCash, onCancel } = props;
@@ -66,23 +68,33 @@ const PettyCashModal = (props) => {
         showModal: false, selectedObj: {}
     })
     const [showLoader,setShowLoader] = useState(false);
-    const pettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+    
+    let cashPetty = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+    const [remPettybal,setRemPettybal] = useState(cashPetty);
     let uniqueId = localStorage.getItem("uniqueId");
 
+    useEffect(()=>{
+        setRemPettybal(cashPetty);
+    },[cashPetty])
 
     if (!showPettyCash) return null;
 
-    const handleSubmit = async (values, setErrors, resetForm) => {
+    const handleSubmit = async (values, setErrors, resetForm,setFieldError) => {
 
         const { date, balance, amount, petty_cash_details } = values;
         let isAllValuesPresent = date && balance && amount && petty_cash_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
+        if(values.balance < 0){
+            setFieldError("balance","Balance should not be lessthan 0");
+            return ;
+        }
         if (isAllValuesPresent) {
             setPettyCashArr((prev) => [...prev, values]);
             setErrors({});
             setTimeout(() => {
                 resetForm();
+                setRemPettybal(values.balance);
             }, 0);
         }
 
@@ -95,6 +107,7 @@ const PettyCashModal = (props) => {
         setShowLoader(true);
         let response = await apiStorePettyCashInfo(pettyCashArr);
         if (response.message) {
+            getPettyCashCommBalance();
             setShowLoader(false);
             dispatch(setShowAddBookPage(false));
             onCancel();
@@ -103,6 +116,15 @@ const PettyCashModal = (props) => {
         }
     }
 
+    const getPettyCashCommBalance = async () => {
+        try {
+          let response = await apiGetPettyCashCommonBalance({ uniqueId });
+          dispatch(setPettyCashBalance(response?.opening_balance));
+        } catch (e) {
+    
+        }
+      }
+
     const handleEditClick = (key, obj) => {
         obj.key = key;
         setSelectedObjDetails({
@@ -110,24 +132,33 @@ const PettyCashModal = (props) => {
             selectedObj: obj
         })
     }
-
+   
     const handleDeleteClick = (key) => {
-        pettyCashArr.splice(key, 1);
-        setPettyCashArr(JSON.parse(JSON.stringify(pettyCashArr)));
-    }
 
-    const handleEditDetails = (val) => {
-        setSelectedObjDetails({
-            showModal: false,
-            selectedObj: val
-        })
-        let newTemp = JSON.parse(JSON.stringify(pettyCashArr));
-        let newObj = JSON.parse(JSON.stringify(val));
-        newObj.key = uniqueId;
-        newObj.amount = Number(newObj.amount);
-        newTemp[val.key] = newObj;
-        setPettyCashArr(newTemp);
+        let newPettyCashArr = [...pettyCashArr];
+        let removedObj = newPettyCashArr.splice(key, 1);
+        setRemPettybal(prevVal => prevVal + (removedObj?.[0].amount || 0));
+        newPettyCashArr.forEach((eachItem,index) => {
+            if(key <= index){
+                eachItem.balance += removedObj?.[0].amount || 0;
+            }
+        });
+        setPettyCashArr(JSON.parse(JSON.stringify(newPettyCashArr)));
     }
+  
+    // const handleEditDetails = (val) => {
+    //     setSelectedObjDetails({
+    //         showModal: false,
+    //         selectedObj: val
+    //     })
+    //     let newTemp = JSON.parse(JSON.stringify(pettyCashArr));
+    //     let newObj = JSON.parse(JSON.stringify(val));
+    //     newObj.key = uniqueId;
+    //     newObj.amount = Number(newObj.amount);
+    //     newTemp[val.key] = newObj;
+    //     setPettyCashArr(newTemp);
+    //     setRemPettybal(newObj.balance);
+    // }
 
     const getButtonStatus = (pArr) => pArr.length <= 0 ? true : false;
     const handleCancelModInPC = () => {
@@ -141,13 +172,13 @@ const PettyCashModal = (props) => {
         <Formik
             initialValues={initialValues}
             validationSchema={PettyCashValidations}
-            onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                handleSubmit(values, setErrors, resetForm);
+            onSubmit={(values, { setErrors, resetForm,setFieldError }) => {
+                handleSubmit(values, setErrors, resetForm,setFieldError);
             }}
             style={{ overflow: "auto" }}
         >
-            {({ setFieldValue, values, errors, setErrors }) => {
-                values.balance = pettyCash - Number(values.amount);
+            {({ setFieldValue,values }) => {
+                values.balance = remPettybal - Number(values.amount);
                 if(values.petty_cash_details) {
                     let reasonStng = values.petty_cash_details;
                     values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
@@ -179,12 +210,8 @@ const PettyCashModal = (props) => {
                                     Add
                                 </CButton>
                             </div>
-                            
                         </div>
-
-
                     </Form>
-
                 )
             }}
         </Formik>
@@ -216,73 +243,6 @@ const PettyCashModal = (props) => {
                 Cancel
             </CButton>
         </div>
-
-
-
-        <Modal openModal={selectObjDetails.showModal}>
-            <Formik
-                initialValues={selectObjDetails.selectedObj}
-                validationSchema={PettyCashValidations}
-                innerRef={editFormikRef}
-                onSubmit={(values, { setSubmitting, resetForm }) => {
-                    handleEditDetails(values)
-                }}
-                style={{ overflow: "auto", position: "relative" }}
-            >
-                {({ setFieldValue,values }) =>  {
-                     values.balance = pettyCash - Number(values.amount);
-                     if(values.petty_cash_details) {
-                        let reasonStng = values.petty_cash_details;
-                        values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
-                    }
-                return (
-                    <Form>
-                        <ParagraphTag label="Edit Details" />
-                        <div className="grid grid-cols-2 px-4 py-2 gap-10">
-                            <AntdFormikSelect
-                                labelText="Type"
-                                name="date"
-                                ph="--- Select Day ---"
-                                handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                Arr={DaysArr}
-                            />
-                            <AntdInput
-                                text="Amount"
-                                value='amount'
-                                ph="Enter Amount"
-                                showPrefix={true}
-                                acceptOnlyNum={true}
-                            />
-                            <AntdInput
-                                text="Remaing Amount"
-                                value='balance'
-                                ph="Enter Remaining Amount"
-                                showPrefix={true}
-                                acceptOnlyNum={true}
-                                disableInput={true}
-                            />
-                            {
-                                ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
-                            }
-                        </div>
-
-                        <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
-                            <CButton btnType="submit" >
-                                Save
-                            </CButton>
-                            <CButton onClick={handleCancelModInPC}
-                                type="cancel"
-                            >
-                                Cancel
-                            </CButton>
-                        </div>
-
-
-                    </Form>
-            )}}
-
-            </Formik>
-        </Modal>
         {
             showLoader && <Loader showLoading = {true}/>
         }
@@ -291,3 +251,69 @@ const PettyCashModal = (props) => {
 }
 
 export default PettyCashModal;
+
+
+{/* <Modal openModal={selectObjDetails.showModal}>
+<Formik
+    initialValues={selectObjDetails.selectedObj}
+    validationSchema={PettyCashValidations}
+    innerRef={editFormikRef}
+    onSubmit={(values, { setSubmitting, resetForm }) => {
+        handleEditDetails(values)
+    }}
+    style={{ overflow: "auto", position: "relative" }}
+>
+    {({ setFieldValue,values }) =>  {
+        //  values.balance = values.balance - Number(values.amount);
+         if(values.petty_cash_details) {
+            let reasonStng = values.petty_cash_details;
+            values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
+        }
+    return (
+        <Form>
+            <ParagraphTag label="Edit Details" />
+            <div className="grid grid-cols-2 px-4 py-2 gap-10">
+                <AntdFormikSelect
+                    labelText="Type"
+                    name="date"
+                    ph="--- Select Day ---"
+                    handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                    Arr={DaysArr}
+                />
+                <AntdInput
+                    text="Amount"
+                    value='amount'
+                    ph="Enter Amount"
+                    showPrefix={true}
+                    acceptOnlyNum={true}
+                />
+                <AntdInput
+                    text="Remaing Amount"
+                    value='balance'
+                    ph="Enter Remaining Amount"
+                    showPrefix={true}
+                    acceptOnlyNum={true}
+                    disableInput={true}
+                />
+                {
+                    ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
+                }
+            </div>
+
+            <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
+                <CButton btnType="submit">
+                    Save
+                </CButton>
+                <CButton onClick={handleCancelModInPC}
+                    type="cancel"
+                >
+                    Cancel
+                </CButton>
+            </div>
+
+
+        </Form>
+)}}
+
+</Formik>
+</Modal> */}

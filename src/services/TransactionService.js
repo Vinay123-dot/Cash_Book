@@ -149,7 +149,12 @@ export async function apiGetCommonOpeningBalance({uniqueId,date}){
 }
 
 export async function apiGetPettyCashCommonBalance({uniqueId,date}){
-    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_opening_balance?input_date=${date}&key=${uniqueId}`;
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_opening_balance?key=${uniqueId}`;
+    const response = await axios.get(url,{headers});
+    return response.data;
+}
+export async function apiGetRemainingCashBalance({uniqueId}){
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/remaining_balance?key=${uniqueId}`;
     const response = await axios.get(url,{headers});
     return response.data;
 }

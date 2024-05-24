@@ -228,7 +228,7 @@ const AdvanceBookModal = (props) => {
     const validatePaymentType = (value) => {
         let error;
         if (!value) {
-            error = 'This Field is Required';
+            error = 'This field is required';
         }
         return error;
     }
@@ -239,7 +239,7 @@ const AdvanceBookModal = (props) => {
             paymentType4: P4, paymentType5: P5
         } = allValues;
         let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This Field is Required' : null
+        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null
         // let err =  !value ? 'This Field is Required' : null
         return err;
 
@@ -252,7 +252,7 @@ const AdvanceBookModal = (props) => {
             paymentType4: P4, paymentType5: P5
         } = allValues;
         let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let error = (paymentTypeArr.includes("UPI") && !value) ? 'This Field is Required' : null
+        let error = (paymentTypeArr.includes("UPI") && !value) ? 'This field is required' : null
         return error;
 
     }
@@ -549,7 +549,11 @@ const AdvanceBookModal = (props) => {
                             <CButton btnType="submit">
                                 Save
                             </CButton>
-                            <CButton onClick={() => dispatch(setShowAddBookPage(false))} type="cancel">
+                            <CButton onClick={() => {
+                                onCancel();
+                                dispatch(setShowAddBookPage(false));
+                                }} type="cancel"
+                            >
                                 Cancel
                             </CButton>
                         </div>
@@ -562,7 +566,7 @@ const AdvanceBookModal = (props) => {
         </Formik>
         <Modal openModal={showBillModal} height={250} width={350}>
             <p style={{ fontSize: 16, fontWeight: 500, color: "#959595", marginTop: 20, textAlign: "center" }}>
-                Bill amount not matching with the payable amount.
+                Bill amount and payable amount not matching.Do you want to continue?
             </p>
             <CButton
                 onClick={() => setShowBillModal(false)}

@@ -276,12 +276,16 @@ const QuickBookTools = () => {
           />
         </div> */}
       </div>
-      <CButton
-        onClick={handleView}
-        className="mr-5"
-      >
-        {viewBtnPrefix} View
-      </CButton>
+      {
+        cashbookData.book_type != 5 && 
+        <CButton
+          onClick={handleView}
+          className="mr-5"
+        >
+          {viewBtnPrefix} View
+        </CButton>
+      }
+      
       <CButton onClick={handleDownload}>
         {dwnBtnPrefix} Download
       </CButton>

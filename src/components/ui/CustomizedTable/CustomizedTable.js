@@ -42,12 +42,12 @@ const CTable = (props) => {
                                 <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.balance}</td>
                                 <td style={thTdStyle} key={eachDoc.petty_cash_details}>{eachDoc.petty_cash_details}</td>
                                 <td style={thTdStyle}>
-                                    <button>
+                                    {/* <button>
                                         <AiOutlineEdit 
                                             className="text-blue-500" 
                                             onClick = {()=>handleEditClick(index,eachDoc)} 
                                         />
-                                    </button>
+                                    </button> */}
                                     <button>
                                         <AiOutlineDelete 
                                             className="text-red-500"

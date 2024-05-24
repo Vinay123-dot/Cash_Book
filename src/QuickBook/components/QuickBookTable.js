@@ -253,7 +253,7 @@ const getTableColumns = (bookType) => {
     return (
         <>
             <DataTable
-                columns={userType ==4 ? MerchantLevelColumns : getTableColumns(cashbookData?.book_type)}
+                columns={userType == 4 ? MerchantLevelColumns : getTableColumns(cashbookData?.book_type)}
                 data={data}
                 // pagingData={{
                 //     pageIndex: pageNumber + 1,

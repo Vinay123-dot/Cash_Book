@@ -22,7 +22,7 @@ const AntdSelectFilter = (props) => {
                 className = "w-full md:w-44"
                 placeholder = {placeholder}
                 optionFilterProp = "children"
-                filterOption={(input, option) => (option?.Type ?? '').includes(input)}
+                filterOption={(input, option) => (option?.children ?? '').includes(input)}
                 // filterSort={(optionA, optionB) =>
                 //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                 // }
@@ -34,7 +34,7 @@ const AntdSelectFilter = (props) => {
                             </Option>
                 ))}
             </Select>
-            <span className="text-blue-400 text-base font-normal ml-2 mt-2">
+            <span className="text-base font-normal ml-2 mt-2 " style={{ color: "#5A87B2" }}>
                 { message? message :(selectedFilter?.label || selectedFilter?.Type)}
             </span>
         </>

@@ -6,6 +6,8 @@ import AdaptableCard from "../components/shared/AdaptableCard";
 import { injectReducer } from "../store/index";
 import reducer from "./store/index";
 import PageNotFound from "../PageNotFound";
+import Loader from "../components/shared/Loader";
+import { useSelector } from "react-redux";
 
 injectReducer('quickbookStore', reducer);
 
@@ -13,6 +15,7 @@ const userList = ["4", "7"];
 
 const Quickbook = () => {
   let userType = localStorage.getItem("mType");
+  const mainPageLoader = useSelector(state => state.quickbookStore.state.mainPageLoader);
  
   return !userList.includes(userType) ? <PageNotFound /> :
     <AdaptableCard className="h-full overflow-hidden border-0 rounded-none" bodyClass="p-0">
@@ -29,6 +32,7 @@ const Quickbook = () => {
         <QuickBookTools />
         <QuickBookTable />
       </AdaptableCard>
+      <Loader showLoading = {mainPageLoader}/>
     </AdaptableCard>
 
 

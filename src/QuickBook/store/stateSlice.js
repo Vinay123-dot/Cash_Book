@@ -7,6 +7,9 @@ const stateSlice = createSlice({
         showAddBookPage : false,
         pettyCashBalance : 0,
         commonCashBanalce : 0,
+        mainPageLoader : false,
+        showdayBookFields : false,
+        showUploadInvoice : false,
         selectedCustomer: {},
         sortedColumn: () => {},
     },
@@ -28,6 +31,15 @@ const stateSlice = createSlice({
         },
         setCommonCashBalance: (state,action) => {
             state.commonCashBanalce = action.payload;
+        },
+        setMainPageLoader: (state,action) => {
+            state.mainPageLoader = action.payload;
+        },
+        setShowDayBookFields : (state,action) => {
+            state.showdayBookFields = action.payload;
+        },
+        setShowUploadInvoice : (state,action) => {
+            state.showUploadInvoice = action.payload;
         }
     },
 })
@@ -40,7 +52,11 @@ export const {
     setShowAddBookPage,
     setDataSavedModal,
     setPettyCashBalance,
-    setCommonCashBalance
+    setCommonCashBalance,
+    setMainPageLoader,
+    setShowDayBookFields,
+    setShowUploadInvoice
+    
 } = stateSlice.actions
 
 export default stateSlice.reducer
