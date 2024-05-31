@@ -1,3 +1,4 @@
 import { dayBookIntialObj } from "./DayBookIntialObj";
+import { AdvanceBookIntialObj } from "./AdvanceBookIntialObj";
 
-export {dayBookIntialObj};
+export {dayBookIntialObj,AdvanceBookIntialObj};

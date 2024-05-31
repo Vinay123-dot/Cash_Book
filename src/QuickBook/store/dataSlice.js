@@ -16,7 +16,6 @@ historyType = persistData?.auth?.session?.transactions
 export const getTransactions = createAsyncThunk(
     'quickbook/data/getTransactions',
     async (data) => {
-        console.log("DATA",data)
         const response = await apiGetBookTypeServices(data);
         return response;
     }
@@ -32,8 +31,8 @@ export const initialTableData = {
     // sort: 1,
     book_type : 0,
     terminal_id : -1,
-    // fromDate: getFromDate(),
-    // toDate: getToDate(),
+    fromDate: getFromDate(),
+    toDate: getToDate(),
 }
 
 export const initialFilterData = {

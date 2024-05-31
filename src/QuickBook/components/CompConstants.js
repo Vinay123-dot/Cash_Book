@@ -12,13 +12,14 @@ const getTotalMoney = (allData) => {
 }
 
 const getTotalMoneyInDayBook = (allData) => {
+    let advanceReAmount = allData?.advance_receipt_amount ? ConvertToNum(allData.advance_receipt_amount) : 0 
     let totalVal =  ConvertToNum(allData.upi_amount)+
                     ConvertToNum(allData.cash_amount)+
                     ConvertToNum(allData.online_bank_amount)+
                     ConvertToNum(allData.bank_cheque_amount)+
                     ConvertToNum(allData.credit_card_amount)+
-                    ConvertToNum(allData.debit_card_amount) +
-                    ConvertToNum(allData.advance_receipt_amount)
+                    ConvertToNum(allData.debit_card_amount) + 
+                    advanceReAmount
    
     return totalVal;
 }
