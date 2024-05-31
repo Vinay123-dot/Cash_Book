@@ -4,7 +4,7 @@ import { getTotalMoneyInDayBook } from "../CompConstants";
 import ParagraphTag from "../../../constants/PTag";
 
 const ShowPaymentTypes = (props) => {
-    const { paymentValues } = props;
+    const { paymentValues,isFromAdvPayments = true } = props;
 
     return <>
         <hr style={{ border: "5px solid #F4F6F9" }} />
@@ -40,15 +40,20 @@ const ShowPaymentTypes = (props) => {
                 }
 
             </div>
-            <div>
-                <p>Advance Used Amount</p>
-                {/* <p>{paymentValues.used_receipt_amount}</p> */}
-                {<p>{paymentValues.advance_receipt_amount}</p>}
-            </div>
-            <div>
-                <p> Pending Amount</p>
-                <p>{Number(paymentValues.bill_value) - getTotalMoneyInDayBook(paymentValues)}</p>
-            </div>
+            {
+                isFromAdvPayments && <>
+                    <div>
+                        <p>Advance Used Amount</p>
+                        {/* <p>{paymentValues.used_receipt_amount}</p> */}
+                        {<p>{paymentValues.advance_receipt_amount}</p>}
+                    </div>
+                    <div>
+                        <p> Pending Amount</p>
+                        <p>{Number(paymentValues.bill_value) - getTotalMoneyInDayBook(paymentValues)}</p>
+                    </div>
+                </>
+            }
+            
         </div>
     </>
 

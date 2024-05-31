@@ -28,13 +28,13 @@ const childrenDiv = {
 
 const Modal = (props) => {
 
-  const { openModal,width = 565,height = 327,header,children } = props;
+  const { openModal,width = 565,height = 327,header,children,jc = null ,bStyle = "none"} = props;
 
   if (!openModal) return null;
 
   return (
     <div  style={mainDiv}>
-      <div style={{...childrenDiv,width:width,height:height}}>
+      <div style={{...childrenDiv,width:width,height:height,justifyContent:jc,borderStyle:bStyle,borderWidth:1.5,borderColor:"#5A87B2"}}>
       {children}
       </div>
     </div>

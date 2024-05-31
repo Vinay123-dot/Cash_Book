@@ -10,12 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     setShowAddBookPage,
     setDataSavedModal,
-    setPettyCashBalance
 } from '../store/stateSlice';
 import Modal from "../../components/shared/Modal";
 import { PettyCashValidations } from "../../Validations";
 import ParagraphTag from "../../constants/PTag";
-import { apiStorePettyCashInfo,apiGetPettyCashCommonBalance } from "../../services/TransactionService";
+import { apiStorePettyCashInfo } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 
 const initialValues = {
@@ -69,13 +68,14 @@ const PettyCashModal = (props) => {
     })
     const [showLoader,setShowLoader] = useState(false);
     
-    let cashPetty = useSelector(state => state.quickbookStore.state.pettyCashBalance);
-    const [remPettybal,setRemPettybal] = useState(cashPetty);
+    // let cashPetty = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+    let remPettyCash = useSelector(state => state.quickbookStore.state.pettyCashRemBal);
+    const [remPettybal,setRemPettybal] = useState(remPettyCash);
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(()=>{
-        setRemPettybal(cashPetty);
-    },[cashPetty])
+        setRemPettybal(remPettyCash);
+    },[remPettyCash])
 
     if (!showPettyCash) return null;
 
@@ -107,7 +107,6 @@ const PettyCashModal = (props) => {
         setShowLoader(true);
         let response = await apiStorePettyCashInfo(pettyCashArr);
         if (response.message) {
-            getPettyCashCommBalance();
             setShowLoader(false);
             dispatch(setShowAddBookPage(false));
             onCancel();
@@ -116,14 +115,6 @@ const PettyCashModal = (props) => {
         }
     }
 
-    const getPettyCashCommBalance = async () => {
-        try {
-          let response = await apiGetPettyCashCommonBalance({ uniqueId });
-          dispatch(setPettyCashBalance(response?.opening_balance));
-        } catch (e) {
-    
-        }
-      }
 
     const handleEditClick = (key, obj) => {
         obj.key = key;

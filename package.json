@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/cashbook",
   "dependencies": {
+    "@emotion/styled": "^11.11.5",
     "@mui/x-date-pickers": "^7.3.2",
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-table": "^8.15.3",

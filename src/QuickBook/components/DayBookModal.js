@@ -1,19 +1,17 @@
 
 import React, { useEffect, useState,memo } from "react";
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import CButton from "../../components/ui/Button";
 import { DaysArr,selectedValType } from "../../Constants";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
-import PaymentSelect from "../../components/ui/PaymentSelect/PaymentSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import { useDispatch,useSelector } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal
+    setDataSavedModal,
+    setShowUploadInvoice
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
-import { AiOutlineDelete } from "react-icons/ai";
 import {
     apiGetCustomerTypeInfo,
     apiGetPaymentTypeInfo,
@@ -21,7 +19,7 @@ import {
     apiGetUPITypeInfo,
     apiStoreDayBookInfo,
     apiVerifyAdvancedBookReceipt,
-    apiGetTerminal
+    apiGetTerminal,
 } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 import { getTotalMoneyInDayBook } from "./CompConstants";
@@ -29,22 +27,10 @@ import ShowPaymentTypes from "./DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { dayBookIntialObj } from "../intialValuesFol";
 import UploadInvoiceModal from "./DayBookFiles/UploadInvoiceModal";
-
-
-
-const validationSchema = Yup.object().shape({
-    date: Yup.string().required('This field is required.'),
-    sales_type: Yup.string().required('This field is required.'),
-    bill_no: Yup.string().required('This field is required.'),
-    customer_type: Yup.string().required('This field is required.'),
-    bill_value: Yup.string().required('This field is required.'),
-    party_code: Yup.string().required('This field is required.'),
-    party_name: Yup.string().required('This field is required.'),
-    // advance_receipt_no: Yup.string().required('This field is required.'),
-});
-
-
-const iconStyle = { color: "red", width: 20, height: 20, position: "absolute", right: 10, bottom: 5 };
+import { DayBookValidations } from "../../Validations";
+import CashTypes from "./DayBookFiles/CashTypes";
+import AdvanceBillDetails from "./DayBookFiles/AdvanceBillDetails";
+import DaybookTable from "../../components/ui/DaybookTable";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -56,11 +42,25 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     />
 )
 
+const daybookColumns = [
+    { id: "Bill_No", name: "Bill No" },
+    { id: "date", name: "Date" },
+    { id: "Customer_Type", name: "Customer Type" },
+    { id: "Bill_Value", name: "Bill Value" },
+    { id: "Cash_Amount", name: "Cash" },
+    { id: "UPI_Type", name: "UPI Type" },
+    { id: "UPI_Amount", name: "UPI Amount" },
+    { id: "Debit_Card_Amount", name: "Debit Card" },
+    { id: "Credit_Card_Amount", name: "Credit Card" },
+    { id: "Online_Bank_Amount", name: "Bank" },
+    { id: "Bank_Cheque_Amount", name: "Cheque" },
+    { id: "Advance_Receipt_Amount", name: "Advanced Receipt Amount" },
+];
+
 const DayBookModal = (props) => {
 
     const { showDaybookModal,onCancel } = props;
     const dispatch = useDispatch();
-    const [clickCount, setClickCount] = useState([0]);
     const [salesType, setSalesType] = useState([]);
     const [paymentListInfo, setPaymentListInfo] = useState([]);
     const [upiTypeInfo, setUpiTypeInfo] = useState([]);
@@ -72,6 +72,7 @@ const DayBookModal = (props) => {
     const showdayBookFields = useSelector(state => state.quickbookStore.state.showdayBookFields);
     const showUploadInvoice = useSelector(state => state.quickbookStore.state.showUploadInvoice);
     const [validateModal,setValidateModal] = useState(true);
+    const [excelData,setExcelData] = useState([]);
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -91,7 +92,7 @@ const DayBookModal = (props) => {
             setCustomerListInfo(customerArr?.data || []);
         }catch(e){}
     }
-    
+  
     const getTerminal = async() => {
         try{
             let response = await apiGetTerminal(uniqueId);
@@ -101,44 +102,7 @@ const DayBookModal = (props) => {
     }
 
     if (!showDaybookModal) return null;
-
-    const handleButtonClick = (setFieldValue) => {
-        if (clickCount.length > 4) return;
-        setFieldValue(`paymentType${clickCount.length}`,null);
-        setClickCount(prevCount => [...prevCount, clickCount.length]);
-    };
-
-    const handleRemoveFromList = (selectedItem,setFieldValue,valObj) => {
-        setFieldValue(`paymentType${selectedItem}`,null);
-        let selectedVal = valObj?.[`paymentType${selectedItem}`];
-        if(selectedVal === "UPI"){
-            setFieldValue("upi_amount",null);
-            setFieldValue("upi_type",null);
-        }
-        if (selectedVal === "Cash"){
-            setFieldValue("cash_amount",null);
-        }
-        if(selectedVal === "Bank"){
-            setFieldValue("online_bank_amount",null);
-            setFieldValue("online_bank_name","");
-            setFieldValue("online_bank_trans_no","");
-        }
-        if(selectedVal === "Cheque"){
-            setFieldValue("bank_cheque_amount",null);
-            setFieldValue("bank_cheque_name","");
-            setFieldValue("bank_cheque_no","");
-        }
-        if(selectedVal === "Credit Card"){
-            setFieldValue("credit_card_amount",null)
-        }
-        if(selectedVal === "Debit Card"){
-            setFieldValue("debit_card_amount",null)
-        }
-
-        let filteredCount = clickCount.filter(item => item !== selectedItem);
-        setClickCount(JSON.parse(JSON.stringify(filteredCount)));
-    }
-
+  
     const convertTONumbers = (newObj) => {
 
         newObj.bill_value = Number(newObj.bill_value);
@@ -150,15 +114,12 @@ const DayBookModal = (props) => {
         newObj.upi_amount = Number(newObj.upi_amount);
         return newObj;
     }
-    //conditions
-        //if sales_type is 2 ,check whather it's going to if or not.
-        //if sales_type is 1 ,check validatemodal
-        console.log("v_outside",validateModal);
+   
+    
     const handleSubmit = async (values,validateModal) => {
-        console.log("v",validateModal);
         try {
+            setShowBillModal(false);
             let diffInAmount = Number(values.bill_value) - getTotalMoneyInDayBook(values);
-            console.log("diffAmount..",diffInAmount);
             let modalFlag = values.sales_type === 1 && validateModal && (diffInAmount > 10 || diffInAmount < -10);
             if (modalFlag) {
                 setShowBillModal(true);
@@ -186,13 +147,6 @@ const DayBookModal = (props) => {
         }
     }
 
-    const validatePaymentType = (value) => {
-        let error;
-        if (!value) {
-            error = 'This field is required';
-        }
-        return error;
-    }
     const validateInputField = (value, allValues, type) => {
         const {
             paymentType0: P0, paymentType1: P1,
@@ -206,23 +160,6 @@ const DayBookModal = (props) => {
 
     }
 
-    const validateReasonField = (value,allValues) => {
-        let diffInAmount = Number(allValues.bill_value) - getTotalMoneyInDayBook(allValues);
-        let err = (diffInAmount > 10 || diffInAmount < -10) && !value ? 'This field is required' : null;
-        return err;
-    }
-
-    const validateUpiType = (value, allValues) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let error = (paymentTypeArr.includes("UPI") && !value) ? 'This field is required' : null
-        return error;
-
-    }
 
     const handleChangeSalesType = (name,sValue,setFieldValue,sArr) => {
         setFieldValue(name,sValue);
@@ -237,18 +174,16 @@ const DayBookModal = (props) => {
         setPaymentListInfo(temp);
     }
 
-    const handleVerifyAdvanceMoney = async(allVal,setFieldValue) => {
-        const {advance_receipt_no} = allVal;
-        if(!advance_receipt_no) return console.log("test")
-            setVerifyBtnLdng(true);
-            const data = {
-                key : uniqueId,
-                id : advance_receipt_no
-            };
-        let response = await apiVerifyAdvancedBookReceipt(data);
-        setFieldValue("advance_receipt_amount",response?.Bill_Value || 0);
-        setFieldValue("advance_customer_name",response?.Customer_Name || "");
-        setVerifyBtnLdng(false);
+    const getCustomerList = (listArr,allObj) => {
+        const { sales_type } =  allObj;
+        let cType;
+        if(sales_type != 1){
+            cType = listArr.filter((eachDoc) => eachDoc.Id != 3);
+        }else{
+            cType = [...listArr];
+        }
+        return cType;
+
     }
 
     const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
@@ -264,18 +199,34 @@ const DayBookModal = (props) => {
             />
         )
     }
+
+    const handleCloseInvoiceModal = () => {
+        dispatch(setShowUploadInvoice(false))
+    }
+
+    // if(excelData.length <= 0) {
+    //     console.log("TEST")
+    //     return  <div className="mt-10">
+    //     <CustomizedTable
+    //         data={[]}
+    //         columns={daybookColumns}
+    //         // handleEditClick={handleEditClick}
+    //         // handleDeleteClick={handleDeleteClick}
+    //     />
+    // </div>
+    // } 
  
     return ( showdayBookFields ?
         <>
             <Formik
                 initialValues={dayBookIntialObj}
-                validationSchema={validationSchema}
+                validationSchema={DayBookValidations}
                 onSubmit={(values, { setSubmitting }) => {
                     handleSubmit(values,validateModal)
                 }}
                 style={{ overflow: "auto" }}
             >
-                {({ errors, touched, isSubmitting, setFieldValue, values, setErrors }) => {
+                {({setFieldValue, values}) => {
                     return (
                         <Form>
                             <ParagraphTag label="Details" />
@@ -301,7 +252,7 @@ const DayBookModal = (props) => {
                                     disableInput = {!values.sales_type && true}
                                 />
                                 {
-                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
+                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", getCustomerList(customerListInfo,values), setFieldValue)
                                 }
                                 {
                                     showInputBox("Bill Total Value", 'bill_value', "Bill TotalValue", validateInputField, values, false, true, true)
@@ -316,192 +267,14 @@ const DayBookModal = (props) => {
                             {
                                 values.sales_type === 1 &&
                                 <>
-                                    <hr style={{ border: "5px solid #F4F6F9" }} />
-    
-                                    <div className="flex items-center mt-5">
-                                        <ParagraphTag label="Payment Details" />
-                                        <CButton onClick={()=>handleButtonClick(setFieldValue)}>Add</CButton>
-    
-                                    </div>
-                                    {clickCount.map((eachItem, index) => (
-                                        <div
-                                            className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2"
-                                            key={index}
-                                        >
-                                            <PaymentSelect
-                                                labelText="Payment Type"
-                                                name={`paymentType${eachItem}`}
-                                                ph="--Select PaymentType--"
-                                                handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                                outputObj = {values}
-                                                Arr={paymentListInfo}
-                                                validation={true}
-                                                validateField={validatePaymentType}
-                                                key={index}
-                                            />
-    
-                                            {
-                                                values[`paymentType${eachItem}`] === "UPI" &&
-                                                <AntdFormikSelect
-                                                    labelText="UPI Type"
-                                                    name="upi_type"
-                                                    ph="--Select UPI Type--"
-                                                    handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                                    Arr={upiTypeInfo}
-                                                    validation={true}
-                                                    validateField={(value) => validateUpiType(value, values)}
-    
-                                                />
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "UPI" &&
-                                                <div className="col-span-1  flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Enter Amount", 'upi_amount', "Amount", validateInputField, values)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete
-                                                            style={iconStyle}
-                                                            onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)}
-                                                        />
-                                                    }
-                                                </div>
-                                            }
-    
-                                            {
-                                                values[`paymentType${eachItem}`] === "Cash" &&
-                                                <div className="col-span-2  flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Enter Amount", 'cash_amount', "Amount", validateInputField, values)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete
-                                                            style={iconStyle}
-                                                            onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)}
-                                                        />
-                                                    }
-                                                </div>
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Bank" &&
-                                                showInputBox("Enter Amount", 'online_bank_amount', "Amount", validateInputField, values)
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Bank" &&
-                                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateInputField, values,true,false,false)
-    
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Bank" &&
-                                                <div className="col-span-3  flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Bank Name", "online_bank_name", "Bank Name", validateInputField, values,true,false,false)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete style={iconStyle} onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)} />
-                                                    }
-                                                </div>
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Cheque" &&
-                                                showInputBox("Amount", "bank_cheque_amount", "Amount", validateInputField, values)
-    
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Cheque" &&
-                                                showInputBox("Cheque Number", "bank_cheque_no", "Cheque Number", validateInputField, values, true, false, false)
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Cheque" &&
-                                                <div className="col-span-3  flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Bank", "bank_cheque_name", "Bank Name", validateInputField, values, true, false, false)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete
-                                                            style={iconStyle}
-                                                            onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)}
-                                                        />
-                                                    }
-                                                </div>
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Credit Card" &&
-                                                <div className="col-span-2  flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Amount", "credit_card_amount", "Amount", validateInputField, values)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete
-                                                            style={iconStyle}
-                                                            onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)}
-                                                        />
-                                                    }
-                                                </div>
-                                            }
-                                            {
-                                                values[`paymentType${eachItem}`] === "Debit Card" &&
-                                                <div className="col-span-2 flex flex-row relative items-center">
-                                                    {
-                                                        showInputBox("Amount", "debit_card_amount", "Amount", validateInputField, values)
-                                                    }
-                                                    {
-                                                        index !== 0 &&
-                                                        <AiOutlineDelete
-                                                            style={iconStyle}
-                                                            onClick={() => handleRemoveFromList(eachItem, setFieldValue, values)}
-                                                        />
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                    ))
-                                    }
-                                    <div
-                                        className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2"
-                                    >
-                                    {
-                                        showInputBox("Reason", 'reason', "Reason", validateReasonField, values,true,false,false)
-                                    }
-    
-                                    </div>
+                                    <CashTypes 
+                                        setFieldValue = {setFieldValue}
+                                        valObj = {values}
+                                        paymentListInfo = {paymentListInfo}
+                                        upiTypeInfo = {upiTypeInfo}
+                                    />
                                     
-                                    <hr style={{ border: "5px solid #F4F6F9" }} />
-                                    <ParagraphTag label="Advance Bill Details" />
-                                    <div className="flex px-4 py-2 items-center">
-                                        {
-                                            showInputBox("Advance Receipt Number", 'advance_receipt_no', "AdvanceReceiptNumber", validateInputField, values, false, false, false)
-                                        }
-                                        <CButton
-                                            className="h-44 mt-10 ml-10"
-                                            isLoading={verifyBtnLdng}
-                                            onClick={() => handleVerifyAdvanceMoney(values, setFieldValue)}
-                                        >
-                                            Verify
-                                        </CButton>
-                                    </div>
-                                    {
-                                        values.advance_receipt_no &&
-                                        <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3">
-                                            <div className="flex flex-col">
-                                                <p>Advance Receipt Amount</p>
-                                                <p>{values.advance_receipt_amount}</p>
-                                            </div>
-                                            <div>
-                                                <p>Customer Name</p>
-                                                <p>{values.advance_customer_name}</p>
-                                            </div>
-                                            {
-                                                showInputBox("Amount", 'used_receipt_amount', "Amount", validateInputField, values, false, false, false)
-                                            }
-                                        </div>
-                                    }
-    
+                                    <AdvanceBillDetails values = {values}/>
     
                                 </>
                             }
@@ -509,9 +282,10 @@ const DayBookModal = (props) => {
                            
                             <ShowPaymentTypes paymentValues = {values}/>
                             <BillAmountModal 
-                                billModal = {showBillModal} 
+                                billModal = {showBillModal}
                                 valuesObj = {values}
-                                handleCancelBillModal = {() =>{setShowBillModal(false);setValidateModal(false)}}
+                                handleSubmitBillModal = {() =>handleSubmit(values,false)}
+                                handleCancelBillModal = {() =>{setShowBillModal(false);setValidateModal(true)}}
                             />
                            
     
@@ -534,11 +308,10 @@ const DayBookModal = (props) => {
     
     
             </Formik>
+           
+            <Loader showLoading={showLoader} />
             
-            {
-                showLoader && <Loader showLoading={true} />
-            }
-        </> : showUploadInvoice ? <UploadInvoiceModal/> : null
+        </> : showUploadInvoice ? <UploadInvoiceModal onClose={handleCloseInvoiceModal}/> : null
     )
 }
 

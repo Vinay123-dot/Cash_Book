@@ -3,6 +3,7 @@ import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
+import AntdTextArea from "../../components/ui/AntdTextArea";
 import { BankDepositTypeValidations } from "../../Validations";
 import { useDispatch,useSelector } from "react-redux";
 import {
@@ -14,10 +15,17 @@ import { DaysArr } from "../../Constants";
 import { 
     apiGetDepositModeInfo, 
     apiGetDepositTypeInfo,
-    apiStoreBankDepositInfo 
+    apiStoreBankDepositInfo
     } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 
+const ShowTextBoxInPC = (label, value, ph) => (
+    <AntdTextArea
+        text={label}
+        value={value}
+        ph={ph}
+    />
+)
 
 const initialValues = {
     id : 0,
@@ -28,6 +36,8 @@ const initialValues = {
     amount: null, //number
     remaining_balance: null, //number
     advance_receipt_no: '', //string
+    bill_number : "",
+    store_id : ""
 };
 
 const BankDepositModal = (props) => {
@@ -35,7 +45,8 @@ const BankDepositModal = (props) => {
     const dispatch = useDispatch();
     const [depositList,setDepositList] = useState([]);
     const [depositModeList,setDepositModeList] = useState([]);
-    const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+    // const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
+    const remCommOpeningBal = useSelector(state => state.quickbookStore.state.remainingCommonBalance);
     const [startLoading,setStartLoading] = useState(false);
     let uniqueId = localStorage.getItem("uniqueId");
  
@@ -106,7 +117,7 @@ const BankDepositModal = (props) => {
         >
             {({ setFieldValue, values }) => {
                 if(values.amount){
-                    values.remaining_balance =  commOpeningBal - Number(values.amount);
+                    values.remaining_balance =  remCommOpeningBal - Number(values.amount);
                 }
                    
                 return (
@@ -178,24 +189,28 @@ const BankDepositModal = (props) => {
                                         showPrefix={true}
                                         acceptOnlyNum = {true}
                                     />
+                                    <AntdInput
+                                        text="Bill Number"
+                                        value = 'bill_number'
+                                        ph= "Bill Number"
+                                    />
+                                    <AntdInput
+                                        text= "Store Id" 
+                                        value= 'store_id'
+                                        ph="Enter Store Id"
+                                    />
                                 </>
                             }
                              
                             
                             {
                                 values.type === 3 &&
-                                <AntdInput
-                                    text={"Reason"}
-                                    value={'reason'}
-                                    ph={"Enter Reason"}
-                            />
+                                ShowTextBoxInPC("Reason", 'reason', "Enter Reason")
                             }
                             
                         </div>
-                        <div className="flex flex-row-reverse gap-10 bottom-10 right-10  md:absolute">
-                            <CButton 
-                                btnType = "submit"
-                            >
+                            <div className="flex flex-row-reverse gap-10 px-4 py-2 lg:absolute right-5 bottom-5">
+                            <CButton btnType = "submit">
                                 Save
                             </CButton>
                             <CButton 

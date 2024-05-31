@@ -11,8 +11,11 @@ import {
   setOutletData,
   setCashBookData,
   setTransactionsLoading,
-  setTransactionArray
+  setTransactionArray,
 } from '../store/dataSlice';
+import {
+  setBookTypeList,
+} from '../store/stateSlice';
 import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
 import { 
@@ -24,6 +27,7 @@ import {
 import FileSaver from 'file-saver';
 import { getFormatDate} from "../../utils/dateFormatter"
 import appConfig from "../../configs/app.config";
+import QuickBookStatusFilter from "./QuickBookStatusFilter";
 
 const QuickBookTools = () => {
 
@@ -31,7 +35,6 @@ const QuickBookTools = () => {
 
   const [outletList, setOutletList] = useState([]);
   const [daysList,setDaysList] = useState([]);
-  const[bookTypeList,setBookTypeList] = useState([]);
   const [errorMessage,setErrorMessage] = useState("");
   const [durationErrMsg,setDurationErrMsg] = useState("");
   const [terminalErrMsg,setTerminalErrMsg] = useState("");
@@ -39,12 +42,13 @@ const QuickBookTools = () => {
   const filterData = useSelector((state) => state.quickbookStore.data.filterData);
   const outletData = useSelector((state) => state.quickbookStore.data.outletData);
   const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
+  const bookTypeList = useSelector((state) => state.quickbookStore.state.bookTypeList);
   let userType = localStorage.getItem("mType");
   let uniqueId = localStorage.getItem("uniqueId");
 
 
   useEffect(() => {
-    userType === '4' && getOutletsList();
+    getOutletsList();
     getBookTypeInfo();
     getDayInfo();
   }, [userType]);
@@ -53,10 +57,10 @@ const QuickBookTools = () => {
   const getBookTypeInfo = async() => {
     try{
       let response = await apiGetBookTypeInfo();
-      setBookTypeList(response?.data || []);
+      dispatch(setBookTypeList(response?.data || []));
     }catch(e){}
   }
-
+  
   const getDayInfo = async() => {
     try{
       let response = await apiGetDayInfo();
@@ -69,7 +73,6 @@ const QuickBookTools = () => {
       Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
     };
     let response = await apiGetTerminal(uniqueId);
-    
     setOutletList([options,...response] || []);
   }
  
@@ -97,13 +100,14 @@ const QuickBookTools = () => {
     setTerminalErrMsg("");
     const newTableData = cloneDeep(payload);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+    let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
     let newObj = { 
       ...newTableData, 
       ...newFilterData,
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType == 7? uniqueId : newOutletData.terminal_id ,
+      terminal_id: userType == 7? uniqueId : outletInStrng.Terminal ,
       key: uniqueId
       }
     dispatch(getTransactions(newObj));
@@ -120,15 +124,20 @@ const QuickBookTools = () => {
   //   }
   // }
 
-  // const handleDateChange = (val) => {
-  //   const newTableData = cloneDeep(tableData)
-  //   newTableData.historyType = val?.historyType
-  //   newTableData.fromDate = val?.fromDate
-  //   newTableData.toDate = val?.toDate
-  //   newTableData.pageNumber = 0
-  //   dispatch(setTransactions({ historyType: newTableData.historyType }))
-  //   dispatch(setTableData(newTableData))
-  // }
+  const handleDateChange = (val) => {
+    console.log("v",val)
+    const newTableData = cloneDeep(tableData);
+    newTableData.historyType = val?.historyType;
+    newTableData.fromDate = val?.fromDate;
+    newTableData.toDate = val?.toDate;
+    newTableData.pageNumber = 0;
+  // dispatch(setTransactions({ historyType: newTableData.historyType }))
+    dispatch(setTableData(newTableData));
+    const newFilterData = cloneDeep(filterData);
+    newFilterData.history_type = val;
+    dispatch(setFilterData(newFilterData));
+    setDurationErrMsg("");
+  }
 
   const handleTimeperiodChange = (val) => {
     const newTableData = cloneDeep(tableData);
@@ -185,36 +194,80 @@ const QuickBookTools = () => {
     setTerminalErrMsg("");
     const newTableData = cloneDeep(payload);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+    let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
     let newObj = { 
       ...newTableData, 
       ...newFilterData,
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType == 7 ? uniqueId : newOutletData.terminal_id ,
+      terminal_id: userType == 7 ? uniqueId : outletInStrng?.Terminal,
       key: uniqueId
       }
       getTransactionHistory(newObj);
   }
 
-  const getTransactionHistory = async (allData) => {
-    const {book_type,history_type} = allData;
-    const tId = userType == 4? 0 : uniqueId;
-    // dispatch(setTransactionsLoading(true));
-    let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
+  // const getTransactionHistory = async (allData) => {
+  //   const {book_type,history_type} = allData;
+  //   const tId = userType == 4 ? 0 : uniqueId;
+  //   dispatch(setTransactionsLoading(true));
+  //   console.log("STARt")
+  //   let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
    
-    const link = document.createElement('a');
-    link.href = url;
-  // link.setAttribute('download', 'filename.pdf');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    // setTimeout(() => dispatch(setTransactionsLoading(false)), 12000);
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  //   dispatch(setTransactionsLoading(false));
+  //   // setTimeout(() => dispatch(setTransactionsLoading(false)), 12000);
 
   
-  };
+  // };
+
+  const getTransactionHistory = async (allData) => {
+    const { book_type, history_type } = allData;
+    const tId = userType == 4 ? 0 : uniqueId;
+
+    // Enable loading state
+    dispatch(setTransactionsLoading(true));
+
+    let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            dispatch(setTransactionsLoading(false));
+            throw new Error('Network response was not ok');
+        }
+
+        // Read the response as a blob
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Create a link element to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.setAttribute('download', book_type); // Specify the filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Revoke the object URL after download
+        URL.revokeObjectURL(blobUrl);
+
+        // Disable loading state after download completes
+        dispatch(setTransactionsLoading(false));
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        // Disable loading state in case of error
+        dispatch(setTransactionsLoading(false));
+    }
+};
+
 
   const getBookTypeList = (booksArr,terminalObj) => {
+
     let temp = [];
     if(terminalObj.terminal_id == 0){
       temp = (booksArr || []).filter((eachItem) => eachItem.Id != 5);
@@ -225,7 +278,7 @@ const QuickBookTools = () => {
   }
   const getTerminalList = (terArr,bookObj) => {
     let temp = [];
-    if(bookObj.book_type== 5){
+    if(bookObj.book_type== 6){
       temp = (terArr || []).filter((eachItem) => eachItem.Id != 0);
     }else {
       temp = JSON.parse(JSON.stringify(terArr));
@@ -247,6 +300,9 @@ const QuickBookTools = () => {
         </div>
 
         <div className="flex flex-col">
+          {/* <QuickBookStatusFilter
+            onDateChange= {handleDateChange}
+          /> */}
           <AntdSelectFilter
             placeholder="Select Duration"
             options={daysList}
@@ -277,7 +333,7 @@ const QuickBookTools = () => {
         </div> */}
       </div>
       {
-        cashbookData.book_type != 5 && 
+        cashbookData.book_type != 6 && 
         <CButton
           onClick={handleView}
           className="mr-5"

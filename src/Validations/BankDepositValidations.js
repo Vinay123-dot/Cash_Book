@@ -21,7 +21,19 @@ const BankDepositTypeValidations = Yup.object({
       then: (schema) => schema.required('This field is required'),
       otherwise: (schema) => schema.notRequired()
     }),
-  advance_receipt_no : Yup.string()
+  advance_receipt_no: Yup.string()
+    .when("type", {
+      is: (val) => val == 3,
+      then: (schema) => schema.required('This field is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+  bill_number: Yup.string()
+    .when("type", {
+      is: (val) => val == 3,
+      then: (schema) => schema.required('This field is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+  store_id : Yup.string()
     .when("type", {
       is: (val) => val == 3,
       then: (schema) => schema.required('This field is required'),

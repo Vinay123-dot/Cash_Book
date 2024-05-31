@@ -202,11 +202,13 @@ import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import CButton from '../../../components/ui/Button';
 import Modal from '../../../components/shared/Modal';
+import { HiOutlineUpload } from "react-icons/hi";
+import  excelIcon from "../../../assets/excelIcon.png";
 
-const UploadModal = ({ openModal }) => {
+const UploadModal = ({ onClose }) => {
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
-  const [fileContent, setFileContent] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const inputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -218,12 +220,11 @@ const UploadModal = ({ openModal }) => {
       setDragActive(false);
     }
   };
-
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setFileName(file.name);
       setFile(URL.createObjectURL(file));
-      readFile(file);
     }
   };
 
@@ -234,7 +235,6 @@ const UploadModal = ({ openModal }) => {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setFile(URL.createObjectURL(file));
-      readFile(file);
     }
   };
 
@@ -242,65 +242,53 @@ const UploadModal = ({ openModal }) => {
     inputRef.current.click();
   };
 
-  const readFile = (file) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const binaryStr = event.target.result;
-      const workbook = XLSX.read(binaryStr, { type: 'binary' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonContent = XLSX.utils.sheet_to_json(worksheet);
-      setFileContent(jsonContent);
-    };
-    reader.readAsBinaryString(file);
-  };
+  const handleCancelBtn = () => {
+    setFile(null);
+    setFileName(null)
+    onClose();
+  }
+
+
 
   return (
-    <Modal openModal={true} height={400} width={300}>
-      <div id='printmodal'>
-        <div className="grid grid-rows-1 grid-cols-3 h-10">
-          <div className="row-start-1 col-start-1 col-span-3 ">
-            <h4 className="mt-1 text-center font-bold" style={{ color: "#5A87B2" }}>
-              Upload Generated Invoice
-            </h4>
-          </div>
-        </div>
-      </div>
+    <Modal openModal={true} height={200} width={400} jc="center" bStyle="dashed">
       <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
-        <div className="flex items-center px-8 mt-2 text-base text-black">
-          <div className="h-60 bg-[#5A87B2] bg-opacity-10 rounded-md px-4">
-            {/* {file && (
-              <div className="grid place-items-center h-60">
-                <object data={file} type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" width="100%" height="100%">
-                  <p>Excel Not LOADED!</p>
-                </object>
-                <CButton className="" onClick={() => { setFile(null); setFileContent(null); }}>Remove file</CButton>
+        <div className="flex items-center justify-center px-8 mt-2 text-base text-black rounded-md">
+          {!file && (
+            <>
+              <input ref={inputRef} type="file" accept=".xlsx" id="input-file-upload" onChange={handleChange} className="hidden" />
+              <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : ""}>
+                <div className="flex flex-col items-center justify-center">
+                  <HiOutlineUpload size={44} style={{ color: "#5A87B2" }} />
+                  <CButton onClick={onButtonClick} style={{borderRadius: 16,width:96,fontSize:12}}>Choose a file</CButton>
+                  <p style={{fontSize: 14,color: "rgba(18, 18, 18, 0.38)"}}> or drop a file here</p>
+                  <p style={{fontSize: 16}}> <span className='text-red-600 text-2xl'>*</span>File supported .xls, .xlsx</p>
+                </div>
+              </label>
+            </>
+          )}
+          {
+            file && (
+              <div className="flex flex-col items-center justify-center">
+                <img src={excelIcon} style={{ width: 80, height: 80}} />
+                <p style={{fontSize: 14,color: "rgba(18, 18, 18, 0.38)"}}>{fileName||""}</p>
+                <p style={{fontSize: 16}} className='text-[#5A87B2]'>File Selected Sucessfully</p>
               </div>
-            )} */}
-            {!file && (
-              <>
-                <input ref={inputRef} type="file" accept=".xlsx" id="input-file-upload" onChange={handleChange} className="hidden" />
-                <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : ""}>
-                  <div className="grid place-items-center h-60">
-                    <p>Drag and drop your file</p>
-                    <p>or</p>
-                    <CButton onClick={onButtonClick}>Choose a file</CButton>
-                  </div>
-                </label>
-              </>
-            )}
-          </div>
+            )
+          }
         </div>
         {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
       </form>
-      {/* {fileContent && (
-        <div className="px-8 mt-2">
-          <pre className="text-sm">{JSON.stringify(fileContent, null, 2)}</pre>
-        </div>
-      )} */}
-      <div className="w-full mt-3 px-8 text-center">
-        <CButton className="w-[213px] h-[48px] my-8 font-medium text-lg tracking-wide" variant="solid">
-          Upload
-        </CButton>
+      <div className='flex mt-4'>
+        <CButton 
+          onClick={handleCancelBtn} 
+          type = "cancel"
+          style={{borderRadius: 8,width:96,fontSize:12,marginRight:10}}
+        >Cancel</CButton>
+        <CButton 
+          onClick={()=>console.log("upload")} 
+          style={{borderRadius: 8,width:96,fontSize:12}}
+        >Submit</CButton>
       </div>
     </Modal>
   );
