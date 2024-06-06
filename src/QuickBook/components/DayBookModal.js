@@ -9,7 +9,8 @@ import { useDispatch,useSelector } from "react-redux";
 import {
     setShowAddBookPage,
     setDataSavedModal,
-    setShowUploadInvoice
+    setShowUploadInvoice,
+    setShowDayBookFields
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import {
@@ -18,11 +19,11 @@ import {
     apiGetSalesTypeInfo,
     apiGetUPITypeInfo,
     apiStoreDayBookInfo,
-    apiVerifyAdvancedBookReceipt,
     apiGetTerminal,
+    apiGetDayBookExcelData
 } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
-import { getTotalMoneyInDayBook } from "./CompConstants";
+import { getTotalMoneyInDayBook,getConvertedObj,convertTONumbers } from "./CompConstants";
 import ShowPaymentTypes from "./DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { dayBookIntialObj } from "../intialValuesFol";
@@ -31,6 +32,7 @@ import { DayBookValidations } from "../../Validations";
 import CashTypes from "./DayBookFiles/CashTypes";
 import AdvanceBillDetails from "./DayBookFiles/AdvanceBillDetails";
 import DaybookTable from "../../components/ui/DaybookTable";
+import EditModeInDayBook from "./EditInvoice/EditModeInDayBook";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -42,33 +44,22 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     />
 )
 
-const daybookColumns = [
-    { id: "Bill_No", name: "Bill No" },
-    { id: "date", name: "Date" },
-    { id: "Customer_Type", name: "Customer Type" },
-    { id: "Bill_Value", name: "Bill Value" },
-    { id: "Cash_Amount", name: "Cash" },
-    { id: "UPI_Type", name: "UPI Type" },
-    { id: "UPI_Amount", name: "UPI Amount" },
-    { id: "Debit_Card_Amount", name: "Debit Card" },
-    { id: "Credit_Card_Amount", name: "Credit Card" },
-    { id: "Online_Bank_Amount", name: "Bank" },
-    { id: "Bank_Cheque_Amount", name: "Cheque" },
-    { id: "Advance_Receipt_Amount", name: "Advanced Receipt Amount" },
-];
 
 const DayBookModal = (props) => {
 
     const { showDaybookModal,onCancel } = props;
     const dispatch = useDispatch();
-    const [salesType, setSalesType] = useState([]);
-    const [paymentListInfo, setPaymentListInfo] = useState([]);
-    const [upiTypeInfo, setUpiTypeInfo] = useState([]);
-    const [customerListInfo, setCustomerListInfo] = useState([]);
+    const [requiredArrList,setRequiredArrList] = useState({
+        salesType : [],paymentListInfo : [],
+        upiTypeInfo : [],customerListInfo : []
+    })
     const [showBillModal,setShowBillModal] = useState(false);
     const [showLoader,setShowLoader] = useState(false);
     const [billNum,setBillNum] = useState("");
-    const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
+    const [editDayBook,setEditDayBook] = useState({
+        showEditDaybookModal : false,
+        editDayBookObj : {}
+    })
     const showdayBookFields = useSelector(state => state.quickbookStore.state.showdayBookFields);
     const showUploadInvoice = useSelector(state => state.quickbookStore.state.showUploadInvoice);
     const [validateModal,setValidateModal] = useState(true);
@@ -78,7 +69,30 @@ const DayBookModal = (props) => {
     useEffect(() => {
         getTerminal();
         fetchReqTypesInDayBook();
+        getExcelTrasaction();
     }, []);
+
+
+    const getExcelTrasaction = async () => {
+        try {
+            let newObj = {
+                terminal_id: uniqueId,
+                key: uniqueId
+            };
+            let resposne = await apiGetDayBookExcelData(newObj);
+            console.log("res",resposne)
+            // let temp = (resposne?.data || []).filter((eachDoc) => eachDoc?.Issales_Report === 1);
+            let filteredData = resposne.data.filter((eachDoc) => {
+                console.log("Checking each document:", eachDoc);
+                return eachDoc?.Issales_Report === 1;
+            });
+            console.log("excelDat",filteredData)
+            // setExcelData(temp || []);
+
+        } catch (e) {
+
+        }
+    }
 
     const fetchReqTypesInDayBook = async() => {
         try{
@@ -86,10 +100,12 @@ const DayBookModal = (props) => {
                 apiGetSalesTypeInfo(),apiGetPaymentTypeInfo(),
                 apiGetUPITypeInfo(),apiGetCustomerTypeInfo()
             ]);
-            setSalesType(salesList?.data || []);
-            setPaymentListInfo(paymentArray?.data || []);
-            setUpiTypeInfo(upiArray?.data || []);
-            setCustomerListInfo(customerArr?.data || []);
+            setRequiredArrList({
+                salesType : salesList?.data || [],
+                paymentListInfo : paymentArray?.data || [],
+                upiTypeInfo : upiArray?.data || [],
+                customerListInfo : customerArr?.data || []
+            });
         }catch(e){}
     }
   
@@ -102,19 +118,6 @@ const DayBookModal = (props) => {
     }
 
     if (!showDaybookModal) return null;
-  
-    const convertTONumbers = (newObj) => {
-
-        newObj.bill_value = Number(newObj.bill_value);
-        newObj.cash_amount = Number(newObj.cash_amount);
-        newObj.credit_card_amount = Number(newObj.credit_card_amount);
-        newObj.debit_card_amount = Number(newObj.debit_card_amount);
-        newObj.bank_cheque_amount = Number(newObj.bank_cheque_amount);
-        newObj.online_bank_amount = Number(newObj.online_bank_amount);
-        newObj.upi_amount = Number(newObj.upi_amount);
-        return newObj;
-    }
-   
     
     const handleSubmit = async (values,validateModal) => {
         try {
@@ -167,11 +170,11 @@ const DayBookModal = (props) => {
         setFieldValue("sales_code",salesObj?.Code || "");
         let temp = [];
         if (sValue == 1) {
-            temp = paymentListInfo.filter((eachDoc) => eachDoc.Id != 4);
+            temp = requiredArrList.paymentListInfo.filter((eachDoc) => eachDoc.Id != 4);
         } else {
-            temp = JSON.parse(JSON.stringify(paymentListInfo));
+            temp = JSON.parse(JSON.stringify(requiredArrList.paymentListInfo));
         }
-        setPaymentListInfo(temp);
+        setRequiredArrList((prev) => ({...prev,paymentListInfo : temp}))
     }
 
     const getCustomerList = (listArr,allObj) => {
@@ -201,32 +204,42 @@ const DayBookModal = (props) => {
     }
 
     const handleCloseInvoiceModal = () => {
-        dispatch(setShowUploadInvoice(false))
+        dispatch(setShowUploadInvoice(false));
+        getExcelTrasaction();
     }
 
-    // if(excelData.length <= 0) {
-    //     console.log("TEST")
-    //     return  <div className="mt-10">
-    //     <CustomizedTable
-    //         data={[]}
-    //         columns={daybookColumns}
-    //         // handleEditClick={handleEditClick}
-    //         // handleDeleteClick={handleDeleteClick}
-    //     />
-    // </div>
-    // } 
+    const handleEditClick = (index,doc) => {
+        console.log("D",doc)
+        let modifiedObj = Object.keys(doc).length !== 0 ? getConvertedObj(doc) : {};
+       console.log("mm",modifiedObj)
+        setEditDayBook({
+            showEditDaybookModal : true,
+            editDayBookObj : modifiedObj
+        })
+    }
+
+    const onSaveEditDayBook = () => {
+        setEditDayBook({
+            showEditDaybookModal: false,
+            editDayBookObj: {}
+        });
+        getExcelTrasaction();
+    }
+  
+  
  
-    return ( showdayBookFields ?
+    return (
+        showdayBookFields ?
         <>
             <Formik
                 initialValues={dayBookIntialObj}
                 validationSchema={DayBookValidations}
                 onSubmit={(values, { setSubmitting }) => {
-                    handleSubmit(values,validateModal)
+                    handleSubmit(values, validateModal)
                 }}
                 style={{ overflow: "auto" }}
             >
-                {({setFieldValue, values}) => {
+                {({ setFieldValue, values }) => {
                     return (
                         <Form>
                             <ParagraphTag label="Details" />
@@ -235,24 +248,24 @@ const DayBookModal = (props) => {
                                     showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
                                 }
                                 <AntdFormikSelect
-                                    labelText = "Sale Type"
-                                    name = "sales_type"
-                                    ph = "--Select Sale Type--"
-                                    handleChange={(name, selectedValue) => handleChangeSalesType(name,selectedValue,setFieldValue,salesType)}
-                                    Arr={salesType}
+                                    labelText="Sale Type"
+                                    name="sales_type"
+                                    ph="--Select Sale Type--"
+                                    handleChange={(name, selectedValue) => handleChangeSalesType(name, selectedValue, setFieldValue, requiredArrList.salesType)}
+                                    Arr={requiredArrList.salesType}
                                 />
                                 <AntdInput
                                     text="Bill Number"
                                     value='bill_no'
                                     ph="Enter Bill Number"
-                                    showAddBefore = {true}
-                                    showAddBeforeValue = {
-                                        billNum+"/"+ (values.sales_code?values.sales_code+"/":"")
+                                    showAddBefore={true}
+                                    showAddBeforeValue={
+                                        billNum + "/" + (values.sales_code ? values.sales_code + "/" : "")
                                     }
-                                    disableInput = {!values.sales_type && true}
+                                    disableInput={!values.sales_type && true}
                                 />
                                 {
-                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", getCustomerList(customerListInfo,values), setFieldValue)
+                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", getCustomerList(requiredArrList.customerListInfo, values), setFieldValue)
                                 }
                                 {
                                     showInputBox("Bill Total Value", 'bill_value', "Bill TotalValue", validateInputField, values, false, true, true)
@@ -267,51 +280,80 @@ const DayBookModal = (props) => {
                             {
                                 values.sales_type === 1 &&
                                 <>
-                                    <CashTypes 
+                                    <CashTypes
                                         setFieldValue = {setFieldValue}
                                         valObj = {values}
-                                        paymentListInfo = {paymentListInfo}
-                                        upiTypeInfo = {upiTypeInfo}
+                                        paymentListInfo = {requiredArrList.paymentListInfo}
+                                        upiTypeInfo = {requiredArrList.upiTypeInfo}
                                     />
-                                    
-                                    <AdvanceBillDetails values = {values}/>
-    
+
+                                    <AdvanceBillDetails values={values} />
+
                                 </>
                             }
-                            
-                           
-                            <ShowPaymentTypes paymentValues = {values}/>
-                            <BillAmountModal 
-                                billModal = {showBillModal}
-                                valuesObj = {values}
-                                handleSubmitBillModal = {() =>handleSubmit(values,false)}
-                                handleCancelBillModal = {() =>{setShowBillModal(false);setValidateModal(true)}}
+
+
+                            <ShowPaymentTypes paymentValues={values} />
+                            <BillAmountModal
+                                billModal={showBillModal}
+                                valuesObj={values}
+                                handleSubmitBillModal={() => handleSubmit(values, false)}
+                                handleCancelBillModal={() => { setShowBillModal(false); setValidateModal(true) }}
                             />
-                           
-    
+
+
                             <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24" style={{ marginBottom: 20 }}>
                                 <CButton btnType="submit">
                                     Save
                                 </CButton>
                                 <CButton onClick={() => {
                                     onCancel();
-                                    dispatch(setShowAddBookPage(false))
+                                    dispatch(setShowAddBookPage(false));
+                                    dispatch(setShowDayBookFields(false));
                                 }} type="cancel"
                                 >
                                     Cancel
                                 </CButton>
                             </div>
-    
+
                         </Form>
                     )
                 }}
-    
-    
+
+
             </Formik>
            
-            <Loader showLoading={showLoader} />
-            
-        </> : showUploadInvoice ? <UploadInvoiceModal onClose={handleCloseInvoiceModal}/> : null
+            <Loader showLoading = {showLoader} />
+
+        </> :
+        showUploadInvoice ? <UploadInvoiceModal onClose={handleCloseInvoiceModal} /> :
+            excelData.length >= 0 ? <>
+                <DaybookTable
+                    data = {excelData}
+                    handleEditClick = {handleEditClick}
+                />
+                <EditModeInDayBook
+                    dayBookObj = {editDayBook}
+                    handleCancelDBook = {() => setEditDayBook({
+                        showEditDaybookModal: false,
+                        editDayBookObj: {}
+                    })}
+                    handleSaveEditDayBook = {onSaveEditDayBook}
+                    requiredArrayData = {requiredArrList}
+                />
+                <div className="p-5 flex flex-row-reverse">
+                    <CButton onClick={() => {
+                        onCancel();
+                        dispatch(setShowAddBookPage(false))
+                        dispatch(setShowDayBookFields(false));
+                        dispatch(setShowUploadInvoice(false));
+                    }} type="cancel"
+                    >
+                        Cancel
+                    </CButton>
+                </div>
+            </> : null
+             
     )
 }
 

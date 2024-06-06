@@ -12,6 +12,19 @@ const thTdStyle = {
     padding: '8px',
     textAlign: 'center',
 };
+
+const daybookColumns = [
+    { id : "sl_no", name : "Sl No"},
+    { id: "Date", name: "Bill Date" },
+    { id : "party_code", name : "Party Code"},
+    { id : "party_name", name : "Party Name"},
+    { id: "Bill_No", name: "Bill Number" },
+    { id: "Customer_Type", name: "Customer Type" },
+    { id: "Bill_Value", name: "Bill Amount" },
+    { id: "action", name: "Action" },
+];
+
+
 const CTable = (props) => {
     const { columns, data,handleEditClick,handleDeleteClick } = props;
 
@@ -21,13 +34,13 @@ const CTable = (props) => {
     }
    
     return (
-        <div className = "w-full px-5 min-h-[80px] h-full">
+        <div className = "w-full p-5 min-h-[80px]">
 
             <table style={tableStyle}>
                 <thead>
                     <tr>
                         {
-                            columns.map((eachDoc) => (
+                            daybookColumns.map((eachDoc) => (
                                 <td style={{ ...thTdStyle, backgroundColor: "rgb(219 234 254)" }} key={eachDoc.id}>{eachDoc.name}</td>
                             ))
                         }
@@ -35,28 +48,29 @@ const CTable = (props) => {
                 </thead>
                 <tbody>
                     {
-                        (data || []).map((eachDoc,index) => (
-                            <tr key = {index}>
-                                <td style={thTdStyle} key={eachDoc.date}>{getSelectedDay(eachDoc.date)}</td>
-                                <td style={thTdStyle} key={eachDoc.balance}>{eachDoc.amount}</td>
-                                <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.balance}</td>
-                                <td style={thTdStyle} key={eachDoc.petty_cash_details}>{eachDoc.petty_cash_details}</td>
-                                <td style={thTdStyle}>
-                                    {/* <button>
-                                        <AiOutlineEdit 
-                                            className="text-blue-500" 
-                                            onClick = {()=>handleEditClick(index,eachDoc)} 
-                                        />
-                                    </button> */}
-                                    <button>
-                                        <AiOutlineDelete 
-                                            className="text-red-500"
-                                            onClick = {()=>handleDeleteClick(index)} 
-                                        />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
+                        (data || []).map((eachDoc,index) => {
+                            return(
+                                <tr key = {index}>
+                                    <td style={thTdStyle} key={eachDoc.sl_no}>{index+1}</td>
+                                    <td style={thTdStyle} key={eachDoc.Date}>{eachDoc.Date}</td>
+                                    <td style={thTdStyle} key={eachDoc.Party_Code}>{eachDoc.Party_Code}</td>
+                                    <td style={thTdStyle} key={eachDoc.Party_Name}>{eachDoc.Party_Name}</td>
+                                    <td style={thTdStyle} key={eachDoc.Bill_No}>{eachDoc.Bill_No}</td>
+                                    <td style={thTdStyle} key={eachDoc.CustomerType}>{eachDoc.CustomerType}</td>
+                                    <td style={thTdStyle} key={eachDoc.Bill_Value}>{eachDoc.Bill_Value}</td>
+                                    <td style={thTdStyle}>
+                                        <button>
+                                            <AiOutlineEdit 
+                                                className="text-blue-500" 
+                                                onClick = {()=>handleEditClick(index,eachDoc)} 
+                                            />
+                                        </button>
+                                    </td>
+                                </tr>
+                            )})
+
+                        
+                           
                     }
                 </tbody>
             </table>

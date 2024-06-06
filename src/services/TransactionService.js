@@ -2,10 +2,15 @@ import ApiServiceV2 from "./ApiServiceV2";
 import ApiService from "./ApiService";
 import axios from "axios";
 import appConfig from "../configs/app.config";
+import { getTodayDate } from "@mui/x-date-pickers/internals";
+import { getTomorrowDate } from "../utils/dateFormatter";
 
 const headers = {
     'Content-Type': 'application/json',
   };
+const excelHeader = {
+    'Content-Type': 'multipart/form-data',
+};
 
 export async function apiTerminalList() {
     return ApiServiceV2.fetchData({
@@ -99,6 +104,13 @@ export async function apiStoreDayBookInfo(data){
     return response.data;
 }
 
+export async function apiStorePaymentCollectionInfo(data){
+
+    let url = `${appConfig.apiPrefix}/v21/payment_collection/save_PaymentCollection`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
+}
+
 export async function apiStorePettyCashInfo(data){
     let url = `${appConfig.apiPrefix}/v21/petty_cash/save_PettyCash`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
@@ -171,6 +183,15 @@ export async function apiGetBookTypeServices(data) {
     return response;
 }
 
+export async function apiGetDayBookExcelData(data) {
+    const {terminal_id,key} = data;
+    let book_type = "Day Transactions";
+    let history_type = 5;
+    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
+    const response = await axios.get(url,{headers});
+    return response;
+}
+
 export async function apiGetSalesTypeInfo(){
     let url = `${appConfig.apiPrefix}/v21/master/get_SalesType`;
     const response = await axios.get(url,{headers});
@@ -178,32 +199,24 @@ export async function apiGetSalesTypeInfo(){
  
 }
 
-// export async function apiGetTransactions(data) {
-//     return ApiService.fetchData({
-//         url: '/v1/mos/getTransactionHistory',
-//         method: 'post',
-//         data,
-//     })
-// }
-// export async function apiGetTransactionHistory(data) {
-//     return ApiService.fetchData({
-//         url: '/v1/mos/transactionhistory',
-//         method: 'post',
-//         responseType: 'arraybuffer',
-//         data,
-//     })
-// }
-
-export async function apiGetTransactionHistory(values,Id){
-    // let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${values.book_type}&history_type=${values.history_type}&terminal_id=${Id}&key=${Id}`;
-   let url = `https://web.rampeylabs.com/api/v21/book_type/download_book?book_type=DayBook&history_type=5&terminal_id=SF7DB8&key=SF7DB8`
-    const response = await axios.get(url,
-        { 
-            headers,
-        });
+export async function apiUploadDayBookExcel(data) {
+    console.log("data",data)
+    let url = `${appConfig.apiPrefix}/v21/day_book/upload_DayBook`;
+    const response = await axios.post(url,data,{excelHeader});
     return response;
-
 }
+
+
+// export async function apiGetTransactionHistory(values,Id){
+//     // let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${values.book_type}&history_type=${values.history_type}&terminal_id=${Id}&key=${Id}`;
+//    let url = `https://web.rampeylabs.com/api/v21/book_type/download_book?book_type=DayBook&history_type=5&terminal_id=SF7DB8&key=SF7DB8`
+//     const response = await axios.get(url,
+//         { 
+//             headers,
+//         });
+//     return response;
+
+// }
 
 export async function apiGetTerminal(id){
     let url = `${appConfig.apiPrefix}/v21/master/get_Terminal?key=${id}`;

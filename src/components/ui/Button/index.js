@@ -2,16 +2,16 @@ import React from "react";
 
 const btnStyle = {
     color : "white",
-    height : 30,
-    width : 150,
+    height : 36,
+    width : 160,
     borderRadius : 4,
     textAlign : "center",
     backgroundColor :"#5A87B2"
 }
 const cancelBtnStyle = {
     color : "black",
-    height : 30,
-    width : 150,
+    height : 36,
+    width : 160,
     borderRadius : 4,
     border : "1px solid #121212",
     textAlign : "center",

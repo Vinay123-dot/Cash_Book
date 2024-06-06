@@ -121,12 +121,14 @@ const AddBookPage = (props) => {
         <AdvanceBookModal showAdvanceBook={selectedValue === 1} onCancel={handleCancelSelectedVal} />
         <DayBookModal 
           showDaybookModal={selectedValue === 3} 
-          onCancel={handleCancelSelectedVal} />
+          onCancel={handleCancelSelectedVal} 
+        />
         <PaymentCollectionModal showPaymentColModal = {selectedValue === 5} onCancel={handleCancelSelectedVal} />
 
       </div>
       {
-        (!selectedValue || selectedValue === 3) && showBtnsForDbook &&
+        // (!selectedValue || selectedValue === 3) && showBtnsForDbook &&
+        !selectedValue &&
         <div className= "absolute flex flex-row-reverse gap-10  bottom-10 right-10">
           <CButton
             btnType="submit"
