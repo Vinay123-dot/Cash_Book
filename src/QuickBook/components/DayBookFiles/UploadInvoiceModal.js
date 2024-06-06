@@ -204,12 +204,16 @@ import CButton from '../../../components/ui/Button';
 import Modal from '../../../components/shared/Modal';
 import { HiOutlineUpload } from "react-icons/hi";
 import  excelIcon from "../../../assets/excelIcon.png";
+import { apiUploadDayBookExcel } from "../../../services/TransactionService";
 
 const UploadModal = ({ onClose }) => {
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState(null);
   const inputRef = useRef(null);
+  const [loadingUPBtn,setLoadingUPBtn] = useState(false);
+
+  let uniqueId = localStorage.getItem("uniqueId");
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -221,10 +225,15 @@ const UploadModal = ({ onClose }) => {
     }
   };
   const handleChange = (e) => {
+    // console.log("ev",e.target.value);
+
     const file = e.target.files[0];
+    console.log("file",file)
     if (file) {
       setFileName(file.name);
-      setFile(URL.createObjectURL(file));
+      // setFile(e.target.value)
+      // setFile(URL.createObjectURL(file));
+      setFile(file);
     }
   };
 
@@ -234,7 +243,8 @@ const UploadModal = ({ onClose }) => {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      setFile(URL.createObjectURL(file));
+      // setFile(URL.createObjectURL(file));
+      setFile(file);
     }
   };
 
@@ -248,7 +258,24 @@ const UploadModal = ({ onClose }) => {
     onClose();
   }
 
+  const handleSubmitExcel = async() => {
+    try{
+      setLoadingUPBtn(true);
+      const formData = new FormData();
+      formData.append("key",uniqueId);
+      formData.append("file",file);
+      let response = await apiUploadDayBookExcel(formData);
+      setLoadingUPBtn(false);
+      if(response?.status === 200) {
+        onClose();
+      }
+      
 
+    }catch(e){
+      setLoadingUPBtn(false);
+    }
+    
+  }
 
   return (
     <Modal openModal={true} height={200} width={400} jc="center" bStyle="dashed">
@@ -284,11 +311,15 @@ const UploadModal = ({ onClose }) => {
           onClick={handleCancelBtn} 
           type = "cancel"
           style={{borderRadius: 8,width:96,fontSize:12,marginRight:10}}
-        >Cancel</CButton>
+        > 
+          Cancel 
+        </CButton>
         <CButton 
-          onClick={()=>console.log("upload")} 
+          onClick={handleSubmitExcel} 
           style={{borderRadius: 8,width:96,fontSize:12}}
-        >Submit</CButton>
+        >
+          {loadingUPBtn ? "Submitting...":"Submit"}
+        </CButton>
       </div>
     </Modal>
   );

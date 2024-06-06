@@ -19,7 +19,7 @@ const AntdSelectFilter = (props) => {
         <>
             <Select
                 showSearch
-                className = "w-full md:w-44"
+                className = "w-full md:w-52 h-10"
                 placeholder = {placeholder}
                 optionFilterProp = "children"
                 filterOption={(input, option) => (option?.children ?? '').includes(input)}

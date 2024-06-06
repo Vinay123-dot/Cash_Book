@@ -53,6 +53,8 @@ const QuickBookTools = () => {
     getDayInfo();
   }, [userType]);
 
+
+
   
   const getBookTypeInfo = async() => {
     try{

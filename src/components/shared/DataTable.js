@@ -202,17 +202,16 @@ const DataTable = forwardRef((props, ref) => {
                 <THead className="z-10 sticky top-0">
                     {table.getHeaderGroups().map((headerGroup) => {
                     return(
-                        // <Tr key={headerGroup.id} style={{display:"flex",justifyContent:"space-around",alignItems:'center'}}>
-                        <Tr key={headerGroup.id}>
-                        {/* // <Tr key={headerGroup.id}> */}
+                        <Tr key={headerGroup.id} style={{display:"flex",justifyContent:"space-between",alignItems:'center',marginTop : 10}}>
+                        {/* <Tr key={headerGroup.id}> */}
                             {headerGroup.headers.map((header) => {
                                 return (
                                     <Th
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         style={{
-                                            minWidth : 90,
-                                            maxWidth: 120
+                                            width : 120,
+                                            textAlign : 'center',
                                         }}
                                     >
                                         {header.isPlaceholder ? null : (
@@ -255,17 +254,17 @@ const DataTable = forwardRef((props, ref) => {
                     ) : !loading && data.length > 0 ? (
                         table
                             .getRowModel()
-                            .rows.slice(0, pagingData.pageSize)
+                            .rows
                             .map((row) => {
                                 return (
-                                    <Tr key={row.id} >
+                                    <Tr key={row.id}  style={{display:"flex",justifyContent:"space-between",alignItems:'center'}} >
                                         {row.getVisibleCells().map((cell) => {
                                             return (
                                                 <Td
                                                     key={cell.id}
                                                     style={{
-                                                        maxWidth: 50,
-                                                        
+                                                        width : 120,
+                                                        textAlign : 'center',
                                                     }}
                                                 >
                                                     {flexRender(
@@ -321,7 +320,7 @@ DataTable.defaultProps = {
     pagingData: {
         total: 0,
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: 100,
     },
     data: [],
     columns: [],

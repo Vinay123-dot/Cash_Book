@@ -1,4 +1,9 @@
-import { dayBookIntialObj } from "./DayBookIntialObj";
-import { AdvanceBookIntialObj } from "./AdvanceBookIntialObj";
+import  { dayBookIntialObj } from "./DayBookIntialObj";
+import  { AdvanceBookIntialObj } from "./AdvanceBookIntialObj";
+import { PaymentColIntialObj } from "./PaymentCollectionIntialObj";
 
-export {dayBookIntialObj,AdvanceBookIntialObj};
+export {
+    dayBookIntialObj,
+    AdvanceBookIntialObj,
+    PaymentColIntialObj
+};

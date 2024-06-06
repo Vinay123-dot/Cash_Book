@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React,{useState} from "react";
 import ParagraphTag from "../../../constants/PTag";
 import CButton from "../../../components/ui/Button";
 import PaymentSelect from "../../../components/ui/PaymentSelect/PaymentSelect";
@@ -6,7 +6,7 @@ import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useFormikContext } from 'formik';
 import { AiOutlineDelete } from "react-icons/ai";
-import { DaysArr,selectedValType } from "../../../Constants";
+import { selectedValType } from "../../../Constants";
 import { getTotalMoneyInDayBook } from "../CompConstants";
 
 const UPI = "UPI";
@@ -64,8 +64,7 @@ const CashTypes = (props) => {
             paymentType4: P4, paymentType5: P5
         } = allValues;
         let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null
-        // let err =  !value ? 'This Field is Required' : null
+        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null;
         return err;
 
     }

@@ -1,5 +1,6 @@
 export const dayBookIntialObj = {
     id: 0,
+    issales_report : 0,
     advance_customer_name: "", //string
     advance_receipt_amount: null, //number
     used_receipt_amount : null,
