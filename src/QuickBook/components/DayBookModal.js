@@ -81,16 +81,18 @@ const DayBookModal = (props) => {
 
     const getExcelTrasaction = async () => {
         try {
+            setShowLoader(true);
             let newObj = {
                 terminal_id: uniqueId,
                 key: uniqueId
             };
+            console.log("te,p")
             let resposne = await apiGetDayBookExcelData(newObj);
             let temp = (resposne?.data || []).filter((eachDoc) => eachDoc?.Issales_Report === 1);
             setExcelData(temp || []);
-
+            setShowLoader(false);
         } catch (e) {
-
+            setShowLoader(false);
         }
     }
 
@@ -335,6 +337,7 @@ const DayBookModal = (props) => {
                     handleSaveEditDayBook = {onSaveEditDayBook}
                     requiredArrayData = {requiredArrList}
                 />
+                <Loader showLoading = {showLoader} />
                 <div className="p-5 flex flex-row-reverse">
                     <CButton onClick={() => {
                         onCancel();

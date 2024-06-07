@@ -38,8 +38,7 @@ const HandleEditInvoice = (props) => {
     const [seletedModalVal, setSelectedModalVal] = useState(null);
     const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
 
-    console.log("cBook", cashbookData)
-
+  
     // const user = useSelector((state) => state.auth.user)
     // const [isOpenDialog, setIsOpenDialog] = useState('')
     // const [message, setMessage] = useState({
@@ -259,7 +258,7 @@ const HandleEditInvoice = (props) => {
     const handleClickIcon = () => {
         setSelectedModalVal(cashbookData.book_type);
     }
-    console.log("row", row)
+    
 
     const convertToSmallPettyCashObj = (pObj) => {
         let newTemp = {

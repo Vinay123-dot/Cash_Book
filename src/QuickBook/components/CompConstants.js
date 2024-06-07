@@ -110,6 +110,7 @@ const convertTONumbers = (newObj) => {
     newObj.upi_amount = Number(newObj.upi_amount);
     newObj.pg_order_amount = newObj.pg_order_amount != null ? Number(newObj.pg_order_amount) : 0;
     newObj.reference_order_amount = newObj.reference_order_amount !=null ? Number(newObj.reference_order_amount):null;
+    newObj.used_receipt_amount = newObj.used_receipt_amount !=null ? Number(newObj.used_receipt_amount):null;
     return newObj;
 }
 // const validatePaymentType = (value) => {

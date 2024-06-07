@@ -30,9 +30,10 @@ import CashTypes from "../DayBookFiles/CashTypes";
 import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
 import Modal from "../../../components/shared/Modal";
 import { getToday } from "../../../utils/dateFormatter";
+import AntdDaySelect from "../../../components/ui/AntdDaySelect";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
-    <AntdFormikSelect
+    <AntdDaySelect
         labelText={label}
         name={name}
         ph={ph}

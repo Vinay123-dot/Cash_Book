@@ -2,8 +2,7 @@ import ApiServiceV2 from "./ApiServiceV2";
 import ApiService from "./ApiService";
 import axios from "axios";
 import appConfig from "../configs/app.config";
-import { getTodayDate } from "@mui/x-date-pickers/internals";
-import { getTomorrowDate } from "../utils/dateFormatter";
+import { getToday, getYesterDay } from "../utils/dateFormatter";
 
 const headers = {
     'Content-Type': 'application/json',
@@ -186,8 +185,11 @@ export async function apiGetBookTypeServices(data) {
 export async function apiGetDayBookExcelData(data) {
     const {terminal_id,key} = data;
     let book_type = "Day Transactions";
-    let history_type = 5;
-    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
+    let history_type = 0;
+    let startDate = getYesterDay();
+    let endDate = getToday();
+    // let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
+    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
     const response = await axios.get(url,{headers});
     return response;
 }
