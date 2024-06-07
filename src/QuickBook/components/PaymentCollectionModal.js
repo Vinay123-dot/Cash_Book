@@ -2,14 +2,13 @@
 import React, { useEffect, useState, memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
-import { DaysArr, selectedValType } from "../../Constants";
+import { DaysArr } from "../../Constants";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal,
-    setShowUploadInvoice
+    setDataSavedModal
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import {
@@ -17,10 +16,9 @@ import {
     apiGetPaymentTypeInfo,
     apiGetUPITypeInfo,
     apiStorePaymentCollectionInfo,
-    apiGetTerminal,
 } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
-import { getTotalMoneyInDayBook } from "./CompConstants";
+import { convertTONumbers, getTotalMoneyInDayBook } from "./CompConstants";
 import ShowPaymentTypes from "./DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { PaymentColIntialObj } from "../intialValuesFol";
@@ -69,18 +67,7 @@ const PaymentCollectionModal = (props) => {
 
     if (!showPaymentColModal) return null;
 
-    const convertTONumbers = (newObj) => {
-
-        newObj.bill_value = Number(newObj.bill_value);
-        newObj.cash_amount = Number(newObj.cash_amount);
-        newObj.credit_card_amount = Number(newObj.credit_card_amount);
-        newObj.debit_card_amount = Number(newObj.debit_card_amount);
-        newObj.bank_cheque_amount = Number(newObj.bank_cheque_amount);
-        newObj.online_bank_amount = Number(newObj.online_bank_amount);
-        newObj.upi_amount = Number(newObj.upi_amount);
-        return newObj;
-    }
-
+  
 
     const handleSubmit = async (values, validateModal) => {
         try {
@@ -96,7 +83,6 @@ const PaymentCollectionModal = (props) => {
             let convertedObj = convertTONumbers(newObj);
 
             convertedObj.key = uniqueId;
-            console.log("cc",convertedObj);
             let response = await apiStorePaymentCollectionInfo([convertedObj]);
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
@@ -111,6 +97,12 @@ const PaymentCollectionModal = (props) => {
         }
     }
 
+    const removeFeilds = (pArr) => {
+        let temp = [];
+        temp = (pArr || []).filter((eachDoc)=> ![7,8].includes(eachDoc.Id));
+        return temp;
+    }
+
     return (
         <>
             <Formik
@@ -122,7 +114,6 @@ const PaymentCollectionModal = (props) => {
                 style={{ overflow: "auto" }}
             >
                 {({ setFieldValue, values }) => {
-                    console.log("VAL",values);
                     return (
                         <Form>
                             <ParagraphTag label="Details" />
@@ -159,8 +150,9 @@ const PaymentCollectionModal = (props) => {
                             <CashTypes
                                 setFieldValue = {setFieldValue}
                                 valObj = {values}
-                                paymentListInfo = {paymentListInfo}
+                                paymentListInfo = {removeFeilds(paymentListInfo)}
                                 upiTypeInfo = {upiTypeInfo}
+                                pLength = {5}
                             />
 
 

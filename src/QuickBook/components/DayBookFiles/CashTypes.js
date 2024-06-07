@@ -6,70 +6,34 @@ import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useFormikContext } from 'formik';
 import { AiOutlineDelete } from "react-icons/ai";
-import { selectedValType } from "../../../Constants";
-import { getTotalMoneyInDayBook } from "../CompConstants";
+import { verifyInputField, verifyPaymentType, verifyReasonField, verifyUpiType } from "../CompConstants";
+import { 
+    UPI,CASH,BANK,CHEQUE,CREDITCARD,DEBITCARD,PAYMENTGATEWAY,REFERENCEORDER 
+} from "../CompConstants";
 
-const UPI = "UPI";
-const CASH = "Cash";
-const BANK = "Bank";
-const  CHEQUE = "Cheque";
-const CREDITCARD = "Credit Card";
-const DEBITCARD = "Debit Card";
-const iconStyle = { 
-    color: "red", 
-    width: 20, 
-    height: 20, 
-    position: "absolute", 
-    right: 10, 
-    bottom: 10 ,
-    cursor : "pointer"
-};
 
 const CashTypes = (props) => {
     
-    const { valObj,paymentListInfo,upiTypeInfo } = props;
+    const { valObj,paymentListInfo,upiTypeInfo,pLength = 6 } = props;
     const { setFieldValue } = useFormikContext();
     const [clickCount, setClickCount] = useState([0]);
 
+    const validateUpiType = (value, allValues) => verifyUpiType(value, allValues);
+
+    const validateInputField = (value, allValues, type) => verifyInputField(value, allValues, type);
+    
+    const validateReasonField = (value,allValues) => verifyReasonField(value,allValues);
+    
+    const handleSetFieldData = (name, selectedValue) => setFieldValue(name, selectedValue);
+
     const handleButtonClick = () => {
-        if (clickCount.length > 4) return;
+        if (clickCount.length > pLength) return;
         setFieldValue(`paymentType${clickCount.length}`,null);
         setClickCount(prevCount => [...prevCount, clickCount.length]);
     };
 
-    const validatePaymentType = (value) => {
-        let error;
-        if (!value) {
-            error = 'This field is required';
-        }
-        return error;
-    }
-
-    const validateUpiType = (value, allValues) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let error = (paymentTypeArr.includes(UPI) && !value) ? 'This field is required' : null
-        return error;
-
-    }
-
-    const validateInputField = (value, allValues, type) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null;
-        return err;
-
-    }
-
-    const handleSetFieldData = (name, selectedValue) => setFieldValue(name, selectedValue);
+   
+    
 
     const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
         return (
@@ -85,15 +49,10 @@ const CashTypes = (props) => {
         )
     }
 
-    const validateReasonField = (value,allValues) => {
-        let diffInAmount = Number(allValues.bill_value) - getTotalMoneyInDayBook(allValues);
-        let err = (diffInAmount > 10 || diffInAmount < -10) && !value ? 'This field is required' : null;
-        return err;
-    }
+    
+    
 
     const handleRemoveFromList = (selectedItem,valObj) => {
-        console.log("EachItem",selectedItem,);
-        console.log("ValObj",valObj);
         setFieldValue(`paymentType${selectedItem}`,null);
         let selectedVal = valObj?.[`paymentType${selectedItem}`];
         if(selectedVal === UPI){
@@ -119,9 +78,24 @@ const CashTypes = (props) => {
         if(selectedVal === DEBITCARD){
             setFieldValue("debit_card_amount",null)
         }
+        if(selectedVal === REFERENCEORDER){
+            setFieldValue("reference_order_amount",null)
+        }
+        if(selectedVal === PAYMENTGATEWAY){
+            setFieldValue("pg_order_amount",null)
+        }
 
         let filteredCount = clickCount.filter(item => item !== selectedItem);
         setClickCount(JSON.parse(JSON.stringify(filteredCount)));
+    }
+
+    const showDeleteIcon = (Item,fullObj) => {
+        return <AiOutlineDelete
+                // style = {iconStyle}
+                className="text-red-500 w-5 h-5 absolute right-2.5 bottom-2.5 cursor-pointer"
+                onClick={() => handleRemoveFromList(Item,fullObj)}
+            />
+        
     }
 
     return (
@@ -147,7 +121,7 @@ const CashTypes = (props) => {
                         outputObj = {valObj}
                         Arr = {paymentListInfo}
                         validation = {true}
-                        validateField = {validatePaymentType}
+                        validateField = {(val) => verifyPaymentType(val)}
                         key = {index}
                     />
                     {/* {
@@ -177,12 +151,9 @@ const CashTypes = (props) => {
                                     showInputBox("Enter Amount", 'upi_amount', "Amount", validateInputField, valObj)
                                 }
                                 {
-                                    index !== 0 &&
-                                    <AiOutlineDelete
-                                        style = {iconStyle}
-                                        onClick={() => handleRemoveFromList(eachItem,valObj)}
-                                    />
+                                    index !== 0 && showDeleteIcon(eachItem,valObj)
                                 }
+                                
                             </div>
                         </>
 
@@ -196,11 +167,7 @@ const CashTypes = (props) => {
                                 showInputBox("Enter Amount", 'cash_amount', "Amount", validateInputField, valObj)
                             }
                             {
-                                index !== 0 &&
-                                <AiOutlineDelete
-                                    style={iconStyle}
-                                    onClick={() => handleRemoveFromList(eachItem,valObj)}
-                                />
+                                index !== 0 && showDeleteIcon(eachItem,valObj)
                             }
                         </div>
                     }
@@ -219,11 +186,7 @@ const CashTypes = (props) => {
                                     showInputBox("Bank Name", "online_bank_name", "Bank Name", validateInputField, valObj, true, false, false)
                                 }
                                 {
-                                    index !== 0 &&
-                                    <AiOutlineDelete 
-                                        style={iconStyle} 
-                                        onClick={() => handleRemoveFromList(eachItem, valObj)} 
-                                    />
+                                    index !== 0 && showDeleteIcon(eachItem,valObj)
                                 }
                             </div>
                         </>
@@ -243,11 +206,7 @@ const CashTypes = (props) => {
                                     showInputBox("Bank", "bank_cheque_name", "Bank Name", validateInputField, valObj, true, false, false)
                                 }
                                 {
-                                    index !== 0 &&
-                                    <AiOutlineDelete
-                                        style={iconStyle}
-                                        onClick={() => handleRemoveFromList(eachItem,valObj)}
-                                    />
+                                    index !== 0 && showDeleteIcon(eachItem,valObj)
                                 }
                             </div>
                         </>
@@ -259,11 +218,7 @@ const CashTypes = (props) => {
                                 showInputBox("Amount", "credit_card_amount", "Amount", validateInputField, valObj)
                             }
                             {
-                                index !== 0 &&
-                                <AiOutlineDelete
-                                    style={iconStyle}
-                                    onClick={() => handleRemoveFromList(eachItem,valObj)}
-                                />
+                                index !== 0 && showDeleteIcon(eachItem,valObj)
                             }
                         </div>
 
@@ -275,11 +230,31 @@ const CashTypes = (props) => {
                                 showInputBox("Amount", "debit_card_amount", "Amount", validateInputField, valObj)
                             }
                             {
-                                index !== 0 &&
-                                <AiOutlineDelete
-                                    style={iconStyle}
-                                    onClick={() => handleRemoveFromList(eachItem,valObj)}
-                                />
+                                index !== 0 && showDeleteIcon(eachItem,valObj)
+                            }
+                        </div>
+
+                    }
+                    {
+                        valObj[`paymentType${eachItem}`] === PAYMENTGATEWAY &&
+                        <div className="col-span-2 flex flex-row relative items-center">
+                            {
+                                showInputBox("Amount", "pg_order_amount", "Amount", validateInputField, valObj)
+                            }
+                            {
+                                index !== 0 && showDeleteIcon(eachItem,valObj)
+                            }
+                        </div>
+
+                    }
+                    {
+                        valObj[`paymentType${eachItem}`] === REFERENCEORDER &&
+                        <div className="col-span-2 flex flex-row relative items-center">
+                            {
+                                showInputBox("Amount", "reference_order_amount", "Amount", validateInputField, valObj)
+                            }
+                            {
+                                index !== 0 && showDeleteIcon(eachItem,valObj)
                             }
                         </div>
 

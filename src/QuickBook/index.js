@@ -7,15 +7,126 @@ import { injectReducer } from "../store/index";
 import reducer from "./store/index";
 import PageNotFound from "../PageNotFound";
 import Loader from "../components/shared/Loader";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { 
+  apiGetBookTypeInfo,
+  apiGetDayInfo,
+  apiGetTerminal,
+  apiGetDepositTypeInfo,
+  apiGetDepositModeInfo,
+  apiGetPaymentTypeInfo,
+  apiGetUPITypeInfo,
+  apiGetCustomerTypeInfo,
+  apiGetSalesTypeInfo
+} from "../services/TransactionService";
+import { 
+  setBookTypeList,
+  setDayInfoList,
+  setOutletsList ,
+  setDepositTypeArray,
+  setDepositModeArray,
+  setPaymentTypeInfo,
+  setUpiTypeInfo,
+  setCustomerListInfo,
+  setSalesType
+} from "./store/stateSlice";
+
 
 injectReducer('quickbookStore', reducer);
 
 const userList = ["4", "7"];
 
 const Quickbook = () => {
-  let userType = localStorage.getItem("mType");
+
+  const dispatch = useDispatch();
   const mainPageLoader = useSelector(state => state.quickbookStore.state.mainPageLoader);
+  let uniqueId = localStorage.getItem("uniqueId");
+  let userType = localStorage.getItem("mType");
+
+  useEffect(() => {
+
+    if(userList.includes(userType)) {
+      getOutletsList();
+      getBookTypeInfo();
+      getDayInfo();
+      fetchDepositTypeList();
+      fetchDepositModeList();
+      fetchPaymentTypeInfo();
+      getUpiTypeInfo();
+      getCustomerTypeInfo();
+      getsalesTypesInfo();
+    }
+
+  },[userType])
+
+  const getBookTypeInfo = async() => {
+    try{
+      let response = await apiGetBookTypeInfo();
+      dispatch(setBookTypeList(response?.data || []));
+    }catch(e){}
+  }
+  
+  const getDayInfo = async() => {
+    try{
+      let response = await apiGetDayInfo();
+      dispatch(setDayInfoList(response?.data || []));
+    }catch(e){}
+  }
+
+  const getOutletsList = async () => {
+    let options = {
+      Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
+    };
+    let response = await apiGetTerminal(uniqueId);
+    dispatch(setOutletsList([options,...response] || []));
+  }
+
+  const fetchDepositTypeList = async () => {
+    try{
+      let response = await apiGetDepositTypeInfo();
+      dispatch(setDepositTypeArray(response?.data || []));
+    }catch(e){}
+  }
+
+  const fetchDepositModeList = async () => {
+    try{
+      let response = await apiGetDepositModeInfo();
+      dispatch(setDepositModeArray(response?.data || []));
+    }catch(e){}
+  }
+
+  const fetchPaymentTypeInfo = async () => {
+    try {
+      let response = await apiGetPaymentTypeInfo();
+      dispatch(setPaymentTypeInfo(response?.data || []));
+    }catch(e){
+
+    }
+  }
+
+  const getUpiTypeInfo = async () => {
+    try {
+        let response = await apiGetUPITypeInfo();
+        dispatch(setUpiTypeInfo(response?.data || []));
+    } catch (e) { }
+  }
+
+  const getCustomerTypeInfo = async () => {
+    try {
+        let response = await apiGetCustomerTypeInfo();
+        dispatch(setCustomerListInfo(response?.data || []));
+    } catch (e) { }
+  }
+
+  const getsalesTypesInfo = async () => {
+    try {
+      let response = await apiGetSalesTypeInfo();
+      dispatch(setSalesType(response?.data || []));
+    }catch(e){
+
+    }
+  }
+
  
   return !userList.includes(userType) ? <PageNotFound /> :
     <AdaptableCard className="h-full overflow-hidden border-0 rounded-none" bodyClass="p-0">

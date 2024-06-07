@@ -2,7 +2,7 @@
 import React, { useEffect, useState,memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
-import { DaysArr,selectedValType } from "../../Constants";
+import { DaysArr } from "../../Constants";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import { useDispatch,useSelector } from "react-redux";
@@ -10,7 +10,8 @@ import {
     setShowAddBookPage,
     setDataSavedModal,
     setShowUploadInvoice,
-    setShowDayBookFields
+    setShowDayBookFields,
+    setEditedDaybookObj
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import {
@@ -23,7 +24,12 @@ import {
     apiGetDayBookExcelData
 } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
-import { getTotalMoneyInDayBook,getConvertedObj,convertTONumbers } from "./CompConstants";
+import { 
+    getTotalMoneyInDayBook,
+    getConvertedObj,
+    convertTONumbers, 
+    verifyInputField 
+} from "./CompConstants";
 import ShowPaymentTypes from "./DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { dayBookIntialObj } from "../intialValuesFol";
@@ -80,14 +86,8 @@ const DayBookModal = (props) => {
                 key: uniqueId
             };
             let resposne = await apiGetDayBookExcelData(newObj);
-            console.log("res",resposne)
-            // let temp = (resposne?.data || []).filter((eachDoc) => eachDoc?.Issales_Report === 1);
-            let filteredData = resposne.data.filter((eachDoc) => {
-                console.log("Checking each document:", eachDoc);
-                return eachDoc?.Issales_Report === 1;
-            });
-            console.log("excelDat",filteredData)
-            // setExcelData(temp || []);
+            let temp = (resposne?.data || []).filter((eachDoc) => eachDoc?.Issales_Report === 1);
+            setExcelData(temp || []);
 
         } catch (e) {
 
@@ -151,16 +151,7 @@ const DayBookModal = (props) => {
     }
 
     const validateInputField = (value, allValues, type) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null
-        // let err =  !value ? 'This Field is Required' : null
-        return err;
-
+        return verifyInputField(value, allValues, type);
     }
 
 
@@ -209,9 +200,12 @@ const DayBookModal = (props) => {
     }
 
     const handleEditClick = (index,doc) => {
-        console.log("D",doc)
         let modifiedObj = Object.keys(doc).length !== 0 ? getConvertedObj(doc) : {};
-       console.log("mm",modifiedObj)
+        if (typeof modifiedObj.customer_type === 'string') {
+            let findedObj = (requiredArrList.customerListInfo || []).find((eachItem) => eachItem.Type === modifiedObj.customer_type);
+            modifiedObj.customer_type = findedObj?.Id || null;
+        } 
+        dispatch(setEditedDaybookObj(modifiedObj));
         setEditDayBook({
             showEditDaybookModal : true,
             editDayBookObj : modifiedObj
@@ -281,7 +275,6 @@ const DayBookModal = (props) => {
                                 values.sales_type === 1 &&
                                 <>
                                     <CashTypes
-                                        setFieldValue = {setFieldValue}
                                         valObj = {values}
                                         paymentListInfo = {requiredArrList.paymentListInfo}
                                         upiTypeInfo = {requiredArrList.upiTypeInfo}
@@ -333,7 +326,8 @@ const DayBookModal = (props) => {
                     handleEditClick = {handleEditClick}
                 />
                 <EditModeInDayBook
-                    dayBookObj = {editDayBook}
+                    isEditDayBookModal = {editDayBook.showEditDaybookModal}
+                    editDayBookObj = {editDayBook.editDayBookObj}
                     handleCancelDBook = {() => setEditDayBook({
                         showEditDaybookModal: false,
                         editDayBookObj: {}

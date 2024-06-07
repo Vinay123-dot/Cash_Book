@@ -15,7 +15,7 @@ const AntdInput = (props) => {
   
     return (
         <div className="flex flex-col w-full md:w-60">
-            <label htmlFor={value} className="my-2">{text}</label>
+            <label htmlFor={value} className="my-2 text-start">{text}</label>
             <Field 
                 name={value} 
                 as={Input} 

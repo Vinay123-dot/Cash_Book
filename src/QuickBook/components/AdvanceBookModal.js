@@ -18,7 +18,7 @@ import {
 } from "../../services/TransactionService";
 import ShowPaymentTypes from "./DayBookFiles/ShowPaymentTypes";
 import Loader from "../../components/shared/Loader";
-import { getTotalMoneyInDayBook } from "./CompConstants";
+import { convertTONumbers, getTotalMoneyInDayBook } from "./CompConstants";
 import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { AdvanceBookIntialObj } from "../intialValuesFol";
 import CashTypes from "./DayBookFiles/CashTypes";
@@ -79,17 +79,6 @@ const AdvanceBookModal = (props) => {
 
     if (!showAdvanceBook) return null;
 
-    const convertTONumbers = (newObj) => {
-
-        newObj.bill_value = Number(newObj.bill_value);
-        newObj.cash_amount = Number(newObj.cash_amount);
-        newObj.credit_card_amount = Number(newObj.credit_card_amount);
-        newObj.debit_card_amount = Number(newObj.debit_card_amount);
-        newObj.bank_cheque_amount = Number(newObj.bank_cheque_amount);
-        newObj.online_bank_amount = Number(newObj.online_bank_amount);
-        newObj.upi_amount = Number(newObj.upi_amount);
-        return newObj;
-    }
 
     const handleSubmit = async (values,validateModal) => {
         try {
@@ -118,6 +107,12 @@ const AdvanceBookModal = (props) => {
         } catch (e) {
             setValidateModal(true);
         }
+    }
+
+    const removeFeilds = (pArr) => {
+        let temp = [];
+        temp = (pArr || []).filter((eachDoc)=> ![7,8].includes(eachDoc.Id));
+        return temp;
     }
 
     return (<>
@@ -168,8 +163,9 @@ const AdvanceBookModal = (props) => {
 
                         <CashTypes 
                             valObj = {values}
-                            paymentListInfo = {paymentListInfo}
+                            paymentListInfo = {removeFeilds(paymentListInfo)}
                             upiTypeInfo = {upiTypeInfo}
+                            pLength = {5}
                         />
 
                         <ShowPaymentTypes 

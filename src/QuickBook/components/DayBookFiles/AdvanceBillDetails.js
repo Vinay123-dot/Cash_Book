@@ -5,6 +5,7 @@ import CButton from "../../../components/ui/Button";
 import { useFormikContext } from 'formik';
 import { DaysArr,selectedValType } from "../../../Constants";
 import { apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
+import { verifyInputField } from "../CompConstants";
 
 const AdvanceBillDetails = (props) => {
 
@@ -49,17 +50,11 @@ const AdvanceBillDetails = (props) => {
     }
 
     const validateInputField = (value, allValues, type) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null
-        // let err =  !value ? 'This Field is Required' : null
-        return err;
+        return verifyInputField(value, allValues, type);
 
     }
+
+    
 
 
     return (
