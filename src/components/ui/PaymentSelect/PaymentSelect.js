@@ -23,7 +23,7 @@ const PaymentSelect = (props) => {
     }
     return (
         <div className="flex flex-col w-full md:w-60">
-            <label htmlFor={name} className="my-2">{labelText}</label>
+            <label htmlFor={name} className="my-2 text-start">{labelText}</label>
             <Field 
                 name={name} 
                 error={error}

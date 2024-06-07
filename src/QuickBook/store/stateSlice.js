@@ -13,8 +13,17 @@ const stateSlice = createSlice({
         showdayBookFields : false,
         showUploadInvoice : false,
         selectedCustomer: {},
+        editedDaybookObj : {},
         sortedColumn: () => {},
         bookTypeList : [],
+        dayInfoList : [],
+        outletsList : [],
+        depositModeList : [],
+        depositTypeList : [],
+        paymentTypeInfo : [],
+        upiTypeInfo : [],
+        customerListInfo : [],
+        salesType : [],
     },
     reducers: {
         setSelectedCustomer: (state, action) => {
@@ -52,7 +61,34 @@ const stateSlice = createSlice({
         },
         setBookTypeList : (state,action) => {
             state.bookTypeList = action.payload;
-        }
+        },
+        setDayInfoList : (state,action) => {
+            state.dayInfoList = action.payload;
+        },
+        setOutletsList : (state,action) => {
+            state.outletsList = action.payload;
+        },
+        setDepositModeArray : (state,action) => {
+            state.depositModeList = action.payload;
+        },
+        setDepositTypeArray : (state,action) => {
+            state.depositTypeList = action.payload;
+        },
+        setPaymentTypeInfo : (state,action) => {
+            state.paymentTypeInfo = action.payload;
+        },
+        setUpiTypeInfo : (state,action) => {
+            state.upiTypeInfo = action.payload;
+        },
+        setCustomerListInfo : (state,action) => {
+            state.customerListInfo = action.payload;
+        },
+        setSalesType : (state,action) => {
+            state.salesType = action.payload;
+        },
+        setEditedDaybookObj : (state,action) => {
+            state.editedDaybookObj = action.payload;
+        },
 
     },
 })
@@ -71,7 +107,16 @@ export const {
     setShowUploadInvoice,
     setRemainingCommonBalance,
     setPettyCashRemainingBalance,
-    setBookTypeList
+    setBookTypeList,
+    setDayInfoList,
+    setOutletsList,
+    setDepositTypeArray,
+    setDepositModeArray,
+    setPaymentTypeInfo,
+    setUpiTypeInfo,
+    setCustomerListInfo,
+    setSalesType,
+    setEditedDaybookObj
     
 } = stateSlice.actions
 

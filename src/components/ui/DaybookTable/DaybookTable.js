@@ -1,6 +1,7 @@
 import React from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { DaysArr } from "../../../Constants";
+import { convertToNormalFormat } from "../../../utils/dateFormatter";
 
 const tableStyle = {
     borderCollapse: 'collapse',
@@ -52,11 +53,11 @@ const CTable = (props) => {
                             return(
                                 <tr key = {index}>
                                     <td style={thTdStyle} key={eachDoc.sl_no}>{index+1}</td>
-                                    <td style={thTdStyle} key={eachDoc.Date}>{eachDoc.Date}</td>
+                                    <td style={thTdStyle} key={eachDoc.Date}>{convertToNormalFormat(eachDoc.Date)}</td>
                                     <td style={thTdStyle} key={eachDoc.Party_Code}>{eachDoc.Party_Code}</td>
                                     <td style={thTdStyle} key={eachDoc.Party_Name}>{eachDoc.Party_Name}</td>
                                     <td style={thTdStyle} key={eachDoc.Bill_No}>{eachDoc.Bill_No}</td>
-                                    <td style={thTdStyle} key={eachDoc.CustomerType}>{eachDoc.CustomerType}</td>
+                                    <td style={thTdStyle} key={eachDoc.CustomerType}>{eachDoc.Customer_Type}</td>
                                     <td style={thTdStyle} key={eachDoc.Bill_Value}>{eachDoc.Bill_Value}</td>
                                     <td style={thTdStyle}>
                                         <button>

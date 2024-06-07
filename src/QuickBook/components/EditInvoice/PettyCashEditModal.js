@@ -16,13 +16,6 @@ import { apiStorePettyCashInfo } from "../../../services/TransactionService";
 import Loader from "../../../components/shared/Loader";
 import Modal from "../../../components/shared/Modal";
 
-const initialValues = {
-    id: 0,
-    date: null,
-    balance: '',
-    amount: '',
-    petty_cash_details: '',
-};
 
 
 const ShowInputBoxInPC = (
@@ -50,7 +43,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashEditModal = (props) => {
 
-    const { showEditPettyCash, onCancel } = props;
+    const { showEditPettyCash, handleCancelPettyCash ,selectedPettyCashObj} = props;
     const dispatch = useDispatch();
     const editFormikRef = useRef();
 
@@ -70,24 +63,18 @@ const PettyCashEditModal = (props) => {
     }, [remPettyCash])
 
     if (!showEditPettyCash) return null;
+   
+    const handleSubmit = async (values) => {
 
-    const handleSubmit = async (values, setErrors, resetForm, setFieldError) => {
-
-        const { date, balance, amount, petty_cash_details } = values;
-        let isAllValuesPresent = date && balance && amount && petty_cash_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
-        if (values.balance < 0) {
-            setFieldError("balance", "Balance should not be lessthan 0");
-            return;
-        }
-        if (isAllValuesPresent) {
-            setPettyCashArr((prev) => [...prev, values]);
-            setErrors({});
-            setTimeout(() => {
-                resetForm();
-                setRemPettybal(values.balance);
-            }, 0);
+        console.log("VALUESIN EDIT",values)
+        setShowLoader(true);
+        let response = await apiStorePettyCashInfo([values]);
+        if (response.message) {
+            setShowLoader(false);
+            handleCancelPettyCash();
+
         }
 
     }
@@ -101,83 +88,80 @@ const PettyCashEditModal = (props) => {
         if (response.message) {
             setShowLoader(false);
             dispatch(setShowAddBookPage(false));
-            onCancel();
+            // onCancel();
             dispatch(setDataSavedModal(true));
 
         }
     }
 
-    const getButtonStatus = (pArr) => pArr.length <= 0 ? true : false;
+    
     return (
-        <Modal openModal={true} height={"90%"} width={"100%"} ai={null}>
+        <Modal openModal={true}  ai={null}>
             <>
-
                 <Formik
-                    initialValues={initialValues}
+                    initialValues={selectedPettyCashObj}
                     validationSchema={PettyCashValidations}
+                    // innerRef={editFormikRef}
                     onSubmit={(values, { setErrors, resetForm, setFieldError }) => {
                         handleSubmit(values, setErrors, resetForm, setFieldError);
                     }}
-                    style={{ overflow: "auto" }}
+                    style={{ overflow: "auto", position: "relative" }}
                 >
                     {({ setFieldValue, values }) => {
-                        values.balance = remPettybal - Number(values.amount);
+                        values.balance = (remPettybal + Number(selectedPettyCashObj.amount)) - Number(values.amount);
                         if (values.petty_cash_details) {
                             let reasonStng = values.petty_cash_details;
                             values.petty_cash_details = reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
                         }
-
                         return (
                             <Form>
-                                <ParagraphTag label="Details" />
-                                <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                                <ParagraphTag label="Edit Details" />
+                                <div className="grid grid-cols-2 px-4 py-2 gap-10">
                                     <AntdFormikSelect
-                                        labelText="Day"
+                                        labelText="Type"
                                         name="date"
                                         ph="--- Select Day ---"
                                         handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                                         Arr={DaysArr}
                                     />
-                                    {
-                                        ShowInputBoxInPC("Amount", 'amount', "Enter Amount")
-                                    }
-                                    {
-                                        ShowInputBoxInPC("Remaing Amount", 'balance', "Enter Remaining Amount", true)
-                                    }
+                                    <AntdInput
+                                        text="Amount"
+                                        value='amount'
+                                        ph="Enter Amount"
+                                        showPrefix={true}
+                                        acceptOnlyNum={true}
+                                    />
+                                    <AntdInput
+                                        text="Remaing Amount"
+                                        value='balance'
+                                        ph="Enter Remaining Amount"
+                                        showPrefix={true}
+                                        acceptOnlyNum={true}
+                                        disableInput={true}
+                                    />
                                     {
                                         ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
                                     }
-
-                                    <div className="flex flex-col w-full md:w-60 py-7 mt-3">
-                                        <CButton btnType="submit">
-                                            Add
-                                        </CButton>
-                                    </div>
                                 </div>
+
+                                <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
+                                    <CButton btnType="submit">
+                                        Save
+                                    </CButton>
+                                    <CButton 
+                                        onClick={() => handleCancelPettyCash()}
+                                        type="cancel"
+                                    >
+                                        Cancel
+                                    </CButton>
+                                </div>
+
+
                             </Form>
                         )
                     }}
-                </Formik>
-                <hr style={{ border: "5px solid #F4F6F9" }} />
-                <ParagraphTag label="Details list" />
 
-                <div className="relative flex flex-row-reverse gap-10  bottom-5 right-5">
-                    <CButton
-                        onClick={handleSavePettyCash}
-                        isDisabled={getButtonStatus(pettyCashArr)}>
-                        Save
-                    </CButton>
-                    <CButton onClick={() => {
-                        setPettyCashArr([]);
-                        onCancel();
-                        dispatch(setShowAddBookPage(false))
-                    }
-                    }
-                        type="cancel"
-                    >
-                        Cancel
-                    </CButton>
-                </div>
+                </Formik>
                 {
                     showLoader && <Loader showLoading={true} />
                 }
@@ -185,5 +169,7 @@ const PettyCashEditModal = (props) => {
         </Modal>
     )
 }
+
+
 
 export default PettyCashEditModal;

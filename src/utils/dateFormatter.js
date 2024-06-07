@@ -43,3 +43,8 @@ export function getTomorrowDate() {
     tomorrow.setDate(today.getDate() + 1);
     return formatDate(tomorrow);
 }
+
+export function convertToNormalFormat(datetimeString) {
+    const date = new Date(datetimeString);
+    return formatDate(date);
+}

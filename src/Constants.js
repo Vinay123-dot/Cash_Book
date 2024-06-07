@@ -44,6 +44,7 @@ const DepositMode = [
   { name: 'Heade Office', id: 'dm1' }
 
 ]
+console.log("gd",getToday(),"yd",getYesterDay())
 const DaysArr = [
   { Type: 'Today', Id: getToday() },
   { Type: 'Yesterday', Id: getYesterDay() }
