@@ -127,7 +127,7 @@ const PaymentCollectionModal = (props) => {
                                     ph="Enter Bill Number"
                                 />
                                 {
-                                    showSelectBox("Party Type", "customer_type", "--Select PartyType--", customerListInfo, setFieldValue)
+                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
                                 }
                                 <AntdInput
                                     text="Amount"

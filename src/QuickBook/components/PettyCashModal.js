@@ -79,7 +79,7 @@ const PettyCashModal = (props) => {
 
     if (!showPettyCash) return null;
 
-    const handleSubmit = async (values, setErrors, resetForm,setFieldError) => {
+    const handleSubmit = async (values, setErrors, resetForm,setFieldError,setFieldValue) => {
 
         const { date, balance, amount, petty_cash_details } = values;
         let isAllValuesPresent = date && balance && amount && petty_cash_details;
@@ -89,13 +89,33 @@ const PettyCashModal = (props) => {
             setFieldError("balance","Balance should not be lessthan 0");
             return ;
         }
+        // if (isAllValuesPresent) {
+        //     setPettyCashArr((prev) => [...prev, values]);
+        //     // setErrors({});
+        //     // setTimeout(() => {
+        //     //     // resetForm();
+        //     //     // setFieldValue("date",null);
+        //     //     setFieldValue("balance","");
+        //     //     setFieldValue("amount","");
+        //     //     setFieldValue("petty_cash_details","");
+        //     //     setRemPettybal(values.balance);
+        //     // }, 0);
+            
+        //     setFieldError("petty_cash_details","");
+        //     setFieldValue("balance","");
+        //     setFieldValue("amount","");
+        //     setFieldValue("petty_cash_details","");
+        //     setFieldError("balance","");
+        //     setFieldError("amount","");
+        //     setRemPettybal(values.balance);
+        // }
         if (isAllValuesPresent) {
             setPettyCashArr((prev) => [...prev, values]);
             setErrors({});
-            setTimeout(() => {
-                resetForm();
-                setRemPettybal(values.balance);
-            }, 0);
+            setFieldValue("balance","");
+            setFieldValue("amount","");
+            setFieldValue("petty_cash_details","");
+            setRemPettybal(values.balance);
         }
 
     }
@@ -163,18 +183,18 @@ const PettyCashModal = (props) => {
         <Formik
             initialValues={initialValues}
             validationSchema={PettyCashValidations}
-            onSubmit={(values, { setErrors, resetForm,setFieldError }) => {
-                handleSubmit(values, setErrors, resetForm,setFieldError);
+            onSubmit={(values, { setErrors, resetForm,setFieldError,setFieldValue }) => {
+                handleSubmit(values, setErrors, resetForm,setFieldError,setFieldValue);
             }}
             style={{ overflow: "auto" }}
         >
-            {({ setFieldValue,values }) => {
+            {({ setFieldValue,values ,errors,setFieldError}) => {
+                
                 values.balance = remPettybal - Number(values.amount);
                 if(values.petty_cash_details) {
                     let reasonStng = values.petty_cash_details;
                     values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
                 }
-                
                 return (
                     <Form>
                         <ParagraphTag label = "Details"/>
@@ -242,69 +262,3 @@ const PettyCashModal = (props) => {
 }
 
 export default PettyCashModal;
-
-
-{/* <Modal openModal={selectObjDetails.showModal}>
-<Formik
-    initialValues={selectObjDetails.selectedObj}
-    validationSchema={PettyCashValidations}
-    innerRef={editFormikRef}
-    onSubmit={(values, { setSubmitting, resetForm }) => {
-        handleEditDetails(values)
-    }}
-    style={{ overflow: "auto", position: "relative" }}
->
-    {({ setFieldValue,values }) =>  {
-        //  values.balance = values.balance - Number(values.amount);
-         if(values.petty_cash_details) {
-            let reasonStng = values.petty_cash_details;
-            values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
-        }
-    return (
-        <Form>
-            <ParagraphTag label="Edit Details" />
-            <div className="grid grid-cols-2 px-4 py-2 gap-10">
-                <AntdFormikSelect
-                    labelText="Type"
-                    name="date"
-                    ph="--- Select Day ---"
-                    handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                    Arr={DaysArr}
-                />
-                <AntdInput
-                    text="Amount"
-                    value='amount'
-                    ph="Enter Amount"
-                    showPrefix={true}
-                    acceptOnlyNum={true}
-                />
-                <AntdInput
-                    text="Remaing Amount"
-                    value='balance'
-                    ph="Enter Remaining Amount"
-                    showPrefix={true}
-                    acceptOnlyNum={true}
-                    disableInput={true}
-                />
-                {
-                    ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
-                }
-            </div>
-
-            <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
-                <CButton btnType="submit">
-                    Save
-                </CButton>
-                <CButton onClick={handleCancelModInPC}
-                    type="cancel"
-                >
-                    Cancel
-                </CButton>
-            </div>
-
-
-        </Form>
-)}}
-
-</Formik>
-</Modal> */}

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useRef } from 'react'
 import DataTable from '../../components/shared/DataTable'
 import { useSelector } from 'react-redux';
 import HandleEditInvoice from './EditInvoice/HandleEditInvoice';
+import { convertToNormalFormat } from '../../utils/dateFormatter';
 
 const BankDepositColumns = [
     { header: 'Sl No',accessorKey: 'serial_no',enableSorting: false},
@@ -13,7 +14,7 @@ const BankDepositColumns = [
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
         accessorKey: 'action',
-        cell: (props) => <div style={{backgroundColor:"blue"}}> <HandleEditInvoice row={props.row.original} /></div>,
+        cell: (props) => <HandleEditInvoice row={props.row.original} />,
         enableSorting: false,
     }
     
@@ -260,14 +261,40 @@ const getTableColumns = (bookType) => {
     }
 }
 
+    // const getSortedData = (arrList) => {
+    //     const Temp = JSON.parse(JSON.stringify(arrList));
+    //     Temp.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+    //     Temp.forEach((item, index) => {
+    //         item.serial_no = index + 1;
+    //         if(cashbookData.book_type === 3){
+    //             item.Date = item?.Date?convertToNormalFormat(item?.Date) : item?.Date;
+    //         }
+    //     });
+    //     return Temp;
+    // }
+
     const getSortedData = (arrList) => {
-        const Temp = JSON.parse(JSON.stringify(arrList));
+        let Temp = JSON.parse(JSON.stringify(arrList));
+    
+        // Filter the data if book_type is three
+        if (cashbookData.book_type === 3) {
+            Temp = Temp.filter(item => item.Issales_Report === 0);
+        }
+    
+        // Sort the data
         Temp.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+    
+        // Update the serial number and date format if needed
         Temp.forEach((item, index) => {
             item.serial_no = index + 1;
+            if (cashbookData.book_type === 3) {
+                item.Date = item?.Date ? convertToNormalFormat(item?.Date) : item?.Date;
+            }
         });
+    
         return Temp;
-    }
+    };
+    
 
     return (
         <>
