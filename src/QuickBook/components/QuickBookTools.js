@@ -11,10 +11,11 @@ import {
   setOutletData,
   setCashBookData,
   setTransactionsLoading,
-  setTransactionArray,
+  setTransactionArray
 } from '../store/dataSlice';
 import {
   setBookTypeList,
+  setAllTerminalsList
 } from '../store/stateSlice';
 import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
@@ -45,6 +46,7 @@ const QuickBookTools = () => {
   const bookTypeList = useSelector((state) => state.quickbookStore.state.bookTypeList);
   let userType = localStorage.getItem("mType");
   let uniqueId = localStorage.getItem("uniqueId");
+  let merchantId = localStorage.getItem("mId");
 
 
   useEffect(() => {
@@ -74,7 +76,9 @@ const QuickBookTools = () => {
     let options = {
       Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
     };
-    let response = await apiGetTerminal(uniqueId);
+    let newId = userType === 4 ? uniqueId : merchantId;
+    let response = await apiGetTerminal(newId);
+    dispatch(setAllTerminalsList(response || []));
     setOutletList([options,...response] || []);
   }
  
@@ -197,6 +201,7 @@ const QuickBookTools = () => {
     const newTableData = cloneDeep(payload);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
     let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
+    console.log("o",outletInStrng)
     let newObj = { 
       ...newTableData, 
       ...newFilterData,
@@ -206,6 +211,7 @@ const QuickBookTools = () => {
       terminal_id: userType == 7 ? uniqueId : outletInStrng?.Terminal,
       key: uniqueId
       }
+      console.log("Obj",newObj)
       getTransactionHistory(newObj);
   }
 
@@ -229,8 +235,8 @@ const QuickBookTools = () => {
 
   const getTransactionHistory = async (allData) => {
     const { book_type, history_type } = allData;
-    const tId = userType == 4 ? 0 : uniqueId;
-
+    let sendingTId = allData.terminal_id === "ALL" ? 0 : allData.terminal_id;
+    const tId = userType == 4 ? sendingTId : uniqueId;
     // Enable loading state
     dispatch(setTransactionsLoading(true));
 

@@ -24,6 +24,7 @@ const stateSlice = createSlice({
         upiTypeInfo : [],
         customerListInfo : [],
         salesType : [],
+        allTerminalList : []
     },
     reducers: {
         setSelectedCustomer: (state, action) => {
@@ -89,6 +90,9 @@ const stateSlice = createSlice({
         setEditedDaybookObj : (state,action) => {
             state.editedDaybookObj = action.payload;
         },
+        setAllTerminalsList : (state,action) => {
+            state.allTerminalList = action.payload;
+        }
 
     },
 })
@@ -116,7 +120,8 @@ export const {
     setUpiTypeInfo,
     setCustomerListInfo,
     setSalesType,
-    setEditedDaybookObj
+    setEditedDaybookObj,
+    setAllTerminalsList
     
 } = stateSlice.actions
 

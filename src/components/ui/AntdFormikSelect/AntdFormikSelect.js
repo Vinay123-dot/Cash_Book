@@ -31,7 +31,7 @@ const AntdFormikSelect = (props) => {
                     >
                         {(Arr || []).map((eachOpt, i) => (
                             <Option key={i} value={eachOpt.id || eachOpt.Id}>
-                                {eachOpt.name || eachOpt.category || eachOpt.value || eachOpt.Type}
+                                {eachOpt.name || eachOpt.category || eachOpt.value || eachOpt.Type || eachOpt.Terminal}
                             </Option>
                         ))}
                     </Select>

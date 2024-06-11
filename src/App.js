@@ -11,10 +11,12 @@ function App() {
   const userType = searchParams.get('mType');
   const rawPersistData = searchParams.get('sessionData');
   const uniqueId = searchParams.get('uniqueId') || "0000000000053575";
+  const merchantId = searchParams.get('mId') || "0000000000053575";
 
   localStorage.setItem("mType",userType);
   localStorage.setItem("whoami",rawPersistData);
   localStorage.setItem("uniqueId",uniqueId);
+  localStorage.setItem("mId",merchantId);
 
   useEffect(() => {
     AddCreateSession();

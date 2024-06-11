@@ -29,7 +29,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
     />
 )
 
-const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""]
+const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 const initialValues = {
     id : 0,
     date: null, //string
@@ -40,7 +40,7 @@ const initialValues = {
     remaining_balance: null, //number
     advance_receipt_no: '', //string
     bill_number : "",
-    store_id : "",
+    store_id : null,
     total_receipt_amount : null,
     receipt_status : ""
 };
@@ -52,6 +52,7 @@ const BankDepositModal = (props) => {
     const [depositModeList,setDepositModeList] = useState([]);
     // const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
     const remCommOpeningBal = useSelector(state => state.quickbookStore.state.remainingCommonBalance);
+    const allTerminals = useSelector(state => state.quickbookStore.state.allTerminalList);
     const [startLoading,setStartLoading] = useState(false);
     const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
     const [eModal,setEModal] = useState({
@@ -94,6 +95,10 @@ const BankDepositModal = (props) => {
             newObj.total_receipt_amount = Number(newObj.total_receipt_amount);
             if(newObj.total_receipt_amount > 0){
                 newObj.type = (newObj.amount === newObj.total_receipt_amount) ? 3 : 4;
+            }
+            if(newObj.store_id) {
+                let dummyObj = (allTerminals || []).find((eachDoc) => eachDoc.Id === newObj.store_id);
+                newObj.store_id = dummyObj.Terminal || newObj.store_id
             }
             newObj.key = uniqueId;
             let response = await apiStoreBankDepositInfo([newObj]);
@@ -268,10 +273,12 @@ const BankDepositModal = (props) => {
                                         value = 'bill_number'
                                         ph= "Bill Number"
                                     />
-                                    <AntdInput
-                                        text= "Store Id" 
-                                        value= 'store_id'
-                                        ph="Enter Store Id"
+                                    <AntdFormikSelect
+                                        labelText="Store Id"
+                                        name="store_id"
+                                        ph="--- Select StoreId---"
+                                        handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                        Arr={allTerminals}
                                     />
                                         </>
                                     }
