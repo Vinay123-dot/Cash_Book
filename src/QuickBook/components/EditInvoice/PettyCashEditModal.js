@@ -43,7 +43,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashEditModal = (props) => {
 
-    const { showEditPettyCash, handleCancelPettyCash ,selectedPettyCashObj} = props;
+    const {handleCancelPettyCash ,selectedPettyCashObj} = props;
     const dispatch = useDispatch();
     const editFormikRef = useRef();
 
@@ -52,9 +52,10 @@ const PettyCashEditModal = (props) => {
         showModal: false, selectedObj: {}
     })
     const [showLoader, setShowLoader] = useState(false);
-
-    // let cashPetty = useSelector(state => state.quickbookStore.state.pettyCashBalance);
-    let remPettyCash = useSelector(state => state.quickbookStore.state.pettyCashRemBal);
+    const {
+        pettyCashBalance : pettyCash,
+        pettyCashRemBal : remPettyCash,
+      } = useSelector(state => state.quickbookStore.state);
     const [remPettybal, setRemPettybal] = useState(remPettyCash);
     let uniqueId = localStorage.getItem("uniqueId");
 
@@ -62,41 +63,25 @@ const PettyCashEditModal = (props) => {
         setRemPettybal(remPettyCash);
     }, [remPettyCash])
 
-    if (!showEditPettyCash) return null;
-   
     const handleSubmit = async (values) => {
-
-        values.amount = Number(values.amount);
-        values.key = uniqueId;
-        console.log("VALUESIN EDIT",values)
-        setShowLoader(true);
-        let response = await apiStorePettyCashInfo([values]);
-        if (response.message) {
+        try {
+            values.amount = Number(values.amount);
+            values.key = uniqueId;
+            console.log("VALUESIN EDIT",values)
+            setShowLoader(true);
+            let response = await apiStorePettyCashInfo([values]);
+            if (response.message) {
+                handleCancelPettyCash();
+                dispatch(setDataSavedModal(true));
+            }
             setShowLoader(false);
-            handleCancelPettyCash();
-
-        }
-
-    }
-
-    const handleSavePettyCash = async () => {
-        if (pettyCashArr?.length <= 0) {
-            return;
-        }
-        setShowLoader(true);
-        let response = await apiStorePettyCashInfo(pettyCashArr);
-        if (response.message) {
+        } catch (e) {
             setShowLoader(false);
-            dispatch(setShowAddBookPage(false));
-            // onCancel();
-            dispatch(setDataSavedModal(true));
-
         }
     }
-
     
     return (
-        <Modal openModal={true}  ai={null}>
+        <Modal openModal={true}  ai={null} height ={400}>
             <>
                 <Formik
                     initialValues={selectedPettyCashObj}
@@ -115,7 +100,18 @@ const PettyCashEditModal = (props) => {
                         }
                         return (
                             <Form>
-                                <ParagraphTag label="Edit Details" />
+                                <div className="flex justify-between">
+
+                                    <ParagraphTag label="Edit Details" />
+                                    <div className="flex flex-col">
+                                        <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
+                                        <p className="text-start">{pettyCash}</p>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h1 style={{ color: "#5A87B2" }}>Remaining Balance</h1>
+                                        <p className="text-start">{remPettyCash}</p>
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-2 px-4 py-2 gap-10">
                                     <AntdFormikSelect
                                         labelText="Type"
@@ -131,14 +127,14 @@ const PettyCashEditModal = (props) => {
                                         showPrefix={true}
                                         acceptOnlyNum={true}
                                     />
-                                    <AntdInput
+                                    {/* <AntdInput
                                         text="Remaing Amount"
                                         value='balance'
                                         ph="Enter Remaining Amount"
                                         showPrefix={true}
                                         acceptOnlyNum={true}
                                         disableInput={true}
-                                    />
+                                    /> */}
                                     {
                                         ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
                                     }

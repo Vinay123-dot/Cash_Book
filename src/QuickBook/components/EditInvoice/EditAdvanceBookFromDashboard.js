@@ -156,7 +156,7 @@ const EditAdvBookFromDashboard = (props) => {
                                         acceptOnlyNum={true}
                                     />
                                     <AntdInput
-                                        text="Amount"
+                                        text="Advance Receipt Amount"
                                         value='bill_value'
                                         ph="Enter Amount"
                                         acceptOnlyNum={true}

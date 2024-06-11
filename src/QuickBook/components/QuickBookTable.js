@@ -24,7 +24,7 @@ const pettyCashColumns = [
     { header: 'Sl No', accessorKey: 'serial_no', enableSorting: false },
     { header: 'Date', accessorKey: 'Date', enableSorting: false },
     { header: 'Amount', accessorKey: 'Amount',enableSorting: false},
-    { header: 'Balance', accessorKey: 'Balance',enableSorting: false},
+    // { header: 'Balance', accessorKey: 'Balance',enableSorting: false},
     { header: "Reason", accessorKey: 'Petty_Cash_Details',enableSorting: false},
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
@@ -65,7 +65,8 @@ const AdvanceBookColumns = [
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
     { header: "Customer Name", accessorKey: 'Customer_Name', enableSorting: false},
     { header: 'Customer Mobile Number',accessorKey: 'Phone_No',enableSorting: false },
-    { header: 'Amount',accessorKey: 'Bill_Value', enableSorting: false },
+    { header: 'Advance Receipt Amount',accessorKey: 'Bill_Value', enableSorting: false },
+    { header: 'Balance',accessorKey: 'Remaining_Balance', enableSorting: false },
     { header: 'Status',accessorKey: 'Status', enableSorting: false },
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
@@ -82,7 +83,7 @@ const PaymentCollectionColumns = [
     { header: 'Bill No',accessorKey: 'Bill_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
-    { header: "Bill Value", accessorKey: 'Bill_Value', enableSorting: false},
+    { header: "Collected Amount", accessorKey: 'Bill_Value', enableSorting: false},
     { header: 'Cash',accessorKey: 'Cash_Amount',enableSorting: false },
     { header: 'UPI Type',accessorKey: 'UPI_Type', enableSorting: false },
     { header: 'UPI Amount',accessorKey: 'UPI_Amount', enableSorting: false },

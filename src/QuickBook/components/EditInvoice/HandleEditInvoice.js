@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import PettyCashEditModal from "./PettyCashEditModal";
 import EditDayBookFromDashboard from "./EditModeFromDashboard";
 import EditAdvBookFromDashboard from './EditAdvanceBookFromDashboard';
+import BankDepositEditModal from './BankDepositEditModal';
 import { getToday, getYesterDay } from '../../../utils/dateFormatter';
 import { HiOutlinePencil } from "react-icons/hi";
 import { allPaymentTypes, getConvertedObj,selectedValType,
@@ -20,7 +21,10 @@ const HandleEditInvoice = (props) => {
     const {
         salesType,
         customerListInfo,
-        upiTypeInfo
+        upiTypeInfo,
+        allTerminalList,
+        depositTypeList,
+        depositModeList,
     } = useSelector(state => state.quickbookStore.state);
 
 
@@ -37,6 +41,37 @@ const HandleEditInvoice = (props) => {
             petty_cash_details: pObj.Petty_Cash_Details || '',
         }
         return newTemp;
+    }
+
+    const convertToSmallBankDepositObj = (pObj) => {
+        let newObj = {
+            id: pObj.Id || 0,
+            deposit_mode : pObj.Deposit_Mode || null,
+            store_id : pObj.Store_Id || null,
+            advance_receipt_no : pObj.Advance_Receipt_No || "",
+            remaining_balance : pObj.Remaining_Balance || null,
+            date : pObj.Date || null,
+            type : pObj.Type || null,
+            reason : pObj.Reason || "",
+            bill_number : pObj.Bill_Number ||  "",
+            amount : pObj.Amount || "",
+            total_receipt_amount : null,
+            receipt_status : ""
+        };
+        if (typeof newObj.store_id === 'string') {
+            let findedObj = (allTerminalList || []).find((eachItem) => eachItem.Terminal === newObj.store_id);
+            newObj.store_id = findedObj?.Id || null;
+        } 
+        
+        if (typeof newObj.deposit_mode === 'string') {
+            let findedObj = (depositModeList || []).find((eachItem) => eachItem.Type === newObj.deposit_mode);
+            newObj.deposit_mode = findedObj?.Id || null;
+        } 
+        if (typeof newObj.type === 'string') {
+            let findedObj = (depositTypeList || []).find((eachItem) => eachItem.Type === newObj.type);
+            newObj.type = findedObj?.Id || null;
+        } 
+        return newObj;
     }
     const onCancelPettyCash = () => {
         console.log("test")
@@ -128,28 +163,22 @@ const HandleEditInvoice = (props) => {
 
     return (
         <>
-        {/* {
-                    <HiOutlinePencil
-                        size={20}
-                        style={{ color: "#5A87B2",width : 120,textAlign:'center' }}
-                        onClick={handleClickIcon}
-                    /> 
-            } */}
-        
             {
-                (row.Date === getToday() || row.Date === getYesterDay()) ?
+                ((row.Date === getToday() || row.Date === getYesterDay()) && ![2,4].includes(cashbookData.book_type)) ?
                     <HiOutlinePencil
                         size={20}
                         style={{ color: "#5A87B2",width : 120,textAlign:'center' }}
                         onClick={handleClickIcon}
                     /> : null
             }
-
-            <PettyCashEditModal
-                showEditPettyCash = {seletedModalVal === 4}
-                selectedPettyCashObj = {convertToSmallPettyCashObj(row)}
-                handleCancelPettyCash = {onCancelPettyCash}
-            />
+            {
+                seletedModalVal === 4 &&
+                <PettyCashEditModal
+                    selectedPettyCashObj = {convertToSmallPettyCashObj(row)}
+                    handleCancelPettyCash = {onCancelPettyCash}
+                />
+            }
+            
             {
                 seletedModalVal === 3 && 
                 <EditDayBookFromDashboard
@@ -172,6 +201,13 @@ const HandleEditInvoice = (props) => {
                 /> 
             }
 
+            {
+                seletedModalVal === 2 &&
+                <BankDepositEditModal
+                    editDayBookObj = {convertToSmallBankDepositObj(row)}
+                    handleCloseEditModal = {onCancelPettyCash}
+                />
+            }
 
 
 

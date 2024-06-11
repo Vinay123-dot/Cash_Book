@@ -130,7 +130,7 @@ const EditPaymentColFromDashboard = (props) => {
                                         showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
                                     }
                                     <AntdInput
-                                        text="Amount"
+                                        text="Collected Amount"
                                         value='bill_value'
                                         ph="Enter Amount"
                                         acceptOnlyNum={true}
