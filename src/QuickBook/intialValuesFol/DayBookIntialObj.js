@@ -3,7 +3,7 @@ export const dayBookIntialObj = {
     issales_report : 0,
     advance_customer_name: "", //string
     advance_receipt_amount: null, //number
-    used_receipt_amount : null,
+    remaining_balance : 0,
     advance_receipt_no: "", //string
     date: null, //string
     customer_type: null, //string //CONVERTING

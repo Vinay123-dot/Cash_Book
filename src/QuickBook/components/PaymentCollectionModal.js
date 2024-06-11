@@ -24,6 +24,7 @@ import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { PaymentColIntialObj } from "../intialValuesFol";
 import { PaymentCollectionValidations } from "../../Validations";
 import CashTypes from "./DayBookFiles/CashTypes";
+import ErrorModal from "../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -45,6 +46,9 @@ const PaymentCollectionModal = (props) => {
     const [showBillModal, setShowBillModal] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
     const [validateModal, setValidateModal] = useState(true);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -84,16 +88,25 @@ const PaymentCollectionModal = (props) => {
 
             convertedObj.key = uniqueId;
             let response = await apiStorePaymentCollectionInfo([convertedObj]);
+            console.log("r",response)
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
                 onCancel();
                 dispatch(setDataSavedModal(true));
                 setValidateModal(true);
+                setEModal({
+                    eMessage : "",
+                    show : false
+                })
             }
             setShowLoader(false);
-        } catch (e) {
+        } catch (Err) {
             setShowLoader(false);
             setValidateModal(true);
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
         }
     }
 
@@ -101,6 +114,13 @@ const PaymentCollectionModal = (props) => {
         let temp = [];
         temp = (pArr || []).filter((eachDoc)=> ![7,8].includes(eachDoc.Id));
         return temp;
+    }
+
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
     }
 
     return (
@@ -174,6 +194,10 @@ const PaymentCollectionModal = (props) => {
                                 <CButton onClick={() => {
                                     onCancel();
                                     dispatch(setShowAddBookPage(false))
+                                    setEModal({
+                                        eMessage : "",
+                                        show : false
+                                    })
                                 }} type="cancel"
                                 >
                                     Cancel
@@ -188,6 +212,9 @@ const PaymentCollectionModal = (props) => {
             </Formik>
 
             <Loader showLoading={showLoader} />
+            { 
+                eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
+            }
 
         </>
     )

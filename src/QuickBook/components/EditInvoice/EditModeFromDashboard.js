@@ -2,25 +2,27 @@
 import React, { useState,memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../../components/ui/Button";
-import { DaysArr,selectedValType } from "../../../Constants";
+import { DaysArr } from "../../../Constants";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useDispatch,useSelector } from "react-redux";
 import {
-    setShowUploadInvoice
+    setShowUploadInvoice,
+    setDataSavedModal
 } from '../../store/stateSlice';
 import ParagraphTag from "../../../constants/PTag";
 import {
     apiStoreDayBookInfo,
 } from "../../../services/TransactionService";
 import Loader from "../../../components/shared/Loader";
-import { getTotalMoneyInDayBook,convertTONumbers } from "../CompConstants";
+import { getTotalMoneyInDayBook,convertTONumbers, verifyInputField } from "../CompConstants";
 import ShowPaymentTypes from "../DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "../DayBookFiles/BillAmountModal";
 import { DayBookValidations } from "../../../Validations";
 import CashTypes from "../DayBookFiles/CashTypes";
 import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
 import Modal from "../../../components/shared/Modal";
+import { selectedValType } from "../CompConstants";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -36,9 +38,7 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 const EditDayBookFromDashboard = (props) => {
 
     const { editDayBookObj,
-            isEditDayBookModal,
             handleCloseEditModal,
-            handleSaveEditDayBook,
         } = props;
     const dispatch = useDispatch();
     const {
@@ -54,8 +54,6 @@ const EditDayBookFromDashboard = (props) => {
     let uniqueId = localStorage.getItem("uniqueId");
 
   
-
-    if (!isEditDayBookModal) return null;
      
     const handleSubmit = async (values,validateModal) => {
         try {
@@ -75,8 +73,9 @@ const EditDayBookFromDashboard = (props) => {
             convertedObj.pending_balance = Number(values.bill_value) - getTotalMoneyInDayBook(values);
             let response = await apiStoreDayBookInfo([convertedObj]);
             if (response.message) {
-                handleSaveEditDayBook();
+                handleCloseEditModal();
                 setValidateModal(true);
+                dispatch(setDataSavedModal(true));
             }
             setShowLoader(false);
         } catch (e) {
@@ -86,15 +85,7 @@ const EditDayBookFromDashboard = (props) => {
     }
 
     const validateInputField = (value, allValues, type) => {
-        const {
-            paymentType0: P0, paymentType1: P1,
-            paymentType2: P2, paymentType3: P3,
-            paymentType4: P4, paymentType5: P5
-        } = allValues;
-        let paymentTypeArr = [P0, P1, P2, P3, P4, P5];
-        let err = (paymentTypeArr.includes(selectedValType[type]) && !value) ? 'This field is required' : null
-        // let err =  !value ? 'This Field is Required' : null
-        return err;
+        return verifyInputField(value, allValues, type);
 
     }
 
@@ -140,7 +131,7 @@ const EditDayBookFromDashboard = (props) => {
     const handleCloseInvoiceModal = () => {
         dispatch(setShowUploadInvoice(false))
     }
-   
+   console.log("editDayBookObj..",editDayBookObj);
     return (
         <Modal openModal={true} height={"90%"} width={"90%"}  ai = {null}>
             <>
@@ -199,6 +190,8 @@ const EditDayBookFromDashboard = (props) => {
                                             valObj = {values}
                                             paymentListInfo = {paymentTypeInfo}
                                             upiTypeInfo = {upiTypeInfo}
+                                            isFromEditObj = {true}
+                                            pLength = {7}
                                         />
 
                                         <AdvanceBillDetails values={values} />
