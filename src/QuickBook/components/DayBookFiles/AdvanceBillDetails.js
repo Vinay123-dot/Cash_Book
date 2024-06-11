@@ -6,12 +6,18 @@ import { useFormikContext } from 'formik';
 import { DaysArr,selectedValType } from "../../../Constants";
 import { apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
 import { verifyInputField } from "../CompConstants";
+import ErrorModal from "../../../components/ui/ErrorModal";
+
+const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 
 const AdvanceBillDetails = (props) => {
 
     const { values } = props; 
     const { setFieldValue } = useFormikContext();
     const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
     const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
@@ -28,6 +34,14 @@ const AdvanceBillDetails = (props) => {
         )
     }
 
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
+    }
+
+
     const handleVerifyAdvanceMoney = async(allVal) => {
         const {advance_receipt_no} = allVal;
         try {
@@ -39,15 +53,28 @@ const AdvanceBillDetails = (props) => {
                 };
             let response = await apiVerifyAdvancedBookReceipt(data);
             console.log("r",response)
-            setFieldValue("advance_receipt_amount",response?.Bill_Value || 0);
-            setFieldValue("advance_customer_name",response?.Customer_Name || "");
-            setVerifyBtnLdng(false);
-        }catch(e){
-            console.log("ERR..",e);
+            if(response){
+                setEModal({
+                    eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
+                    show : statusArr.includes(response?.Status) ?true :false
+                })
+                setFieldValue("advance_customer_name",response?.Customer_Name || "");
+                setFieldValue("remaining_balance",response?.Remaining_Balance || 0);
+                setVerifyBtnLdng(false);
+            }
+           
+            
+        }catch(Err){
+            console.log("ERR..",Err);
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
             setVerifyBtnLdng(false);
         }
         
     }
+
 
     const validateInputField = (value, allValues, type) => {
         return verifyInputField(value, allValues, type);
@@ -73,21 +100,42 @@ const AdvanceBillDetails = (props) => {
                     Verify
                 </CButton>
             </div>
-            {
+            {/* {
                 values.advance_receipt_no &&
-                <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="flex flex-col">
+                <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3 place-items-center">
+                    <div className="flex flex-col  bg-blue-100 align-self-start">
                         <p>Advance Receipt Amount</p>
-                        <p>{values.advance_receipt_amount}</p>
+                        <p>{values.remaining_balance}</p>
                     </div>
                     <div>
                         <p>Customer Name</p>
-                        <p>{values.advance_customer_name}</p>
+                        <p>{values.advance_customer_name || "--"}</p>
                     </div>
                     {
-                        showInputBox("Amount", 'used_receipt_amount', "Amount", validateInputField, values, false, false, false)
+                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values, false, false, false)
                     }
+                   
                 </div>
+            } */}
+             {
+                values.advance_receipt_no &&
+                <div className="flex flex-col justify-between items-start px-4 py-2 lg:items-center  lg:flex-row">
+                    <div className="flex flex-col">
+                        <p>Advance Receipt Amount</p>
+                        <p>{values.remaining_balance}</p>
+                    </div>
+                    <div>
+                        <p>Customer Name</p>
+                        <p>{values.advance_customer_name || "--"}</p>
+                    </div>
+                    {
+                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values, false, false, false)
+                    }
+                   
+                </div>
+            }
+            { 
+                eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
             }
         </>
 

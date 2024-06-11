@@ -39,6 +39,7 @@ import CashTypes from "./DayBookFiles/CashTypes";
 import AdvanceBillDetails from "./DayBookFiles/AdvanceBillDetails";
 import DaybookTable from "../../components/ui/DaybookTable";
 import EditModeInDayBook from "./EditInvoice/EditModeInDayBook";
+import ErrorModal from "../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -70,6 +71,9 @@ const DayBookModal = (props) => {
     const showUploadInvoice = useSelector(state => state.quickbookStore.state.showUploadInvoice);
     const [validateModal,setValidateModal] = useState(true);
     const [excelData,setExcelData] = useState([]);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -86,7 +90,6 @@ const DayBookModal = (props) => {
                 terminal_id: uniqueId,
                 key: uniqueId
             };
-            console.log("te,p")
             let resposne = await apiGetDayBookExcelData(newObj);
             let temp = (resposne?.data || []).filter((eachDoc) => eachDoc?.Issales_Report === 1);
             setExcelData(temp || []);
@@ -138,15 +141,24 @@ const DayBookModal = (props) => {
             convertedObj.bill_no = billNum+"/"+ convertedObj.sales_code+"/"+convertedObj.bill_no;
             convertedObj.pending_balance = Number(values.bill_value) - getTotalMoneyInDayBook(values);
             let response = await apiStoreDayBookInfo([convertedObj]);
+            console.log("rd",response)
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
                 onCancel();
                 dispatch(setDataSavedModal(true));
                 setBillNum("");
                 setValidateModal(true);
+                setEModal({
+                    eMessage : "",
+                    show : false
+                })
             }
             setShowLoader(false);
-        } catch (e) {
+        } catch (Err) {
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
             setShowLoader(false);
             setValidateModal(true);
         }
@@ -222,7 +234,12 @@ const DayBookModal = (props) => {
         getExcelTrasaction();
     }
   
-  
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
+    }
  
     return (
         showdayBookFields ?
@@ -305,6 +322,10 @@ const DayBookModal = (props) => {
                                     onCancel();
                                     dispatch(setShowAddBookPage(false));
                                     dispatch(setShowDayBookFields(false));
+                                    setEModal({
+                                        eMessage : "",
+                                        show : false
+                                    })
                                 }} type="cancel"
                                 >
                                     Cancel
@@ -319,6 +340,9 @@ const DayBookModal = (props) => {
             </Formik>
            
             <Loader showLoading = {showLoader} />
+            { 
+                eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
+            }
 
         </> :
         showUploadInvoice ? <UploadInvoiceModal onClose={handleCloseInvoiceModal} /> :

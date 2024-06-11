@@ -23,6 +23,7 @@ import BillAmountModal from "./DayBookFiles/BillAmountModal";
 import { AdvanceBookIntialObj } from "../intialValuesFol";
 import CashTypes from "./DayBookFiles/CashTypes";
 import { AdvanceBookValidations } from "../../Validations";
+import ErrorModal from "../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -48,6 +49,9 @@ const AdvanceBookModal = (props) => {
     const [showBillModal, setShowBillModal] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
     const [validateModal,setValidateModal] = useState(true);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -94,9 +98,14 @@ const AdvanceBookModal = (props) => {
             let convertedObj = convertTONumbers(newObj);
 
             convertedObj.key = uniqueId;
+            convertedObj.remaining_balance = convertedObj.bill_value;
 
             let response = await apiStoreAdvancedBookInfo([convertedObj]);
             if (response.status === 200) {
+                setEModal({
+                    eMessage : "",
+                    show : false
+                })
                 dispatch(setShowAddBookPage(false));
                 onCancel();
                 dispatch(setDataSavedModal(true));
@@ -104,7 +113,12 @@ const AdvanceBookModal = (props) => {
 
             }
             setShowLoader(false);
-        } catch (e) {
+        } catch (Err) {
+            setShowLoader(false);
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
             setValidateModal(true);
         }
     }
@@ -115,6 +129,12 @@ const AdvanceBookModal = (props) => {
         return temp;
     }
 
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
+    }
     return (<>
         <Formik
             initialValues = {AdvanceBookIntialObj}
@@ -188,6 +208,10 @@ const AdvanceBookModal = (props) => {
                                 Save
                             </CButton>
                             <CButton onClick={() => {
+                                setEModal({
+                                    eMessage : "",
+                                    show : false
+                                })
                                 onCancel();
                                 dispatch(setShowAddBookPage(false));
                                 }} type="cancel"
@@ -204,6 +228,9 @@ const AdvanceBookModal = (props) => {
         </Formik>
         {
             showLoader && <Loader showLoading={true} />
+        }
+        { 
+            eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
         }
     </>
     )

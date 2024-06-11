@@ -51,8 +51,8 @@ const ShowPaymentTypes = (props) => {
                 isFromAdvPayments && <>
                     <div>
                         <p>Advance Used Amount</p>
-                        <p>{paymentValues.used_receipt_amount}</p>
-                        {/* {<p>{paymentValues.advance_receipt_amount}</p>} */}
+                        {/* <p>{paymentValues.used_receipt_amount}</p> */}
+                        {<p>{paymentValues.advance_receipt_amount}</p>}
                     </div>
                     <div>
                         <p> Pending Amount</p>

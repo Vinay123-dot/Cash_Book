@@ -37,7 +37,7 @@ const AntdFormikSelect = (props) => {
                     </Select>
                 )}
             </Field>
-            <ErrorMessage name={name} component="div" style={{ color: 'red' }} />
+            <ErrorMessage name={name} component="div" style={{ color: 'red' }} className="text-start" />
         </div>
 
     )

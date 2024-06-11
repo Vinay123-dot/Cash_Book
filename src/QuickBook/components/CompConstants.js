@@ -9,6 +9,16 @@ export const CREDITCARD = "Credit Card";
 export const PAYMENTGATEWAY = "Payment Gateway Order";
 export const REFERENCEORDER = "Reference Order";
 
+export const UPI_AMOUNT = "upi_amount";
+export const CASH_AMOUNT = "cash_amount";
+export const BANK_AMOUNT = "online_bank_amount";
+export const CHEQUE_AMOUNT = "bank_cheque_amount";
+export const DEBITCARD_AMOUNT = "debit_card_amount";
+export const CREDITCARD_AMOUNT = "credit_card_amount";
+export const PAYMENTGATEWAY_AMOUNT = "pg_order_amount";
+export const REFERENCEORDER_AMOUNT = "reference_order_amount";
+
+
 export const selectedValType = {
   "cash_amount": CASH,
   "upi_amount": UPI,
@@ -25,12 +35,19 @@ export const selectedValType = {
   "reference_order_amount" : REFERENCEORDER
 };
 
+
+export const allPaymentTypes = [
+    CASH_AMOUNT,UPI_AMOUNT,BANK_AMOUNT,CHEQUE_AMOUNT,
+    CREDITCARD_AMOUNT,DEBITCARD_AMOUNT,PAYMENTGATEWAY_AMOUNT,
+    REFERENCEORDER_AMOUNT
+];
+
 const ConvertToNum = (val) => Number(val);
 
 
 const getTotalMoneyInDayBook = (allData) => {
-    let usedReceiptAmount = allData?.used_receipt_amount ? 
-        Number(allData.used_receipt_amount) : 0 ;
+    let usedReceiptAmount = allData?.advance_receipt_amount ? 
+        Number(allData.advance_receipt_amount) : 0 ;
     let referenceOrderAmount = allData?.reference_order_amount ? 
         Number(allData.reference_order_amount) : 0 ;
     let pgOrderAmount = allData?.pg_order_amount ? 
@@ -99,6 +116,86 @@ const getConvertedObj = (tempObj) => {
   return newCreatedObj;
 }
 
+const advanceModalConObj = (tempObj) => {
+    let newCreatedObj = {
+        id:  tempObj.Id,
+        date: convertToNormalFormat(tempObj.Date) || null,
+        receipt_no: tempObj.Receipt_No || "",  //
+        customer_name : tempObj.Customer_Name || "",  //
+        phone_no : tempObj.Phone_No || "", //
+        bill_value:  tempObj.Bill_Value|| null, 
+        customer_type: tempObj.Customer_Type || null,
+        status : tempObj.Status ||"Pending",
+        paymentType0 :  null,
+    
+        upi: tempObj.UPI || null, 
+        upi_amount: tempObj.UPI_Amount|| null, 
+        upi_type:  tempObj.UPI_Type || null,
+        upi_trans_no:  tempObj.UPI_Trans_No || "",
+    
+        cash: tempObj.Cash || null, 
+        cash_amount: tempObj.Cash_Amount || null, 
+    
+        debit_card : tempObj.Debit_Card || null,
+        debit_card_amount: tempObj.Debit_Card_Amount || null,
+    
+        credit_card: tempObj.Credit_Card || null,  
+        credit_card_amount : tempObj.Credit_Card_Amount || null, 
+    
+        bank_cheque: tempObj.Bank_Cheque || null,   
+        bank_cheque_amount: tempObj.Bank_Cheque_Amount || null, 
+        bank_cheque_name : tempObj.Bank_Cheque_Name || "", 
+        bank_cheque_no: tempObj.Bank_Cheque_No || "", 
+    
+        online_bank: tempObj.Online_Bank || null, 
+        online_bank_amount : tempObj.Online_Bank_Amount || null,
+        online_bank_name: tempObj.Online_Bank_Name || "", 
+        online_bank_trans_no: tempObj.Online_Bank_Trans_No ||"",
+        reason : tempObj.Reason || "",
+    
+    };
+  return newCreatedObj;
+}
+
+const paymentCollectionConObj = (tempObj) => {
+    let newCreatedObj = {
+        id:  tempObj.Id,
+        date: convertToNormalFormat(tempObj.Date) || null,
+        customer_type: tempObj.Customer_Type || null,
+        bill_value:  tempObj.Bill_Value|| null, 
+        bill_no: tempObj.Bill_No|| null, 
+        paymentType0 :  null,
+    
+        upi: tempObj.UPI || null, 
+        upi_amount: tempObj.UPI_Amount|| null, 
+        upi_type:  tempObj.UPI_Type || null,
+        upi_trans_no:  tempObj.UPI_Trans_No || "",
+    
+        cash: tempObj.Cash || null, 
+        cash_amount: tempObj.Cash_Amount || null, 
+    
+        debit_card : tempObj.Debit_Card || null,
+        debit_card_amount: tempObj.Debit_Card_Amount || null,
+    
+        credit_card: tempObj.Credit_Card || null,  
+        credit_card_amount : tempObj.Credit_Card_Amount || null, 
+    
+        bank_cheque: tempObj.Bank_Cheque || null,   
+        bank_cheque_amount: tempObj.Bank_Cheque_Amount || null, 
+        bank_cheque_name : tempObj.Bank_Cheque_Name || "", 
+        bank_cheque_no: tempObj.Bank_Cheque_No || "", 
+    
+        online_bank: tempObj.Online_Bank || null, 
+        online_bank_amount : tempObj.Online_Bank_Amount || null,
+        online_bank_name: tempObj.Online_Bank_Name || "", 
+        online_bank_trans_no: tempObj.Online_Bank_Trans_No ||"",
+        reason : tempObj.Reason || "",
+        party_code : tempObj.Party_Code || "",
+        party_name : tempObj.Party_Name || "",
+    
+    };
+  return newCreatedObj;
+}
 const convertTONumbers = (newObj) => {
 
     newObj.bill_value = Number(newObj.bill_value);
@@ -111,6 +208,7 @@ const convertTONumbers = (newObj) => {
     newObj.pg_order_amount = newObj.pg_order_amount != null ? Number(newObj.pg_order_amount) : 0;
     newObj.reference_order_amount = newObj.reference_order_amount !=null ? Number(newObj.reference_order_amount):null;
     newObj.used_receipt_amount = newObj.used_receipt_amount !=null ? Number(newObj.used_receipt_amount):null;
+    newObj.advance_receipt_amount = newObj.advance_receipt_amount != null ? Number(newObj.advance_receipt_amount) : null;
     return newObj;
 }
 // const validatePaymentType = (value) => {
@@ -163,5 +261,7 @@ export {
     verifyInputField,
     verifyUpiType,
     verifyPaymentType,
-    verifyReasonField
+    verifyReasonField,
+    advanceModalConObj,
+    paymentCollectionConObj
 };

@@ -32,7 +32,7 @@ const AntdInput = (props) => {
                 validate = {validation && validateField}
                 
             />
-            <ErrorMessage name={value} component="div" style={{ color: 'red' }}/>
+            <ErrorMessage name={value} component="div" style={{ color: 'red', }} className="text-start"/>
         </div>
 
     )

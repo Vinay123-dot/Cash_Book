@@ -14,9 +14,9 @@ import {
 
 const CashTypes = (props) => {
     
-    const { valObj,paymentListInfo,upiTypeInfo,pLength = 6 } = props;
+    const { valObj,paymentListInfo,upiTypeInfo,pLength = 6,  isFromEditObj = false } = props;
     const { setFieldValue } = useFormikContext();
-    const [clickCount, setClickCount] = useState([0]);
+    const [clickCount, setClickCount] = useState(isFromEditObj ?[...valObj.PaymentCountArr]  :[0]);
 
     const validateUpiType = (value, allValues) => verifyUpiType(value, allValues);
 

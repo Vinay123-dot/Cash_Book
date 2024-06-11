@@ -15,9 +15,11 @@ import { DaysArr } from "../../Constants";
 import { 
     apiGetDepositModeInfo, 
     apiGetDepositTypeInfo,
-    apiStoreBankDepositInfo
+    apiStoreBankDepositInfo,
+    apiVerifyAdvancedBookReceipt
     } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
+import ErrorModal from "../../components/ui/ErrorModal";
 
 const ShowTextBoxInPC = (label, value, ph) => (
     <AntdTextArea
@@ -27,6 +29,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
     />
 )
 
+const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""]
 const initialValues = {
     id : 0,
     date: null, //string
@@ -37,7 +40,9 @@ const initialValues = {
     remaining_balance: null, //number
     advance_receipt_no: '', //string
     bill_number : "",
-    store_id : ""
+    store_id : "",
+    total_receipt_amount : null,
+    receipt_status : ""
 };
 
 const BankDepositModal = (props) => {
@@ -48,6 +53,10 @@ const BankDepositModal = (props) => {
     // const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
     const remCommOpeningBal = useSelector(state => state.quickbookStore.state.remainingCommonBalance);
     const [startLoading,setStartLoading] = useState(false);
+    const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
  
 
@@ -61,7 +70,13 @@ const BankDepositModal = (props) => {
                 apiGetDepositTypeInfo(),
                 apiGetDepositModeInfo()
             ])
-            setDepositList(depositTypeResponse?.data || []);
+            let newArr = [...depositTypeResponse?.data];
+            let splicedObj = (newArr || []).splice(3,1);
+            (newArr || []).forEach((eachDoc) => {
+                eachDoc.Type = eachDoc.Id === 3 ? eachDoc.Type+'/'+splicedObj?.[0].Type :eachDoc.Type;
+                
+            });
+            setDepositList(newArr);
             setDepositModeList(depositModeResponse?.data || []);
         }catch(e){
 
@@ -76,6 +91,10 @@ const BankDepositModal = (props) => {
             setStartLoading(true);
             let newObj = JSON.parse(JSON.stringify(values));
             newObj.amount = Number(newObj.amount);
+            newObj.total_receipt_amount = Number(newObj.total_receipt_amount);
+            if(newObj.total_receipt_amount > 0){
+                newObj.type = (newObj.amount === newObj.total_receipt_amount) ? 3 : 4;
+            }
             newObj.key = uniqueId;
             let response = await apiStoreBankDepositInfo([newObj]);
             setSubmitting(false);
@@ -102,7 +121,49 @@ const BankDepositModal = (props) => {
     }
     const handleCancelBankDeposit = () => {
         dispatch(setShowAddBookPage(false));
+        setVerifyBtnLdng(false);
         onCancel();
+    }
+
+    const handleVerifyAdvanceMoney = async(allVal,setFieldValue) => {
+        const {advance_receipt_no} = allVal;
+        try {
+            if(!advance_receipt_no) return console.log("test")
+                setVerifyBtnLdng(true);
+                const data = {
+                    key : uniqueId,
+                    id : advance_receipt_no
+                };
+            let response = await apiVerifyAdvancedBookReceipt(data);
+            console.log("r",response)
+            if(response){
+                setEModal({
+                    eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
+                    show : statusArr.includes(response?.Status) ?true :false
+                })
+                setFieldValue("total_receipt_amount",response?.Bill_Value || 0);
+                setFieldValue("amount",response?.Remaining_Balance || 0);
+                setFieldValue("receipt_status",response?.Status || "");
+                setVerifyBtnLdng(false);
+            }
+           
+            
+        }catch(Err){
+            console.log("ERR..",Err);
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
+            setVerifyBtnLdng(false);
+        }
+        
+    }
+
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
     }
 
     return (<>
@@ -177,12 +238,25 @@ const BankDepositModal = (props) => {
                             {
                                 values.type != null && [3].includes(values.type) &&
                                 <>
-                                    <AntdInput
-                                        text="Receipt Number"
-                                        value = 'advance_receipt_no'
-                                        ph= "Enter Receipt Number"
-                                    />
-                                    <AntdInput
+                                    <div className="flex">
+                                        <AntdInput
+                                            text = "Receipt Number"
+                                            value = 'advance_receipt_no'
+                                            ph= "Enter Receipt Number"
+                                        />
+                                        <CButton
+                                            className = "ml-5 mt-10"
+                                            style = {{width : 100,height : 32}}
+                                            isLoading = {verifyBtnLdng}
+                                            onClick = {() => handleVerifyAdvanceMoney(values,setFieldValue)}
+                                        >
+                                            Verify
+                                        </CButton>
+                                    </div>
+                                    {
+                                        !statusArr.includes(values.receipt_status) && <> 
+
+                                        <AntdInput
                                         text= "Receipt Amount" 
                                         value= 'amount'
                                         ph="Enter Remaining Balance"
@@ -199,12 +273,15 @@ const BankDepositModal = (props) => {
                                         value= 'store_id'
                                         ph="Enter Store Id"
                                     />
+                                        </>
+                                    }
+                                    
                                 </>
                             }
                              
                             
                             {
-                                values.type === 3 &&
+                                values.type === 3 && !statusArr.includes(values.receipt_status) &&
                                 ShowTextBoxInPC("Reason", 'reason', "Enter Reason")
                             }
                             
@@ -226,6 +303,9 @@ const BankDepositModal = (props) => {
         </Formik>
         {
             startLoading && <Loader showLoading = {true}/>
+        }
+        { 
+            eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
         }
         
        

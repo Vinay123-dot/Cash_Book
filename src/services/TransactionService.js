@@ -189,7 +189,7 @@ export async function apiGetDayBookExcelData(data) {
     let startDate = getYesterDay();
     let endDate = getToday();
     // let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
-    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
+    let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
     const response = await axios.get(url,{headers});
     return response;
 }
