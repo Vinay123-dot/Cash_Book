@@ -131,7 +131,7 @@ const EditDayBookFromDashboard = (props) => {
     const handleCloseInvoiceModal = () => {
         dispatch(setShowUploadInvoice(false))
     }
-   console.log("editDayBookObj..",editDayBookObj);
+  
     return (
         <Modal openModal={true} height={"90%"} width={"90%"}  ai = {null}>
             <>

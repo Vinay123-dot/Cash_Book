@@ -177,7 +177,10 @@ const PaymentCollectionModal = (props) => {
 
 
 
-                            <ShowPaymentTypes paymentValues={values} />
+                            <ShowPaymentTypes 
+                                paymentValues={values}
+                                isFromAdvPayments = {false}
+                            />
                             <BillAmountModal
                                 billModal={showBillModal}
                                 valuesObj={values}

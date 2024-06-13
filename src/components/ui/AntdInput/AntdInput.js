@@ -11,7 +11,7 @@ const AntdInput = (props) => {
         showPrefix = false,acceptOnlyNum = false,
         validation = false,disableInput  = false,
         validateField,showAddBefore = false,
-        showAddBeforeValue ="" } = props;
+        showAddBeforeValue ="" ,maxLen = 200} = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
@@ -30,6 +30,7 @@ const AntdInput = (props) => {
                     }
                 }}
                 validate = {validation && validateField}
+                maxLength={maxLen}
                 
             />
             <ErrorMessage name={value} component="div" style={{ color: 'red', }} className="text-start"/>
