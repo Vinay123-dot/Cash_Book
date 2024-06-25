@@ -10,7 +10,7 @@ const BankDepositColumns = [
     { header: 'Type',accessorKey: 'Type',enableSorting: false },
     { header: 'Amount',accessorKey: 'Amount',enableSorting: false },
     { header: 'Deposit Mode',accessorKey: 'Deposit_Mode', enableSorting: false},
-    { header: "Remaining Balance",accessorKey: 'Remaining_Balance', enableSorting: false},
+    // { header: "Remaining Balance",accessorKey: 'Remaining_Balance', enableSorting: false},
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
         accessorKey: 'action',

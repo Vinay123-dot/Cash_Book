@@ -14,6 +14,9 @@ const AntdSelectFilter = (props) => {
         (option) => option.value === selectedValue
     )
 
+    const caseSensitiveFilterOption = (input, option) => {
+        return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+    };
 
     return (
         <>
@@ -22,7 +25,7 @@ const AntdSelectFilter = (props) => {
                 className = "w-full md:w-52 h-10"
                 placeholder = {placeholder}
                 optionFilterProp = "children"
-                filterOption={(input, option) => (option?.children ?? '').includes(input)}
+                filterOption={caseSensitiveFilterOption}
                 // filterSort={(optionA, optionB) =>
                 //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                 // }
@@ -34,7 +37,7 @@ const AntdSelectFilter = (props) => {
                             </Option>
                 ))}
             </Select>
-            <span className="text-base font-normal ml-2 mt-2 " style={{ color: "#5A87B2" }}>
+            <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} >
                 { message? message :(selectedFilter?.label || selectedFilter?.Type)}
             </span>
         </>

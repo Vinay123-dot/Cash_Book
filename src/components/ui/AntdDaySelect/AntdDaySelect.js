@@ -17,6 +17,11 @@ const AntdDaySelect = (props) => {
         let temp = (Arr || []).find((item)=> item.Id === val || item.Type === val);
         return temp?.Type  || null;
     }
+
+    const caseSensitiveFilterOption = (input, option) => {
+        return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+    };
+    
     return (
         <div className="flex flex-col w-full md:w-60">
             <label htmlFor={name} className="my-2 text-start">{labelText}</label>
@@ -35,6 +40,8 @@ const AntdDaySelect = (props) => {
                             handleChange(name, selectedValue);
                         }}
                         value = {getSelectedVal(sVal)}
+                        optionFilterProp = "children"
+                        filterOption={caseSensitiveFilterOption}
                     >
                         {(Arr || []).map((eachOpt, i) => (
                             <Option key={i} value={eachOpt.id || eachOpt.Id}>

@@ -164,7 +164,7 @@ const HandleEditInvoice = (props) => {
     return (
         <>
             {
-                ((row.Date === getToday() || row.Date === getYesterDay()) && ![2,4].includes(cashbookData.book_type)) ?
+                ((row.Date === getToday() || row.Date === getYesterDay()) ) ?
                     <HiOutlinePencil
                         size={20}
                         style={{ color: "#5A87B2",width : 120,textAlign:'center' }}

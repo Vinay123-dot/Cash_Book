@@ -57,7 +57,13 @@ const BankDepositEditModal = (props) => {
         try {
             values.amount = Number(values.amount);
             values.key = uniqueId;
-            console.log("VALUESIN EDIT", values)
+            if(values.amount > remainingOpeningBal) {
+                setEModal({
+                    eMessage : "Given amount should be less than or equal to the remaining opening balance",
+                    show : true
+                })
+                return ;
+            }
             setShowLoader(true);
             let response = await apiStoreBankDepositInfo([values]);
             if (response.message) {
@@ -91,7 +97,6 @@ const BankDepositEditModal = (props) => {
                 id: advance_receipt_no
             };
             let response = await apiVerifyAdvancedBookReceipt(data);
-            console.log("r", response)
             if (response) {
                 setEModal({
                     eMessage: statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
@@ -144,30 +149,17 @@ const BankDepositEditModal = (props) => {
                     style={{ overflow: "auto", position: "relative" }}
                 >
                     {({ setFieldValue, values }) => {
-                        if (values.amount) {
-                            values.remaining_balance =  (remBankbal + Number(editDayBookObj.amount)) - Number(values.amount);
-                        }
+                        values.remaining_balance =  (remBankbal + Number(editDayBookObj.amount) || 0) - Number(values.amount);
+                        
                         return (
                             <Form>
-                                <div className="flex justify-between">
-                                    <ParagraphTag label="Edit Details" />
-                                    <div className = "flex justify-between gap-10">
-                                        <div className="flex flex-col">
-                                            <h1 style={{ color: "#5A87B2",fontSize: 18}}>Opening Balance</h1>
-                                            <p className="text-start">{bankBalance}</p>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <h1 style={{ color: "#5A87B2",fontSize:18 }}>Remaining Balance</h1>
-                                            <p className="text-start">{remainingOpeningBal}</p>
-                                        </div>
-                                    </div>
-
-                                </div>
+                                <ParagraphTag label="Edit Details" />
                                 <div className="grid grid-cols-1 gap-10 px-4 py-2  md:grid-cols-2">
                                     <AntdFormikSelect
                                         labelText="Type"
                                         name="type"
                                         ph="Select Type"
+                                        isDisabled = {true}
                                         handleChange={(name, selectedValue) => handleChangeType(name, selectedValue, setFieldValue)}
                                         Arr={getFilteredDepositTypeList(depositTypeList)}
                                     />
@@ -203,7 +195,7 @@ const BankDepositEditModal = (props) => {
                                             Arr={depositModeList}
                                         />
                                     }
-                                    {/* {
+                                    {
                                         values.type != null && [1, 2].includes(values.type) &&
                                         <AntdInput
                                             text="Remaing Balance"
@@ -213,7 +205,7 @@ const BankDepositEditModal = (props) => {
                                             acceptOnlyNum={true}
                                             disableInput={true}
                                         />
-                                    } */}
+                                    }
                                     {
                                         values.type != null && [3].includes(values.type) &&
                                         <>

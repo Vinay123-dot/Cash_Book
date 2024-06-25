@@ -93,6 +93,14 @@ const BankDepositModal = (props) => {
             let newObj = JSON.parse(JSON.stringify(values));
             newObj.amount = Number(newObj.amount);
             newObj.total_receipt_amount = Number(newObj.total_receipt_amount);
+            if(newObj.amount > remCommOpeningBal) {
+                setEModal({
+                    eMessage : "Given amount should be less than or equal to the remaining opening balance",
+                    show : true
+                })
+                setStartLoading(false);
+                return ;
+            }
             if(newObj.total_receipt_amount > 0){
                 newObj.type = (newObj.amount === newObj.total_receipt_amount) ? 3 : 4;
             }
@@ -312,7 +320,7 @@ const BankDepositModal = (props) => {
             startLoading && <Loader showLoading = {true}/>
         }
         { 
-            eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
+            eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}  ai ="center"/>
         }
         
        

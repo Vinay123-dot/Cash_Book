@@ -230,9 +230,10 @@ const verifyInputField = (value, allValues, type) => {
         paymentType4: P4, paymentType5: P5,
         paymentType6: P6, paymentType7: P7,
     } = allValues;
+
     let paymentTypeArr = [P0, P1, P2, P3, P4, P5, P6, P7];
-    let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 
-                'This field is required' : 
+    let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 'This field is required' : 
+                paymentTypeArr.includes(selectedValType[type]) && value && value <=0 ? "Amount must be greater than zero" :
                 null;
     return err;
 

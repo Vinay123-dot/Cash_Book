@@ -23,6 +23,7 @@ import CashTypes from "../DayBookFiles/CashTypes";
 import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
 import Modal from "../../../components/shared/Modal";
 import { selectedValType } from "../CompConstants";
+import ErrorModal from "../../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -51,6 +52,9 @@ const EditDayBookFromDashboard = (props) => {
     const [showBillModal,setShowBillModal] = useState(false);
     const [showLoader,setShowLoader] = useState(false);
     const [validateModal,setValidateModal] = useState(true);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
   
@@ -58,6 +62,14 @@ const EditDayBookFromDashboard = (props) => {
     const handleSubmit = async (values,validateModal) => {
         try {
             setShowBillModal(false);
+            if(Number(values.advance_receipt_amount) > values.remaining_balance ) {
+                setEModal({
+                    eMessage : "Given amount should be less than or equal to the Advance Receipt Amount",
+                    show : true
+                })
+                return;
+
+            }
             let diffInAmount = Number(values.bill_value) - getTotalMoneyInDayBook(values);
             let modalFlag = values.sales_type === 1 && validateModal && (diffInAmount > 10 || diffInAmount < -10);
             if (modalFlag) {
@@ -76,9 +88,17 @@ const EditDayBookFromDashboard = (props) => {
                 handleCloseEditModal();
                 setValidateModal(true);
                 dispatch(setDataSavedModal(true));
+                setEModal({
+                    eMessage : "",
+                    show : false
+                })
             }
             setShowLoader(false);
-        } catch (e) {
+        } catch (Err) {
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
             setShowLoader(false);
             setValidateModal(true);
         }
@@ -89,6 +109,13 @@ const EditDayBookFromDashboard = (props) => {
 
     }
 
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
+    }
+ 
 
     const handleChangeSalesType = (name,sValue,setFieldValue,sArr) => {
         setFieldValue(name,sValue);
@@ -214,6 +241,10 @@ const EditDayBookFromDashboard = (props) => {
                                         Save
                                     </CButton>
                                     <CButton onClick={() => {
+                                        setEModal({
+                                            eMessage : "",
+                                            show : false
+                                        })
                                         handleCloseEditModal();
                                         // dispatch(setShowAddBookPage(false))
                                     }} type="cancel"
@@ -227,6 +258,10 @@ const EditDayBookFromDashboard = (props) => {
                     }}
                 </Formik>
                 <Loader showLoading={showLoader} />
+                { 
+                    eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
+                }
+
 
             </>
 

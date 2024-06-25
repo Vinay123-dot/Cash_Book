@@ -11,7 +11,7 @@ const AntdInput = (props) => {
         showPrefix = false,acceptOnlyNum = false,
         validation = false,disableInput  = false,
         validateField,showAddBefore = false,
-        showAddBeforeValue ="" ,maxLen = 200} = props;
+        showAddBeforeValue ="" ,maxLen = 200,forMobileNum = false} = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
@@ -23,9 +23,12 @@ const AntdInput = (props) => {
                 readOnly={disableInput}
                 addonBefore= {showAddBefore &&showAddBeforeValue}
                 // error={error}
-                prefix = {showPrefix && RupeePrefix}
-                onKeyPress={(event) => {
-                    if (!/^[0-9.]+$/.test(event.key) && acceptOnlyNum) {
+                prefix = {showPrefix && RupeePrefix}                
+                onKeyPress={(event) => {                    
+                    if (!/^[0-9.]+$/.test(event.key) && acceptOnlyNum && !forMobileNum) {
+                        event.preventDefault()
+                    }
+                    if (!/^[0-9]+$/.test(event.key) && acceptOnlyNum && forMobileNum) {
                         event.preventDefault()
                     }
                 }}
