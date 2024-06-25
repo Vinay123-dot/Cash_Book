@@ -151,6 +151,7 @@ const EditPaymentColFromDashboard = (props) => {
                                     valObj={values}
                                     paymentListInfo={removeFeilds(paymentTypeInfo)}
                                     upiTypeInfo={upiTypeInfo}
+                                    isFromEditObj = {true}
                                 />
 
                                 <ShowPaymentTypes 

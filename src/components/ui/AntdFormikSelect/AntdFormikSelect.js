@@ -6,8 +6,11 @@ import { useSelector } from 'react-redux';
 const { Option } = Select;
 
 const AntdFormikSelect = (props) => {
-    const {labelText,name,ph,handleChange,Arr,error,validation = false,validateField,key} = props;
+    const {labelText,name,ph,handleChange,Arr,error,validation = false,validateField,key,isDisabled = false} = props;
   
+    const caseSensitiveFilterOption = (input, option) => {
+        return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+    };
 
     if(Arr.length === 0) return null;
 
@@ -28,6 +31,9 @@ const AntdFormikSelect = (props) => {
                         onChange={(selectedValue) => {
                             handleChange(name, selectedValue);
                         }}
+                        disabled = {isDisabled}
+                        optionFilterProp = "children"
+                        filterOption={caseSensitiveFilterOption}
                     >
                         {(Arr || []).map((eachOpt, i) => (
                             <Option key={i} value={eachOpt.id || eachOpt.Id}>

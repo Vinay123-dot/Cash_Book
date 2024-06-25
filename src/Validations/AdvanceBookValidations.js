@@ -12,7 +12,12 @@ const AdvanceBookValidations = Yup.object().shape({
                     message: 'Please enter valid number.',
                     excludeEmptyString: false,
                 }),
-    bill_value : Yup.string().required('This field is required.'),
+    bill_value: Yup.string()
+                .required('This field is required')
+                .test('is-positive', 'Amount must be greater than zero', value => {
+                    return Number(value) > 0;
+                }),
+    // bill_value : Yup.string().required('This field is required.'),
 });
 
 export default AdvanceBookValidations;

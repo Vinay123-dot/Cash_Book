@@ -278,7 +278,7 @@ const QuickBookTools = () => {
 
     let temp = [];
     if(terminalObj.terminal_id == 0){
-      temp = (booksArr || []).filter((eachItem) => eachItem.Id != 5);
+      temp = (booksArr || []).filter((eachItem) => eachItem.Id != 6);
     }else {
       temp = JSON.parse(JSON.stringify(booksArr));
     }

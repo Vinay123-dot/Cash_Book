@@ -70,7 +70,8 @@ const getConvertedObj = (tempObj) => {
     let newCreatedObj = {
         id:  tempObj.Id,
         advance_customer_name: tempObj.Advance_Customer_Name || "",
-        advance_receipt_amount: tempObj.Advance_Receipt_Amount || null, 
+        advance_receipt_amount: tempObj.Advance_Receipt_Amount || null,
+        remaining_balance : tempObj.Remaining_Balance || 0, 
         used_receipt_amount : tempObj.Used_Receipt_Amount || null, 
         advance_receipt_no: tempObj.Advance_Receipt_No || "",
         date: convertToNormalFormat(tempObj.Date) || null, 
@@ -109,7 +110,11 @@ const getConvertedObj = (tempObj) => {
         party_code : tempObj.Party_Code ||"",
         party_name : tempObj.Party_Name||"",
         reason : tempObj.Reason || "",
-        issales_report:0
+        issales_report:0,
+        pg_order: tempObj.Pg_Order || null,
+        pg_order_amount: tempObj.Pg_Order_Amount || null,
+        reference_order: tempObj.Reference_Order ||null,
+        reference_order_amount:tempObj.Reference_Order_Amount || null,
     
     
     };
@@ -225,9 +230,10 @@ const verifyInputField = (value, allValues, type) => {
         paymentType4: P4, paymentType5: P5,
         paymentType6: P6, paymentType7: P7,
     } = allValues;
+
     let paymentTypeArr = [P0, P1, P2, P3, P4, P5, P6, P7];
-    let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 
-                'This field is required' : 
+    let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 'This field is required' : 
+                paymentTypeArr.includes(selectedValType[type]) && value && value <=0 ? "Amount must be greater than zero" :
                 null;
     return err;
 

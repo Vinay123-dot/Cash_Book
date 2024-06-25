@@ -154,6 +154,8 @@ const EditAdvBookFromDashboard = (props) => {
                                         value='phone_no'
                                         ph="Enter Customer Mobile Number"
                                         acceptOnlyNum={true}
+                                        maxLen = {10}
+                                        forMobileNum = {true}
                                     />
                                     <AntdInput
                                         text="Advance Receipt Amount"

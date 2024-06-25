@@ -16,7 +16,7 @@ const ShowPaymentTypes = (props) => {
                 <p>{paymentValues.bill_value || 0}</p>
             </div>
         </div>
-        <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3 w-full">
+        <div className="flex flex-col justify-between items-start px-4 py-2 lg:items-center  lg:flex-row">
             <div className="flex flex-col">
                 <p className="text-start">Payment Type</p>
                 {
@@ -49,14 +49,14 @@ const ShowPaymentTypes = (props) => {
             </div>
             {
                 isFromAdvPayments && <>
-                    <div>
-                        <p>Advance Used Amount</p>
+                    <div className="flex flex-col">
+                        <p className="text-start">Advance Used Amount</p>
                         {/* <p>{paymentValues.used_receipt_amount}</p> */}
-                        {<p>{paymentValues.advance_receipt_amount}</p>}
+                        {<p className="text-start">{paymentValues.advance_receipt_amount}</p>}
                     </div>
-                    <div>
-                        <p> Pending Amount</p>
-                        <p>{Number(paymentValues.bill_value) - getTotalMoneyInDayBook(paymentValues)}</p>
+                    <div className="w-60 ">
+                        <p className="text-start"> Pending Amount</p>
+                        <p className="text-start">{Number(paymentValues.bill_value) - getTotalMoneyInDayBook(paymentValues)}</p>
                     </div>
                 </>
             }

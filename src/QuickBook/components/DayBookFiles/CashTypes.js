@@ -24,7 +24,39 @@ const CashTypes = (props) => {
     
     const validateReasonField = (value,allValues) => verifyReasonField(value,allValues);
     
-    const handleSetFieldData = (name, selectedValue) => setFieldValue(name, selectedValue);
+    const handleSetFieldData = (name, selectedValue,valObj) => {
+        let existedType = valObj?.[name] || null;
+        if(existedType === UPI){
+            setFieldValue("upi_amount",null);
+            setFieldValue("upi_type",null);
+        }
+        if (existedType === CASH){
+            setFieldValue("cash_amount",null);
+        }
+        if(existedType === BANK){
+            setFieldValue("online_bank_amount",null);
+            setFieldValue("online_bank_name","");
+            setFieldValue("online_bank_trans_no","");
+        }
+        if(existedType === CHEQUE){
+            setFieldValue("bank_cheque_amount",null);
+            setFieldValue("bank_cheque_name","");
+            setFieldValue("bank_cheque_no","");
+        }
+        if(existedType === CREDITCARD){
+            setFieldValue("credit_card_amount",null)
+        }
+        if(existedType === DEBITCARD){
+            setFieldValue("debit_card_amount",null)
+        }
+        if(existedType === REFERENCEORDER){
+            setFieldValue("reference_order_amount",null)
+        }
+        if(existedType === PAYMENTGATEWAY){
+            setFieldValue("pg_order_amount",null)
+        }
+        setFieldValue(name, selectedValue);
+    } 
 
     const handleButtonClick = () => {
         if (clickCount.length > pLength) return;
@@ -32,7 +64,7 @@ const CashTypes = (props) => {
         setClickCount(prevCount => [...prevCount, clickCount.length]);
     };
 
-   
+   const handleSetUPIData = (name,selectedVal) => setFieldValue(name,selectedVal);
     
 
     const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
@@ -109,30 +141,34 @@ const CashTypes = (props) => {
 
             </div>
 
-            {clickCount.map((eachItem, index) => (
-
+            {clickCount.map((eachItem, index) =>(
+                
                 <div className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2 relative" key={index}>
-
+                    <div className="flex items-center">
                     <PaymentSelect
                         labelText = "Payment Type"
                         name = {`paymentType${eachItem}`}
                         ph = "--Select PaymentType--"
-                        handleChange = {handleSetFieldData}
+                        handleChange = {(name,val) =>handleSetFieldData(name,val,valObj)}
                         outputObj = {valObj}
                         Arr = {paymentListInfo}
                         validation = {true}
                         validateField = {(val) => verifyPaymentType(val)}
-                        key = {index}
+                        key = {index+`paymentType${eachItem}`}
                     />
-                    {/* {
-                        index !== 0 &&
+                    {
+                        index !== 0 && valObj[`paymentType${eachItem}`] == null &&
                         <AiOutlineDelete
-                            key = {index}
-                            style = {iconStyle}
+                            key = {eachItem}
+                            className="w-10 h-5  right-2.5 bottom-2.5 cursor-pointer self-end text-red-500"
                             onClick={() => handleRemoveFromList(eachItem, valObj)}
                             // onClick={() => console.log("TEMp")}
                         />
-                    } */}
+                    }
+
+                    </div>
+                    
+                    
 
                     {
                         valObj[`paymentType${eachItem}`] === UPI &&
@@ -141,7 +177,7 @@ const CashTypes = (props) => {
                                 labelText = "UPI Type"
                                 name = "upi_type"
                                 ph = "--Select UPI Type--"
-                                handleChange = {handleSetFieldData}
+                                handleChange = {handleSetUPIData}
                                 Arr = {upiTypeInfo}
                                 validation = {true}
                                 validateField = {(value) => validateUpiType(value, valObj)}

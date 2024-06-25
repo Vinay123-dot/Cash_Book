@@ -89,6 +89,10 @@ const PettyCashModal = (props) => {
             setFieldError("balance","Balance should not be lessthan 0");
             return ;
         }
+        if(values.amount > remPettyCash) {
+            setFieldError("amount","Balance should not be morethan Remaining pettycash balance");
+            return ;
+        }
         // if (isAllValuesPresent) {
         //     setPettyCashArr((prev) => [...prev, values]);
         //     // setErrors({});

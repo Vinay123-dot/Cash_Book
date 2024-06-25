@@ -100,36 +100,19 @@ const AdvanceBillDetails = (props) => {
                     Verify
                 </CButton>
             </div>
-            {/* {
-                values.advance_receipt_no &&
-                <div className="grid grid-cols-1  px-4 py-2 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-                    <div className="flex flex-col  bg-blue-100 align-self-start">
-                        <p>Advance Receipt Amount</p>
-                        <p>{values.remaining_balance}</p>
-                    </div>
-                    <div>
-                        <p>Customer Name</p>
-                        <p>{values.advance_customer_name || "--"}</p>
-                    </div>
-                    {
-                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values, false, false, false)
-                    }
-                   
-                </div>
-            } */}
              {
                 values.advance_receipt_no &&
                 <div className="flex flex-col justify-between items-start px-4 py-2 lg:items-center  lg:flex-row">
                     <div className="flex flex-col">
-                        <p>Advance Receipt Amount</p>
-                        <p>{values.remaining_balance}</p>
+                        <p className="text-start">Advance Receipt Amount</p>
+                        <p className="text-start">{values.remaining_balance}</p>
                     </div>
-                    <div>
-                        <p>Customer Name</p>
-                        <p>{values.advance_customer_name || "--"}</p>
+                    <div className="">
+                        <p className="text-start">Customer Name</p>
+                        <p className="text-start">{values.advance_customer_name || "--"}</p>
                     </div>
                     {
-                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values, false, false, false)
+                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values)
                     }
                    
                 </div>

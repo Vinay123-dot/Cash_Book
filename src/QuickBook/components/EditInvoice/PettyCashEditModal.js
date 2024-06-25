@@ -15,6 +15,7 @@ import ParagraphTag from "../../../constants/PTag";
 import { apiStorePettyCashInfo } from "../../../services/TransactionService";
 import Loader from "../../../components/shared/Loader";
 import Modal from "../../../components/shared/Modal";
+import ErrorModal from "../../../components/ui/ErrorModal";
 
 
 
@@ -57,6 +58,9 @@ const PettyCashEditModal = (props) => {
         pettyCashRemBal : remPettyCash,
       } = useSelector(state => state.quickbookStore.state);
     const [remPettybal, setRemPettybal] = useState(remPettyCash);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
@@ -68,6 +72,13 @@ const PettyCashEditModal = (props) => {
             values.amount = Number(values.amount);
             values.key = uniqueId;
             console.log("VALUESIN EDIT",values)
+            if(values.amount > remPettyCash) {
+                setEModal({
+                    eMessage : "Given amount should be less than or equal to the remaining pettycash balance",
+                    show : true
+                })
+                return ;
+            }
             setShowLoader(true);
             let response = await apiStorePettyCashInfo([values]);
             if (response.message) {
@@ -75,11 +86,25 @@ const PettyCashEditModal = (props) => {
                 dispatch(setDataSavedModal(true));
             }
             setShowLoader(false);
+            setEModal({
+                eMessage : "",
+                show : false
+            })
         } catch (e) {
+            setEModal({
+                eMessage : "",
+                show : false
+            })
             setShowLoader(false);
         }
     }
     
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
+    }
     return (
         <Modal openModal={true}  ai={null} height ={400}>
             <>
@@ -100,18 +125,7 @@ const PettyCashEditModal = (props) => {
                         }
                         return (
                             <Form>
-                                <div className="flex justify-between">
-
-                                    <ParagraphTag label="Edit Details" />
-                                    <div className="flex flex-col">
-                                        <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
-                                        <p className="text-start">{pettyCash}</p>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <h1 style={{ color: "#5A87B2" }}>Remaining Balance</h1>
-                                        <p className="text-start">{remPettyCash}</p>
-                                    </div>
-                                </div>
+                                <ParagraphTag label="Edit Details" />
                                 <div className="grid grid-cols-2 px-4 py-2 gap-10">
                                     <AntdFormikSelect
                                         labelText="Type"
@@ -127,14 +141,14 @@ const PettyCashEditModal = (props) => {
                                         showPrefix={true}
                                         acceptOnlyNum={true}
                                     />
-                                    {/* <AntdInput
+                                    <AntdInput
                                         text="Remaing Amount"
                                         value='balance'
                                         ph="Enter Remaining Amount"
                                         showPrefix={true}
                                         acceptOnlyNum={true}
                                         disableInput={true}
-                                    /> */}
+                                    />
                                     {
                                         ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
                                     }
@@ -160,6 +174,9 @@ const PettyCashEditModal = (props) => {
                 </Formik>
                 {
                     showLoader && <Loader showLoading={true} />
+                }
+                { 
+                    eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}  ai ="center"/>
                 }
             </>
         </Modal>

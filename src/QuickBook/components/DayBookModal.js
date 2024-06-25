@@ -127,12 +127,21 @@ const DayBookModal = (props) => {
     const handleSubmit = async (values,validateModal) => {
         try {
             setShowBillModal(false);
+            if(Number(values.advance_receipt_amount) > values.remaining_balance ) {
+                setEModal({
+                    eMessage : "Given amount should be less than or equal to the Advance Receipt Amount",
+                    show : true
+                })
+                return;
+
+            }
             let diffInAmount = Number(values.bill_value) - getTotalMoneyInDayBook(values);
             let modalFlag = values.sales_type === 1 && validateModal && (diffInAmount > 10 || diffInAmount < -10);
             if (modalFlag) {
                 setShowBillModal(true);
                 return;
             }
+            
             setShowLoader(true);
             let newObj = JSON.parse(JSON.stringify(values));
             let convertedObj = convertTONumbers(newObj);
@@ -141,7 +150,6 @@ const DayBookModal = (props) => {
             convertedObj.bill_no = billNum+"/"+ convertedObj.sales_code+"/"+convertedObj.bill_no;
             convertedObj.pending_balance = Number(values.bill_value) - getTotalMoneyInDayBook(values);
             let response = await apiStoreDayBookInfo([convertedObj]);
-            console.log("rd",response)
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
                 onCancel();
