@@ -25,6 +25,7 @@ import { PaymentColIntialObj } from "../intialValuesFol";
 import { PaymentCollectionValidations } from "../../Validations";
 import CashTypes from "./DayBookFiles/CashTypes";
 import ErrorModal from "../../components/ui/ErrorModal";
+import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -138,9 +139,13 @@ const PaymentCollectionModal = (props) => {
                         <Form>
                             <ParagraphTag label="Details" />
                             <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
-                                {
-                                    showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                                }
+                            <AntdDatePicker
+                                labelText="Day"
+                                name="date"
+                                ph="--- Select Day ---"
+                                value = {values["date"]}
+                                handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                            />
                                 <AntdInput
                                     text="Bill Number"
                                     value='bill_no'

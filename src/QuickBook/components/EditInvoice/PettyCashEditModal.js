@@ -16,6 +16,7 @@ import { apiStorePettyCashInfo } from "../../../services/TransactionService";
 import Loader from "../../../components/shared/Loader";
 import Modal from "../../../components/shared/Modal";
 import ErrorModal from "../../../components/ui/ErrorModal";
+import AntdDatePicker from "../../../components/ui/AntdDatePicker/AntdDatePicker";
 
 
 
@@ -127,12 +128,12 @@ const PettyCashEditModal = (props) => {
                             <Form>
                                 <ParagraphTag label="Edit Details" />
                                 <div className="grid grid-cols-2 px-4 py-2 gap-10">
-                                    <AntdFormikSelect
-                                        labelText="Type"
+                                    <AntdDatePicker
+                                        labelText="Day"
                                         name="date"
                                         ph="--- Select Day ---"
-                                        handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                        Arr={DaysArr}
+                                        value = {values["date"]}
+                                        handleChange = {(date,dateString) => setFieldValue("date",dateString)}
                                     />
                                     <AntdInput
                                         text="Amount"

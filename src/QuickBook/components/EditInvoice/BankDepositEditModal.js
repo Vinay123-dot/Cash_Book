@@ -16,6 +16,7 @@ import Loader from "../../../components/shared/Loader";
 import Modal from "../../../components/shared/Modal";
 import ErrorModal from "../../../components/ui/ErrorModal";
 import ParagraphTag from "../../../constants/PTag";
+import AntdDatePicker from "../../../components/ui/AntdDatePicker";
 
 
 const ShowTextBoxInPC = (label, value, ph) => (
@@ -165,13 +166,20 @@ const BankDepositEditModal = (props) => {
                                     />
                                     {
                                         values.type != null &&
-                                        <AntdFormikSelect
-                                            labelText="Day"
-                                            name="date"
-                                            ph="--- Select Day ---"
-                                            handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                            Arr={DaysArr}
-                                        />
+                                        // <AntdFormikSelect
+                                        //     labelText="Day"
+                                        //     name="date"
+                                        //     ph="--- Select Day ---"
+                                        //     handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                        //     Arr={DaysArr}
+                                        // />
+                                        <AntdDatePicker
+                                        labelText="Day"
+                                        name="date"
+                                        ph="--- Select Day ---"
+                                        value = {values["date"]}
+                                        handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                                    />
                                     }
                                     {
                                         values.type != null && [1, 2].includes(values.type) &&

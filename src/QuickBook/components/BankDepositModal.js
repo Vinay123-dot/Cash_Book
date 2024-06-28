@@ -20,6 +20,7 @@ import {
     } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 import ErrorModal from "../../components/ui/ErrorModal";
+import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 
 const ShowTextBoxInPC = (label, value, ph) => (
     <AntdTextArea
@@ -207,13 +208,14 @@ const BankDepositModal = (props) => {
                             />
                             {
                                 values.type != null && 
-                                <AntdFormikSelect
+                                <AntdDatePicker
                                     labelText="Day"
                                     name="date"
                                     ph="--- Select Day ---"
-                                    handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                    Arr={DaysArr}
+                                    value={values["date"]}
+                                    handleChange={(date, dateString) => setFieldValue("date", dateString)}
                                 />
+                                
                             }
                             {
                                 values.type != null && [1,2].includes(values.type) &&

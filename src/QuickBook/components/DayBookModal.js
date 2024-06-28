@@ -40,6 +40,7 @@ import AdvanceBillDetails from "./DayBookFiles/AdvanceBillDetails";
 import DaybookTable from "../../components/ui/DaybookTable";
 import EditModeInDayBook from "./EditInvoice/EditModeInDayBook";
 import ErrorModal from "../../components/ui/ErrorModal";
+import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -51,6 +52,8 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     />
 )
 
+const INDEPENDENTWORKSHOP = "INDEPENDENTWORKSHOP";
+const INDEPENDENT_WORKSHOP = "INDEPENDENT WORKSHOP"
 
 const DayBookModal = (props) => {
 
@@ -224,9 +227,27 @@ const DayBookModal = (props) => {
     const handleEditClick = (index,doc) => {
         let modifiedObj = Object.keys(doc).length !== 0 ? getConvertedObj(doc) : {};
         if (typeof modifiedObj.customer_type === 'string') {
-            let findedObj = (requiredArrList.customerListInfo || []).find((eachItem) => eachItem.Type === modifiedObj.customer_type);
+
+            let dummyArr = requiredArrList.customerListInfo || [];
+            let findedObj;
+            if(modifiedObj.customer_type === INDEPENDENTWORKSHOP){
+                findedObj = dummyArr.find((eachItem) =>eachItem.Type === INDEPENDENT_WORKSHOP);
+            }else{
+               findedObj = dummyArr.find((eachItem) =>eachItem.Type === modifiedObj.customer_type);
+            }
+            
             modifiedObj.customer_type = findedObj?.Id || null;
         } 
+        if(modifiedObj?.bill_no){
+
+            let splittedObj = modifiedObj?.bill_no?.split("/");
+            let salesArr = requiredArrList?.salesType || [];
+            let salesObj = salesArr.find((eachDoc) => eachDoc.Code === splittedObj?.[1]);
+            modifiedObj["sales_code"] = splittedObj?.[1] || null;
+            modifiedObj["sales_type"] = salesObj?.Id || null;
+
+        }
+        
         dispatch(setEditedDaybookObj(modifiedObj));
         setEditDayBook({
             showEditDaybookModal : true,
@@ -265,9 +286,16 @@ const DayBookModal = (props) => {
                         <Form>
                             <ParagraphTag label="Details" />
                             <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
-                                {
+                                {/* {
                                     showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                                }
+                                } */}
+                                <AntdDatePicker
+                                    labelText="Day"
+                                    name="date"
+                                    ph="--- Select Day ---"
+                                    value = {values["date"]}
+                                    handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                                />
                                 <AntdFormikSelect
                                     labelText="Sale Type"
                                     name="sales_type"

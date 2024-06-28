@@ -25,6 +25,12 @@ export function getToday() {
     return formatDate(today);
 }
 
+export function getDaybeforeYesterday() {
+    let yesterday = new Date();
+    yesterday.setDate(today.getDate() - 2);
+    return formatDate(yesterday);
+}
+
 export function getYesterDay() {
     let yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);

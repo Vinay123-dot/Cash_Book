@@ -24,6 +24,7 @@ import { AdvanceBookIntialObj } from "../intialValuesFol";
 import CashTypes from "./DayBookFiles/CashTypes";
 import { AdvanceBookValidations } from "../../Validations";
 import ErrorModal from "../../components/ui/ErrorModal";
+import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -154,9 +155,17 @@ const AdvanceBookModal = (props) => {
                                 value='receipt_no'
                                 ph="Enter Receipt Number"
                             />
-                            {
+                              <AntdDatePicker
+                                    labelText="Day"
+                                    name="date"
+                                    ph="--- Select Day ---"
+                                    value = {values["date"]}
+                                    isFromAdvance = {true}
+                                    handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                                />
+                            {/* {
                                 showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                            }
+                            } */}
 
                             {
                                 showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
