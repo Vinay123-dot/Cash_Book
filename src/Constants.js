@@ -74,6 +74,8 @@ const CHEQUE = "Cheque";
 const DEBIT_CARD = "Debit Card";
 const CREDIT_CARD = "Credit Card";
 
+export const dateFormat = 'YYYY-MM-DD';
+
 const selectedValType = {
   "cash_amount": CASH,
   "upi_amount": UPI,

@@ -16,6 +16,7 @@ import { PettyCashValidations } from "../../Validations";
 import ParagraphTag from "../../constants/PTag";
 import { apiStorePettyCashInfo } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
+import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 
 const initialValues = {
     id: 0,
@@ -203,12 +204,19 @@ const PettyCashModal = (props) => {
                     <Form>
                         <ParagraphTag label = "Details"/>
                         <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
-                            <AntdFormikSelect
+                            {/* <AntdFormikSelect
                                 labelText="Day"
                                 name="date"
                                 ph="--- Select Day ---"
                                 handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                                 Arr={DaysArr}
+                            /> */}
+                            <AntdDatePicker
+                            labelText="Day"
+                            name="date"
+                            ph="--- Select Day ---"
+                            value = {values["date"]}
+                            handleChange = {(date,dateString) => setFieldValue("date",dateString)}
                             />
                             {
                                 ShowInputBoxInPC("Amount", 'amount', "Enter Amount")

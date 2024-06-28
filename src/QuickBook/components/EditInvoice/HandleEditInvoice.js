@@ -4,7 +4,7 @@ import PettyCashEditModal from "./PettyCashEditModal";
 import EditDayBookFromDashboard from "./EditModeFromDashboard";
 import EditAdvBookFromDashboard from './EditAdvanceBookFromDashboard';
 import BankDepositEditModal from './BankDepositEditModal';
-import { getToday, getYesterDay } from '../../../utils/dateFormatter';
+import { getDaybeforeYesterday, getToday, getYesterDay } from '../../../utils/dateFormatter';
 import { HiOutlinePencil } from "react-icons/hi";
 import { allPaymentTypes, getConvertedObj,selectedValType,
         advanceModalConObj,paymentCollectionConObj } from '../CompConstants';
@@ -164,7 +164,7 @@ const HandleEditInvoice = (props) => {
     return (
         <>
             {
-                ((row.Date === getToday() || row.Date === getYesterDay()) ) ?
+                ((row.Date === getToday() || row.Date === getYesterDay() || row.Date === getDaybeforeYesterday()) ) ?
                     <HiOutlinePencil
                         size={20}
                         style={{ color: "#5A87B2",width : 120,textAlign:'center' }}

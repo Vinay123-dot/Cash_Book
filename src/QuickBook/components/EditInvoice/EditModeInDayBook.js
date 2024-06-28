@@ -31,6 +31,7 @@ import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
 import Modal from "../../../components/shared/Modal";
 import { getToday } from "../../../utils/dateFormatter";
 import AntdDaySelect from "../../../components/ui/AntdDaySelect";
+import AntdDatePicker from "../../../components/ui/AntdDatePicker"
 import ErrorModal from "../../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
@@ -203,9 +204,14 @@ const EditModalInDayBook = (props) => {
                             <Form style={{ overflow: "auto"}}>
                                 <ParagraphTag label="Details" />
                                 <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
-                                    {
-                                        showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                                    }
+                                    
+                                    <AntdDatePicker
+                                        labelText="Day"
+                                        name="date"
+                                        ph="--- Select Day ---"
+                                        value={values["date"]}
+                                        handleChange={(date, dateString) => setFieldValue("date", dateString)}
+                                    />
                                     <AntdFormikSelect
                                         labelText = "Sale Type"
                                         name = "sales_type"
