@@ -2,7 +2,7 @@ import ApiServiceV2 from "./ApiServiceV2";
 import ApiService from "./ApiService";
 import axios from "axios";
 import appConfig from "../configs/app.config";
-import { getToday, getYesterDay } from "../utils/dateFormatter";
+import { getToday, getYesterDay,getDaybeforeYesterday } from "../utils/dateFormatter";
 
 const headers = {
     'Content-Type': 'application/json',
@@ -82,12 +82,6 @@ export async function apiGetBankDepositInfo(){
     })
 }
 
-// export async function apiGetTerminalList(){
-//     return ApiServiceV2.fetchData({
-//         url: '/v21/get_AAPTerminal`',
-//         method: 'get',
-//     })
-// }
 
 
 export async function apiStoreBankDepositInfo(data){
@@ -175,9 +169,36 @@ export async function apiGetPettyCashRemainingBalance({uniqueId}){
     return response.data;
 }
 
+export  function apiGetTestCommonOpeningBalance({uniqueId,date}){
+  
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/common_opening_balance?input_date=${date}&key=${uniqueId}`;
+    return axios.get(url,{headers});
+}
+
+export function apiGetTestPettyCashCommonBalance({uniqueId,date}){
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_opening_balance?key=${uniqueId}&input_date=${date}`;
+    return axios.get(url,{headers});
+   
+}
+export  function apiGetTestRemainingCashBalance({uniqueId}){
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/common_remaining_balance?key=${uniqueId}`;
+    return axios.get(url,{headers});
+}
+export  function apiGetTestPettyCashRemainingBalance({uniqueId}){
+    let url = `${appConfig.apiPrefix}/v21/opening_balance/pettycash_remaining_balance?key=${uniqueId}`;
+    return axios.get(url,{headers});
+}
+
 export async function apiGetBookTypeServices(data) {
-    const {book_type,history_type,terminal_id,key} = data;
-    let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
+    const {book_type,history_type,terminal_id,key,fromDate,toDate} = data;
+    let hType = 0
+    let url ;
+    if(!fromDate && !toDate){
+        url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
+    }else {
+        url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${hType}&key=${key}&terminal_id=${terminal_id}&start_date=${fromDate}&end_date=${toDate}`;
+    }
+
     const response = await axios.get(url,{headers});
     return response;
 }
@@ -186,7 +207,7 @@ export async function apiGetDayBookExcelData(data) {
     const {terminal_id,key} = data;
     let book_type = "Day Transactions";
     let history_type = 0;
-    let startDate = getYesterDay();
+    let startDate = getDaybeforeYesterday();
     let endDate = getToday();
     // let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
     let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
@@ -222,6 +243,12 @@ export async function apiUploadDayBookExcel(data) {
 
 export async function apiGetTerminal(id){
     let url = `${appConfig.apiPrefix}/v21/master/get_Terminal?key=${id}`;
+    const response = await axios.get(url,{headers});
+    return response.data;
+}
+
+export async function apiGetPettyCashReason(id){
+    let url = `${appConfig.apiPrefix}/v21/master/get_PettyCashReason?key=${id}`;
     const response = await axios.get(url,{headers});
     return response.data;
 }

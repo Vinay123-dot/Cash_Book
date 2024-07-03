@@ -4,7 +4,7 @@ import CButton from "../../components/ui/Button";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import AntdTextArea from "../../components/ui/AntdTextArea";
-import { DaysArr } from "../../Constants";
+import { DaysArr, getStatusOfCurrentDate } from "../../Constants";
 import CustomizedTable from "../../components/ui/CustomizedTable";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -23,7 +23,7 @@ const initialValues = {
     date: null,
     balance: '',
     amount: '',
-    petty_cash_details: '',
+    petty_cash_details: null,
 };
 
 const columns = [
@@ -67,16 +67,21 @@ const PettyCashModal = (props) => {
     const [selectObjDetails, setSelectedObjDetails] = useState({
         showModal: false, selectedObj: {}
     })
+    const [selectedDate,setSelectedDate] = useState(null);
     const [showLoader,setShowLoader] = useState(false);
-    
-    // let cashPetty = useSelector(state => state.quickbookStore.state.pettyCashBalance);
+    let commonPettyCash = useSelector(state => state.quickbookStore.state.pettyCashBalance);
     let remPettyCash = useSelector(state => state.quickbookStore.state.pettyCashRemBal);
     const [remPettybal,setRemPettybal] = useState(remPettyCash);
+    const {
+        reasonsList,
+    } = useSelector(state => state.quickbookStore.state);
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(()=>{
-        setRemPettybal(remPettyCash);
-    },[remPettyCash])
+        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
+        let balanceTemp = (selectedDate === null || checkDateStatus ||selectedDate === "" ) ? remPettyCash : commonPettyCash;
+        setRemPettybal(balanceTemp);
+    },[remPettyCash,commonPettyCash,selectedDate])
 
     if (!showPettyCash) return null;
 
@@ -91,36 +96,21 @@ const PettyCashModal = (props) => {
             return ;
         }
         if(values.amount > remPettyCash) {
-            setFieldError("amount","Balance should not be morethan Remaining pettycash balance");
+            setFieldError("amount","Balance should not be morethan pettycash balance");
             return ;
         }
-        // if (isAllValuesPresent) {
-        //     setPettyCashArr((prev) => [...prev, values]);
-        //     // setErrors({});
-        //     // setTimeout(() => {
-        //     //     // resetForm();
-        //     //     // setFieldValue("date",null);
-        //     //     setFieldValue("balance","");
-        //     //     setFieldValue("amount","");
-        //     //     setFieldValue("petty_cash_details","");
-        //     //     setRemPettybal(values.balance);
-        //     // }, 0);
-            
-        //     setFieldError("petty_cash_details","");
-        //     setFieldValue("balance","");
-        //     setFieldValue("amount","");
-        //     setFieldValue("petty_cash_details","");
-        //     setFieldError("balance","");
-        //     setFieldError("amount","");
-        //     setRemPettybal(values.balance);
-        // }
+        let newTempObj = JSON.parse(JSON.stringify(values));
+        let findObj = (reasonsList || []).find((eachDoc) => eachDoc.Id == petty_cash_details);
+        newTempObj.petty_cash_details = findObj?.Type || ""; 
+
         if (isAllValuesPresent) {
-            setPettyCashArr((prev) => [...prev, values]);
+            setPettyCashArr((prev) => [...prev, newTempObj]);
             setErrors({});
+            setFieldValue("date",null);
             setFieldValue("balance","");
             setFieldValue("amount","");
-            setFieldValue("petty_cash_details","");
-            setRemPettybal(values.balance);
+            setFieldValue("petty_cash_details",null);
+            setRemPettybal(newTempObj.balance);
         }
 
     }
@@ -193,13 +183,9 @@ const PettyCashModal = (props) => {
             }}
             style={{ overflow: "auto" }}
         >
-            {({ setFieldValue,values ,errors,setFieldError}) => {
+            {({ setFieldValue,values }) => {
                 
                 values.balance = remPettybal - Number(values.amount);
-                if(values.petty_cash_details) {
-                    let reasonStng = values.petty_cash_details;
-                    values.petty_cash_details =  reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
-                }
                 return (
                     <Form>
                         <ParagraphTag label = "Details"/>
@@ -216,7 +202,9 @@ const PettyCashModal = (props) => {
                             name="date"
                             ph="--- Select Day ---"
                             value = {values["date"]}
-                            handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                            handleChange = {(date,dateString) => {setFieldValue("date",dateString);
+                                setSelectedDate(dateString)
+                            }}
                             />
                             {
                                 ShowInputBoxInPC("Amount", 'amount', "Enter Amount")
@@ -224,9 +212,14 @@ const PettyCashModal = (props) => {
                             {
                                 ShowInputBoxInPC("Remaing Amount", 'balance', "Enter Remaining Amount", true)
                             }
-                            {
-                                ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
-                            }
+                           
+                            <AntdFormikSelect
+                                labelText="Reason"
+                                name="petty_cash_details"
+                                ph="Select Reason"
+                                handleChange={(name, selectedValue) => setFieldValue(name,selectedValue)}
+                                Arr={reasonsList}
+                            />
                             
                             <div className="flex flex-col w-full md:w-60 py-7 mt-3">
                                 <CButton btnType="submit">

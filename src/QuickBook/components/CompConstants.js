@@ -223,15 +223,19 @@ const convertTONumbers = (newObj) => {
 //     }
 //     return error;
 // }
-const verifyInputField = (value, allValues, type) => {
+
+const getPaymentArr = (tempArr) => {
     const {
         paymentType0: P0, paymentType1: P1,
         paymentType2: P2, paymentType3: P3,
         paymentType4: P4, paymentType5: P5,
         paymentType6: P6, paymentType7: P7,
-    } = allValues;
-
-    let paymentTypeArr = [P0, P1, P2, P3, P4, P5, P6, P7];
+    } = tempArr;
+    return [P0, P1, P2, P3, P4, P5, P6, P7];
+}
+const verifyInputField = (value, allValues, type) => {
+    
+    let paymentTypeArr = getPaymentArr(allValues);
     let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 'This field is required' : 
                 paymentTypeArr.includes(selectedValType[type]) && value && value <=0 ? "Amount must be greater than zero" :
                 null;
@@ -239,15 +243,38 @@ const verifyInputField = (value, allValues, type) => {
 
 }
 
+const verifyInputTextField = (value, allValues, type) => {
+  
+    let paymentTypeArr = getPaymentArr(allValues);
+    let err = paymentTypeArr.includes(selectedValType[type]) && !value ? 'This field is required' : null;
+    return err;
+
+}
+
 const verifyUpiType = (value, allValues) => {
-    const {
-        paymentType0: P0, paymentType1: P1,
-        paymentType2: P2, paymentType3: P3,
-        paymentType4: P4, paymentType5: P5,
-        paymentType6: P6, paymentType7: P7,
-    } = allValues;
-    let paymentTypeArr = [P0, P1, P2, P3, P4, P5, P6, P7];
+    
+    let paymentTypeArr = getPaymentArr(allValues);
     let error = (paymentTypeArr.includes(UPI) && !value) ? 'This field is required' : null
+    return error;
+
+};
+
+const verifyUTRNum = (value, allValues) => {
+    
+    let paymentTypeArr = getPaymentArr(allValues);
+    let error = (paymentTypeArr.includes(BANK) && !value) ? 'This field is required' : null
+    return error;
+
+};
+
+const verifyChequeNum = (value, allValues) => {
+
+    const regex = /^[a-zA-Z0-9]+$/;
+    let paymentTypeArr = getPaymentArr(allValues);
+    let error = paymentTypeArr.includes(CHEQUE) ? 
+                !value ? 'This field is required' :
+                (value && !regex.test(value)) ? "Please give alphanumeric":null :null;
+
     return error;
 
 };
@@ -265,9 +292,12 @@ export {
     getConvertedObj,
     convertTONumbers,
     verifyInputField,
+    verifyInputTextField,
     verifyUpiType,
     verifyPaymentType,
     verifyReasonField,
     advanceModalConObj,
-    paymentCollectionConObj
+    paymentCollectionConObj,
+    verifyUTRNum,
+    verifyChequeNum
 };

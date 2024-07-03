@@ -7,6 +7,7 @@ import { DaysArr,selectedValType } from "../../../Constants";
 import { apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
 import { verifyInputField } from "../CompConstants";
 import ErrorModal from "../../../components/ui/ErrorModal";
+import amountFormatter from "../../../utils/amountFormatter";
 
 const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 
@@ -105,7 +106,7 @@ const AdvanceBillDetails = (props) => {
                 <div className="flex flex-col justify-between items-start px-4 py-2 lg:items-center  lg:flex-row">
                     <div className="flex flex-col">
                         <p className="text-start">Advance Receipt Amount</p>
-                        <p className="text-start">{values.remaining_balance}</p>
+                        <p className="text-start">{amountFormatter(values.remaining_balance || 0)}</p>
                     </div>
                     <div className="">
                         <p className="text-start">Customer Name</p>

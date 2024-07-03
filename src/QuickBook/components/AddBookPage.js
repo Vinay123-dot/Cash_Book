@@ -15,6 +15,7 @@ import {
   setShowUploadInvoice,
 } from '../store/stateSlice';
 import CButton from "../../components/ui/Button";
+import amountFormatter from "../../utils/amountFormatter";
 
 const { Option } = Select;
 const AddBookPage = (props) => {
@@ -41,7 +42,7 @@ const AddBookPage = (props) => {
   const handleCancelSelectedVal = () => {
     setSelectedValue(null);
     setShowBtnsForDBook(true);
-    getCommonOpeningBalance();
+    // getCommonOpeningBalance();
   };
 
 
@@ -98,15 +99,15 @@ const AddBookPage = (props) => {
         {
           userType == 7 && [2,4].includes(selectedValue) &&
           <div className="flex flex-col">
-            <h1 style={{ color: "#5A87B2" }}>Opening Balance</h1>
-            <p>{selectedValue === 4 ? pettyCash : bankBalance}</p>
+            <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Opening Balance</label>
+            <p className="text-2xl">{amountFormatter(selectedValue === 4 ? pettyCash : bankBalance)}</p>
           </div>
         }
         {
           userType == 7 && [2,4].includes(selectedValue) && 
           <div className="flex flex-col">
-            <h1 style={{ color: "#5A87B2" }}>Remaining Balance</h1>
-            <p>{selectedValue === 4 ? pettyCashRem : remainingOpeningBal}</p>
+            <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Remaining Balance</label>
+            <p className="text-2xl">{amountFormatter(selectedValue === 4 ? pettyCashRem : remainingOpeningBal)}</p>
           </div>
         }
         {

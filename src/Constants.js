@@ -1,4 +1,5 @@
 import { getToday,getYesterDay } from "./utils/dateFormatter";
+import moment from "moment";
 const Options = [
     {
       value: '1',
@@ -44,7 +45,7 @@ const DepositMode = [
   { name: 'Heade Office', id: 'dm1' }
 
 ]
-console.log("gd",getToday(),"yd",getYesterDay())
+
 const DaysArr = [
   { Type: 'Today', Id: getToday() },
   { Type: 'Yesterday', Id: getYesterDay() }
@@ -67,6 +68,11 @@ const PaymentsArray = [
 const UPIARRAY = [
   { name: 'Swinkpay', value: '0' },
 ];
+
+const ReturnType = [
+  { Type: 'Advance Receipt Cancel', Id: 1 },
+  { Type: 'Return Order', Id: 2 },
+]
 const UPI = "UPI";
 const CASH = "Cash";
 const BANK = "Bank";
@@ -92,5 +98,13 @@ const selectedValType = {
 
 const PERSIST_STORE_NAME = "quickBookRedux";
 
+const getStatusOfCurrentDate = (day) => {
+  let selectedDate = moment(day);
+  let currentDate = moment().startOf('day');
+  return selectedDate.isSame(currentDate, 'day') ? true : false;
+}
+
 export {Options,HeaderSelectOptions,DepositType,DepositMode,
-  PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY,selectedValType};
+  PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY,selectedValType,
+  getStatusOfCurrentDate,ReturnType
+};

@@ -22,7 +22,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { 
   apiGetBookTypeInfo, 
   apiGetDayInfo, 
-  apiGetTransactionHistory ,
   apiGetTerminal
 } from "../../services/TransactionService";
 import FileSaver from 'file-saver';
@@ -73,13 +72,13 @@ const QuickBookTools = () => {
   }
 
   const getOutletsList = async () => {
-    let options = {
-      Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
-    };
-    let newId = userType === 4 ? uniqueId : merchantId;
+    // let options = {
+    //   Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
+    // };
+    let newId = userType == 4 ? uniqueId : merchantId;
     let response = await apiGetTerminal(newId);
     dispatch(setAllTerminalsList(response || []));
-    setOutletList([options,...response] || []);
+    setOutletList(response || []);
   }
  
   const handleView = async () => {
@@ -133,14 +132,14 @@ const QuickBookTools = () => {
   const handleDateChange = (val) => {
     console.log("v",val)
     const newTableData = cloneDeep(tableData);
-    newTableData.historyType = val?.historyType;
+    newTableData.history_type = val?.historyType;
     newTableData.fromDate = val?.fromDate;
     newTableData.toDate = val?.toDate;
     newTableData.pageNumber = 0;
   // dispatch(setTransactions({ historyType: newTableData.historyType }))
     dispatch(setTableData(newTableData));
     const newFilterData = cloneDeep(filterData);
-    newFilterData.history_type = val;
+    newFilterData.history_type = val?.historyType;
     dispatch(setFilterData(newFilterData));
     setDurationErrMsg("");
   }
@@ -201,7 +200,7 @@ const QuickBookTools = () => {
     const newTableData = cloneDeep(payload);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
     let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
-    console.log("o",outletInStrng)
+
     let newObj = { 
       ...newTableData, 
       ...newFilterData,
@@ -211,36 +210,24 @@ const QuickBookTools = () => {
       terminal_id: userType == 7 ? uniqueId : outletInStrng?.Terminal,
       key: uniqueId
       }
-      console.log("Obj",newObj)
+    
       getTransactionHistory(newObj);
   }
 
-  // const getTransactionHistory = async (allData) => {
-  //   const {book_type,history_type} = allData;
-  //   const tId = userType == 4 ? 0 : uniqueId;
-  //   dispatch(setTransactionsLoading(true));
-  //   console.log("STARt")
-  //   let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
-   
-  //   const link = document.createElement('a');
-  //   link.href = url;
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  //   dispatch(setTransactionsLoading(false));
-  //   // setTimeout(() => dispatch(setTransactionsLoading(false)), 12000);
-
-  
-  // };
-
   const getTransactionHistory = async (allData) => {
-    const { book_type, history_type } = allData;
+    const { book_type, history_type,fromDate,toDate } = allData;
     let sendingTId = allData.terminal_id === "ALL" ? 0 : allData.terminal_id;
     const tId = userType == 4 ? sendingTId : uniqueId;
     // Enable loading state
     dispatch(setTransactionsLoading(true));
-
-    let url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
+    let url;
+    if(fromDate && toDate) {
+      let hType = 0;
+      url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${hType}&key=${uniqueId}&terminal_id=${tId}&start_date=${fromDate}&end_date=${toDate}`;
+    }else{
+      url = `${appConfig.apiPrefix}/v21/book_type/download_book?book_type=${book_type}&history_type=${history_type}&key=${uniqueId}&terminal_id=${tId}`;
+    }
+  
 
     try {
         const response = await fetch(url);
@@ -295,8 +282,8 @@ const QuickBookTools = () => {
   }
 
   return (
-    <div className="xl:flex justify-between py-4 px-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4  mb-10 md:mb-2">
+    <div className="xl:flex justify-between py-2 px-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2  md:mb-2">
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"
@@ -308,16 +295,18 @@ const QuickBookTools = () => {
         </div>
 
         <div className="flex flex-col">
-          {/* <QuickBookStatusFilter
+          <QuickBookStatusFilter
             onDateChange= {handleDateChange}
-          /> */}
-          <AntdSelectFilter
+            message = {durationErrMsg}
+            options={daysList}
+          />
+          {/* <AntdSelectFilter
             placeholder="Select Duration"
             options={daysList}
             onStatusChange={handleTimeperiodChange}
             value = {filterData.history_type}
             message = {durationErrMsg}
-          />
+          /> */}
         </div>
         {
           userType === "4" &&
@@ -363,35 +352,3 @@ const QuickBookTools = () => {
 }
 
 export default QuickBookTools;
-
-
-  // const handleDownload = async () => {
-  //   const payload1 = cloneDeep(tableData)
-  //   const payload2 = cloneDeep(filterData)
-  //   const payload3 = cloneDeep(outletData)
-  //   const payload = { ...payload1, ...payload2, ...payload3 }
-  //   if (payload?.historyType <= 0) {
-  //     setMessage('Please select duration')
-  //     return
-  //   }
-  //   payload.recordsPerPage = -1
-  //   payload.pageNumber = 0
-  //   await getTransactionHistory(payload)
-  // }
-
-  // const handleDownload = async () => {
-  //   const payload = cloneDeep(tableData);
-  //   console.log("pp",payload)
-  
-  //   // if (payload?.historyType <= 0) {
-  //   //     setMessage('Please select duration')
-  //   //     return
-  //   // }
-  //   const newTableData = cloneDeep(payload);
-  //   const newFilterData = cloneDeep(filterData);
-  //   const newCashBookData = cloneDeep(cashbookData);
-  //   // const newOutletData = cloneDeep(outletData);
-  //   let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
-  //   getTransactionHistory({ ...newTableData, ...newFilterData,...newCashBookData,book_type:bookTypeInStrng?.Type})
-
-  // }

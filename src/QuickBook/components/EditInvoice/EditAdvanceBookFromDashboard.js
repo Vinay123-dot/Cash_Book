@@ -24,6 +24,7 @@ import Modal from "../../../components/shared/Modal";
 import { getToday } from "../../../utils/dateFormatter";
 import AntdDaySelect from "../../../components/ui/AntdDaySelect";
 import AntdDatePicker from "../../../components/ui/AntdDatePicker";
+import ErrorModal from "../../../components/ui/ErrorModal";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -50,6 +51,9 @@ const EditAdvBookFromDashboard = (props) => {
     const [showBillModal, setShowBillModal] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
     const [validateModal, setValidateModal] = useState(true);
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
     let uniqueId = localStorage.getItem("uniqueId");
 
 
@@ -74,47 +78,36 @@ const EditAdvBookFromDashboard = (props) => {
 
             let response = await apiStoreAdvancedBookInfo([convertedObj]);
             if (response.status === 200) {
+                setEModal({
+                    eMessage : "",
+                    show : false
+                })
                 handleCloseEditModal();
                 setValidateModal(true);
                 dispatch(setDataSavedModal(true));
             }
             setShowLoader(false);
-        } catch (e) {
+        } catch (Err) {
             setShowLoader(false);
+            setEModal({
+                eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
+                show : true
+            })
             setValidateModal(true);
         }
-    }
-
-    const validateInputField = (value, allValues, type) => verifyInputField(value, allValues, type);
-
-    const handleChangeSalesType = (name, sValue, setFieldValue, sArr) => {
-        setFieldValue(name, sValue);
-        let salesObj = sArr.find((eachDoc) => eachDoc.Id === sValue);
-        setFieldValue("sales_code", salesObj?.Code || "");
-        let temp = [];
-        if (sValue == 1) {
-            temp = paymentTypeInfo.filter((eachDoc) => eachDoc.Id != 4);
-        } else {
-            temp = JSON.parse(JSON.stringify(paymentTypeInfo));
-        }
-    }
-
-    const getCustomerList = (listArr, allObj) => {
-        const { sales_type } = allObj;
-        let cType;
-        if (sales_type != 1) {
-            cType = listArr.filter((eachDoc) => eachDoc.Id != 3);
-        } else {
-            cType = [...listArr];
-        }
-        return cType;
-
     }
 
     const removeFeilds = (pArr) => {
         let temp = [];
         temp = (pArr || []).filter((eachDoc)=> ![7,8].includes(eachDoc.Id));
         return temp;
+    }
+
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
     }
 
 
@@ -199,6 +192,10 @@ const EditAdvBookFromDashboard = (props) => {
                                     </CButton>
                                     <CButton onClick={() => {
                                         handleCloseEditModal();
+                                        setEModal({
+                                            eMessage : "",
+                                            show : false
+                                        })
                                         // dispatch(setShowAddBookPage(false))
                                     }} type="cancel"
                                     >
@@ -211,6 +208,9 @@ const EditAdvBookFromDashboard = (props) => {
                     }}
                 </Formik>
                 <Loader showLoading={showLoader} />
+                { 
+                    eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
+                }
 
             </>
 

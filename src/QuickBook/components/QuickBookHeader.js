@@ -14,10 +14,13 @@ import {
 } from '../store/stateSlice';
 import SucessIcon from "../../assets/SucessIcon.png";
 import { 
+    apiGetTestCommonOpeningBalance, apiGetTestRemainingCashBalance,
+    apiGetTestPettyCashCommonBalance,apiGetTestPettyCashRemainingBalance,
     apiGetCommonOpeningBalance, apiGetRemainingCashBalance,
     apiGetPettyCashCommonBalance,apiGetPettyCashRemainingBalance
 } from "../../services/TransactionService";
 import { getToday,getTomorrowDate } from "../../utils/dateFormatter";
+import amountFormatter from "../../utils/amountFormatter";
 
 const Header = () => {
 
@@ -26,6 +29,9 @@ const Header = () => {
         dataSavedModalOpen,showAddBookPage,commonCashBanalce,
         remainingCommonBalance
     } = useSelector(state => state.quickbookStore.state);
+    const [allBalance,setAllBalance] = useState({
+        mainBalance : 0 ,remBankBalance : 0
+    })
     let userType = localStorage.getItem("mType");
     let uniqueId = localStorage.getItem("uniqueId");
   
@@ -34,27 +40,64 @@ const Header = () => {
      
     },[userType])
 
+    useEffect(() => {
+        setAllBalance({
+            mainBalance : commonCashBanalce,
+            remBankBalance : remainingCommonBalance
+        })
+    },[commonCashBanalce,remainingCommonBalance])
+
    
 
     const getBankBalance = async() => {
         try{
             dispatch(setMainPageLoader(true));
             const [openingBal,remBalance,pettyOpBal,pettyRembal] = await Promise.all([
-                apiGetCommonOpeningBalance({uniqueId,date:getToday()}),
-                apiGetRemainingCashBalance({uniqueId,date:getToday()}),
-                apiGetPettyCashCommonBalance({ uniqueId,date: getToday()}),
-                apiGetPettyCashRemainingBalance({ uniqueId, date: getToday() })
+                 apiGetTestCommonOpeningBalance({uniqueId,date:getToday()}),
+                apiGetTestRemainingCashBalance({uniqueId,date:getToday()}),
+                apiGetTestPettyCashCommonBalance({ uniqueId,date: getToday()}),
+                apiGetTestPettyCashRemainingBalance({ uniqueId, date: getToday() })
             ]);
-            dispatch(setCommonCashBalance(openingBal?.opening_balance));
-            dispatch(setRemainingCommonBalance(remBalance?.opening_balance));
-            dispatch(setPettyCashBalance(pettyOpBal?.opening_balance));
-            dispatch(setPettyCashRemainingBalance(pettyRembal?.opening_balance));
+            dispatch(setCommonCashBalance(openingBal?.data?.opening_balance));
+            dispatch(setRemainingCommonBalance(remBalance?.data?.opening_balance));
+            dispatch(setPettyCashBalance(pettyOpBal?.data?.opening_balance));
+            dispatch(setPettyCashRemainingBalance(pettyRembal?.data?.opening_balance));
+            setAllBalance({
+                mainBalance : openingBal?.data?.opening_balance,
+                remBankBalance : remBalance?.data?.opening_balance
+            })
             dispatch(setMainPageLoader(false));
         }catch(e){
             dispatch(setMainPageLoader(false));
         }
         
     }
+
+    // const getBankBalance = async() => { //This one with async/await from api also
+    //     try{
+    //         dispatch(setMainPageLoader(true));
+    //         const [openingBal,remBalance,pettyOpBal,pettyRembal] = await Promise.all([
+    //              apiGetCommonOpeningBalance({uniqueId,date:getToday()}),
+    //             apiGetRemainingCashBalance({uniqueId,date:getToday()}),
+    //             apiGetPettyCashCommonBalance({ uniqueId,date: getToday()}),
+    //             apiGetPettyCashRemainingBalance({ uniqueId, date: getToday() })
+    //         ]);
+    //         console.log("opem",openingBal)
+    //         dispatch(setCommonCashBalance(openingBal?.opening_balance));
+    //         dispatch(setRemainingCommonBalance(remBalance?.opening_balance));
+    //         dispatch(setPettyCashBalance(pettyOpBal?.opening_balance));
+    //         dispatch(setPettyCashRemainingBalance(pettyRembal?.opening_balance));
+    //         setAllBalance({
+    //             mainBalance : openingBal?.opening_balance,
+    //             remBankBalance : remBalance?.opening_balance
+    //         })
+    //         dispatch(setMainPageLoader(false));
+    //     }catch(e){
+    //         dispatch(setMainPageLoader(false));
+    //     }
+        
+    // }
+   
    
     const handleClickInHeader = () => {
         dispatch(setDataSavedModal(false));
@@ -65,14 +108,14 @@ const Header = () => {
         <>
             {
                 userType === "7" && <div className="flex flex-col lg:ml-32 xl:ml-0">
-                    <label className="text-lg font-medium tracking-wide mb-1 opBalance">Opening Balance</label>
-                    <h4 className="text-2xl">₹{commonCashBanalce}</h4>
+                    <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Opening Balance</label>
+                    <p className="text-2xl">{amountFormatter(allBalance.mainBalance)}</p>
                 </div>
             }
             {
                 userType === "7" && <div className="flex flex-col lg:ml-32 xl:ml-0">
-                    <label className="text-lg font-medium tracking-wide mb-1 opBalance">Remaining Balance</label>
-                    <h4 className="text-2xl">₹{remainingCommonBalance}</h4>
+                    <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Remaining Balance</label>
+                    <h4 className="text-2xl">{amountFormatter(allBalance.remBankBalance)}</h4>
                 </div>
             }
             {

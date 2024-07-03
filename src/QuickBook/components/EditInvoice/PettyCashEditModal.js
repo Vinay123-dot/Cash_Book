@@ -4,7 +4,7 @@ import CButton from "../../../components/ui/Button";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import AntdTextArea from "../../../components/ui/AntdTextArea";
-import { DaysArr } from "../../../Constants";
+import { DaysArr,getStatusOfCurrentDate } from "../../../Constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setShowAddBookPage,
@@ -20,20 +20,6 @@ import AntdDatePicker from "../../../components/ui/AntdDatePicker/AntdDatePicker
 
 
 
-const ShowInputBoxInPC = (
-    label, value, ph, disableInput = false,
-    isShowPrefix = true, showOnlyNumbers = true
-) => (
-    <AntdInput
-        text={label}
-        value={value}
-        ph={ph}
-        disableInput={disableInput}
-        showPrefix={isShowPrefix}
-        acceptOnlyNum={showOnlyNumbers}
-    />
-)
-
 const ShowTextBoxInPC = (label, value, ph) => (
     <AntdTextArea
         text={label}
@@ -45,19 +31,17 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashEditModal = (props) => {
 
-    const {handleCancelPettyCash ,selectedPettyCashObj} = props;
     const dispatch = useDispatch();
-    const editFormikRef = useRef();
-
-    const [pettyCashArr, setPettyCashArr] = useState([]);
-    const [selectObjDetails, setSelectedObjDetails] = useState({
-        showModal: false, selectedObj: {}
-    })
+    const {handleCancelPettyCash ,selectedPettyCashObj} = props;
     const [showLoader, setShowLoader] = useState(false);
+    const [selectedDate,setSelectedDate] = useState(selectedPettyCashObj?.date || null);
     const {
         pettyCashBalance : pettyCash,
         pettyCashRemBal : remPettyCash,
       } = useSelector(state => state.quickbookStore.state);
+    const {
+        reasonsList,
+    } = useSelector(state => state.quickbookStore.state);
     const [remPettybal, setRemPettybal] = useState(remPettyCash);
     const [eModal,setEModal] = useState({
         eMessage : "",show : false
@@ -65,23 +49,29 @@ const PettyCashEditModal = (props) => {
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
-        setRemPettybal(remPettyCash);
-    }, [remPettyCash])
+        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
+        let balanceTemp = (selectedDate === null || checkDateStatus ||selectedDate === "" ) ? remPettyCash : pettyCash;
+        setRemPettybal(balanceTemp);
+    }, [remPettyCash,pettyCash,selectedDate])
 
     const handleSubmit = async (values) => {
         try {
             values.amount = Number(values.amount);
             values.key = uniqueId;
-            console.log("VALUESIN EDIT",values)
             if(values.amount > remPettyCash) {
                 setEModal({
-                    eMessage : "Given amount should be less than or equal to the remaining pettycash balance",
+                    eMessage : "Given amount should be less than or equal to the pettycash balance",
                     show : true
                 })
                 return ;
             }
             setShowLoader(true);
-            let response = await apiStorePettyCashInfo([values]);
+
+            let newTempObj = JSON.parse(JSON.stringify(values));
+            let findObj = (reasonsList || []).find((eachDoc) => eachDoc.Id == values.petty_cash_details);
+            newTempObj.petty_cash_details = findObj?.Type || ""; 
+
+            let response = await apiStorePettyCashInfo([newTempObj]);
             if (response.message) {
                 handleCancelPettyCash();
                 dispatch(setDataSavedModal(true));
@@ -120,10 +110,6 @@ const PettyCashEditModal = (props) => {
                 >
                     {({ setFieldValue, values }) => {
                         values.balance = (remPettybal + Number(selectedPettyCashObj.amount)) - Number(values.amount);
-                        if (values.petty_cash_details) {
-                            let reasonStng = values.petty_cash_details;
-                            values.petty_cash_details = reasonStng.charAt(0).toUpperCase() + reasonStng.slice(1);
-                        }
                         return (
                             <Form>
                                 <ParagraphTag label="Edit Details" />
@@ -133,7 +119,10 @@ const PettyCashEditModal = (props) => {
                                         name="date"
                                         ph="--- Select Day ---"
                                         value = {values["date"]}
-                                        handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                                        handleChange = {(date,dateString) => {
+                                            setFieldValue("date",dateString);
+                                            setSelectedDate(dateString);
+                                        }}
                                     />
                                     <AntdInput
                                         text="Amount"
@@ -150,9 +139,13 @@ const PettyCashEditModal = (props) => {
                                         acceptOnlyNum={true}
                                         disableInput={true}
                                     />
-                                    {
-                                        ShowTextBoxInPC("Reason", "petty_cash_details", "Enter Reason")
-                                    }
+                                    <AntdFormikSelect
+                                        labelText="Reason"
+                                        name="petty_cash_details"
+                                        ph="Select Reason"
+                                        handleChange={(name, selectedValue) => setFieldValue(name,selectedValue)}
+                                        Arr={reasonsList}
+                                    />
                                 </div>
 
                                 <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">

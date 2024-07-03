@@ -18,6 +18,7 @@ const stateSlice = createSlice({
         bookTypeList : [],
         dayInfoList : [],
         outletsList : [],
+        reasonsList : [],
         depositModeList : [],
         depositTypeList : [],
         paymentTypeInfo : [],
@@ -69,6 +70,9 @@ const stateSlice = createSlice({
         setOutletsList : (state,action) => {
             state.outletsList = action.payload;
         },
+        setReasonsList : (state,action) => {
+            state.reasonsList = action.payload;
+        },
         setDepositModeArray : (state,action) => {
             state.depositModeList = action.payload;
         },
@@ -114,6 +118,7 @@ export const {
     setBookTypeList,
     setDayInfoList,
     setOutletsList,
+    setReasonsList,
     setDepositTypeArray,
     setDepositModeArray,
     setPaymentTypeInfo,

@@ -4,7 +4,7 @@ import CButton from "../../../components/ui/Button";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import AntdTextArea from "../../../components/ui/AntdTextArea";
-import { DaysArr } from "../../../Constants";
+import { DaysArr,getStatusOfCurrentDate,ReturnType } from "../../../Constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setDataSavedModal,
@@ -27,9 +27,8 @@ const ShowTextBoxInPC = (label, value, ph) => (
     />
 )
 const statusArr = ["Partially Refunded", "Invoiced", "ORDERCANCEL", ""];
-
+const checkArr = ["",null];
 const BankDepositEditModal = (props) => {
-
     
     const dispatch = useDispatch();
     const { handleCloseEditModal, editDayBookObj } = props;
@@ -48,17 +47,21 @@ const BankDepositEditModal = (props) => {
     const [eModal, setEModal] = useState({
         eMessage: "", show: false
     })
+    const [selectedDate,setSelectedDate] = useState(editDayBookObj.date || null);
+    // const [selectedType,setSelectedType] = useState(editDayBookObj.type || null);
     let uniqueId = localStorage.getItem("uniqueId");
 
     useEffect(() => {
-        setRemBankbal(remainingOpeningBal);
-    }, [remainingOpeningBal])
+        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
+        let balanceTemp = (checkArr.includes(selectedDate)|| checkDateStatus ) && editDayBookObj.type !== 2 ? remainingOpeningBal : bankBalance;
+        setRemBankbal(balanceTemp);
+    }, [bankBalance,remainingOpeningBal,selectedDate])
 
     const handleSubmit = async (values) => {
         try {
             values.amount = Number(values.amount);
             values.key = uniqueId;
-            if(values.amount > remainingOpeningBal) {
+            if(values.remaining_balance < 0) {
                 setEModal({
                     eMessage : "Given amount should be less than or equal to the remaining opening balance",
                     show : true
@@ -78,6 +81,7 @@ const BankDepositEditModal = (props) => {
     }
 
     const handleChangeType = (name, val, setFieldValue) => {
+        // setSelectedType(val);
         setFieldValue(name, val);
         setFieldValue("date", null);
         setFieldValue("deposit_mode", null);
@@ -136,7 +140,7 @@ const BankDepositEditModal = (props) => {
         });
         return tempArr;
     }
-    console.log("ee",editDayBookObj)
+
     return (
         <Modal openModal={true} ai={null} height={"90%"} width={"60%"}>
             <>
@@ -155,7 +159,7 @@ const BankDepositEditModal = (props) => {
                         return (
                             <Form>
                                 <ParagraphTag label="Edit Details" />
-                                <div className="grid grid-cols-1 gap-10 px-4 py-2  md:grid-cols-2">
+                                <div className="grid grid-cols-1 gap-5 px-4 py-2  md:grid-cols-2">
                                     <AntdFormikSelect
                                         labelText="Type"
                                         name="type"
@@ -166,19 +170,14 @@ const BankDepositEditModal = (props) => {
                                     />
                                     {
                                         values.type != null &&
-                                        // <AntdFormikSelect
-                                        //     labelText="Day"
-                                        //     name="date"
-                                        //     ph="--- Select Day ---"
-                                        //     handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                        //     Arr={DaysArr}
-                                        // />
                                         <AntdDatePicker
                                         labelText="Day"
                                         name="date"
                                         ph="--- Select Day ---"
                                         value = {values["date"]}
-                                        handleChange = {(date,dateString) => setFieldValue("date",dateString)}
+                                        handleChange = {(date,dateString) => {
+                                            setFieldValue("date",dateString);
+                                            setSelectedDate(dateString)}}
                                     />
                                     }
                                     {
@@ -215,8 +214,17 @@ const BankDepositEditModal = (props) => {
                                         />
                                     }
                                     {
-                                        values.type != null && [3].includes(values.type) &&
-                                        <>
+                                        values.type != null && values.type === 3 && 
+                                        <AntdFormikSelect
+                                            labelText="Receipt Type"
+                                            name="return_type"
+                                            ph="--- Select Receipt Type---"
+                                            handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                            Arr={ReturnType}
+                                        />
+                                    }
+                                    {
+                                        values.type != null && [3].includes(values.type) && values.return_type === 1 && 
                                             <div className="flex">
                                                 <AntdInput
                                                     text="Receipt Number"
@@ -232,39 +240,37 @@ const BankDepositEditModal = (props) => {
                                                     Verify
                                                 </CButton>
                                             </div>
-                                            {
-                                                !statusArr.includes(values.receipt_status) && <>
-
-                                                    <AntdInput
-                                                        text="Receipt Amount"
-                                                        value='amount'
-                                                        ph="Enter Remaining Balance"
-                                                        showPrefix={true}
-                                                        acceptOnlyNum={true}
-                                                    />
-                                                    <AntdInput
-                                                        text="Bill Number"
-                                                        value='bill_number'
-                                                        ph="Bill Number"
-                                                    />
-                                                    <AntdFormikSelect
-                                                        labelText="Store Id"
-                                                        name="store_id"
-                                                        ph="--- Select StoreId---"
-                                                        handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                                        Arr={allTerminalList}
-                                                    />
-                                                </>
-                                            }
-
-                                        </>
                                     }
-
-
                                     {
-                                        values.type === 3 && !statusArr.includes(values.receipt_status) &&
+                                values.type === 3 && values.return_type !== null &&
+                                (values.return_type === 2 || !statusArr.includes(values.receipt_status)) &&
+                                <>
+                                 <AntdInput
+                                        text="Receipt Amount" 
+                                        value='amount'
+                                        ph="Enter Remaining Balance"
+                                        showPrefix={true}
+                                        acceptOnlyNum={true}
+                                        disableInput = {values.return_type === 1}
+                                        
+                                    />
+                                    <AntdInput
+                                        text="Bill Number"
+                                        value='bill_number'
+                                        ph="Bill Number"
+                                    />
+                                    <AntdFormikSelect
+                                        labelText="Store Id"
+                                        name="store_id"
+                                        ph="--- Select StoreId---"
+                                        handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
+                                        Arr={allTerminalList}
+                                    />
+                                    {
                                         ShowTextBoxInPC("Reason", 'reason', "Enter Reason")
                                     }
+                                </>
+                            }
 
                                 </div>
 
