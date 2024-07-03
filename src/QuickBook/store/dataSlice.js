@@ -31,8 +31,10 @@ export const initialTableData = {
     // sort: 1,
     book_type : 0,
     terminal_id : -1,
-    fromDate: getFromDate(),
-    toDate: getToDate(),
+    // fromDate: getFromDate(),
+    // toDate: getToDate(),
+    fromDate: "",
+    toDate: "",
 }
 
 export const initialFilterData = {

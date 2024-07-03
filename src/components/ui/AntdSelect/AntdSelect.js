@@ -6,7 +6,7 @@ const {Option} = Select;
 
 const AntdSelectFilter = (props) => {
 
-    const { onStatusChange,placeholder,options,value:selectedValue,message ="" } = props;
+    const { onStatusChange,placeholder,options,value:selectedValue,message ="",customData = null } = props;
 
     const onStatusFilterChange = (value) => onStatusChange?.(value);
 
@@ -37,9 +37,12 @@ const AntdSelectFilter = (props) => {
                             </Option>
                 ))}
             </Select>
-            <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} >
-                { message? message :(selectedFilter?.label || selectedFilter?.Type)}
-            </span>
+            {
+                customData ? <span className="text-blue-400 text-base font-normal ml-2">{customData}</span> :
+                message  ?  <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} >{message}</span> :
+                <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} > {(selectedFilter?.label || selectedFilter?.Type)}</span>
+            }
+         
         </>
     )
 }

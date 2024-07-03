@@ -265,6 +265,7 @@ const DataTable = forwardRef((props, ref) => {
                                                     style={{
                                                         width : 120,
                                                         textAlign : 'center',
+                                                        wordWrap: 'break-word',
                                                     }}
                                                 >
                                                     {flexRender(

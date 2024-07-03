@@ -1,0 +1,26 @@
+/* customStyles.css */
+/* customStyles.css */
+.custom-calendar .ant-picker-panel-container,
+.custom-calendar .ant-picker-content {
+  height: auto; /* Let the content define the height */
+  max-height: 300px; /* Adjust this value as needed */
+  overflow: hidden; /* Prevent overflow */
+}
+
+.custom-calendar .ant-picker-body {
+  height: 300px; /* Adjust this value as needed */
+  max-height: 300px; /* Adjust this value as needed */
+  overflow-y: auto; /* Add scroll if the content exceeds the height */
+}
+
+.custom-calendar .ant-picker-cell-inner {
+  height: 24px; /* Adjust this value as needed */
+  line-height: 24px; /* Adjust line height to center text */
+}
+
+/* .custom-calendar .ant-picker-header,
+.custom-calendar .ant-picker-footer {
+  display: none; 
+} */
+
+  

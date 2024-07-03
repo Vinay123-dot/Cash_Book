@@ -6,7 +6,15 @@ import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useFormikContext } from 'formik';
 import { AiOutlineDelete } from "react-icons/ai";
-import { verifyInputField, verifyPaymentType, verifyReasonField, verifyUpiType } from "../CompConstants";
+import { 
+    verifyInputField, 
+    verifyPaymentType, 
+    verifyReasonField, 
+    verifyUpiType,
+    verifyInputTextField,
+    verifyUTRNum,
+    verifyChequeNum
+ } from "../CompConstants";
 import { 
     UPI,CASH,BANK,CHEQUE,CREDITCARD,DEBITCARD,PAYMENTGATEWAY,REFERENCEORDER 
 } from "../CompConstants";
@@ -21,8 +29,14 @@ const CashTypes = (props) => {
     const validateUpiType = (value, allValues) => verifyUpiType(value, allValues);
 
     const validateInputField = (value, allValues, type) => verifyInputField(value, allValues, type);
+
+    const validateInputTextField = (value, allValues, type) => verifyInputTextField(value, allValues, type);
     
     const validateReasonField = (value,allValues) => verifyReasonField(value,allValues);
+
+    const validateUTRNumber = (value, allValues) => verifyUTRNum(value, allValues);
+
+    const validateChequeNum = (value, allValues) => verifyChequeNum(value, allValues);
     
     const handleSetFieldData = (name, selectedValue,valObj) => {
         let existedType = valObj?.[name] || null;
@@ -67,7 +81,7 @@ const CashTypes = (props) => {
    const handleSetUPIData = (name,selectedVal) => setFieldValue(name,selectedVal);
     
 
-    const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
+    const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true,mLen) => {
         return (
             <AntdInput
                 text={txt}
@@ -77,6 +91,7 @@ const CashTypes = (props) => {
                 acceptOnlyNum={onlyNum}
                 validation={validation}
                 validateField={(value) => func(value, values, val)}
+                maxLen = {mLen}
             />
         )
     }
@@ -215,11 +230,11 @@ const CashTypes = (props) => {
                                 showInputBox("Enter Amount", 'online_bank_amount', "Amount", validateInputField, valObj)
                             }
                             {
-                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateInputField, valObj, true, false, false)
+                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateUTRNumber, valObj, true, false, true,16)
                             }
                             <div className="col-span-3  flex flex-row relative items-center">
                                 {
-                                    showInputBox("Bank Name", "online_bank_name", "Bank Name", validateInputField, valObj, true, false, false)
+                                    showInputBox("Bank Name", "online_bank_name", "Bank Name", validateInputTextField, valObj, true, false, false)
                                 }
                                 {
                                     index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -235,11 +250,11 @@ const CashTypes = (props) => {
                                 showInputBox("Amount", "bank_cheque_amount", "Amount", validateInputField, valObj)
                             }
                             {
-                                showInputBox("Cheque Number", "bank_cheque_no", "Cheque Number", validateInputField, valObj, true, false, false)
+                                showInputBox("Cheque Number", "bank_cheque_no", "Cheque Number", validateChequeNum, valObj, true, false, false)
                             }
                             <div className="col-span-3  flex flex-row relative items-center">
                                 {
-                                    showInputBox("Bank", "bank_cheque_name", "Bank Name", validateInputField, valObj, true, false, false)
+                                    showInputBox("Bank", "bank_cheque_name", "Bank Name", validateInputTextField, valObj, true, false, false)
                                 }
                                 {
                                     index !== 0 && showDeleteIcon(eachItem,valObj)

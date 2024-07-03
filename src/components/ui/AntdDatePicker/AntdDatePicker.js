@@ -4,9 +4,10 @@ import { Field, ErrorMessage } from "formik";
 import moment from "moment";
 import dayjs from "dayjs";
 import {dateFormat } from "../../../Constants";
+import './customStyles.css';
 
 const AntdDatePicker = (props) => {
-  const { error,ph,labelText,name,handleChange,isFromAdvance = false } = props;
+  const { error,ph,labelText,name,handleChange,isFromAdvance = false,value } = props;
 
   const disabledDate = (current) => {
     const today = moment().startOf('day');
@@ -22,26 +23,16 @@ const AntdDatePicker = (props) => {
   return (
     <div className="flex flex-col w-full md:w-60 mt-1">
       <label htmlFor={"test"} className="text-start mb-3">{labelText}</label>
-
-
-      <Field
-        name={name}
-        error={error}
-      >
-        {({ field, form }) => {
-          return (
-            <DatePicker
-              {...field}
-              id={name}
-              format={dateFormat}
-              disabledDate={isFromAdvance ? disabledDateForABModal :disabledDate}
-              value={field?.value ? dayjs(field.value, dateFormat) : null}
-              onChange={(date, dateString) => handleChange(date, dateString)}
-              placeholderText={ph}
-            />
-          )
-        }}
-      </Field>
+      <DatePicker
+        id={name}
+        format={dateFormat}
+        disabledDate={isFromAdvance ? disabledDateForABModal : disabledDate}
+        value={value ? dayjs(value, dateFormat) : null}
+        onChange={handleChange}
+        placeholderText={ph}
+        popupClassName="custom-calendar"
+        
+      />
       <ErrorMessage name={name} component="div" style={{ color: 'red' }} className="text-start" />
     </div>
 
