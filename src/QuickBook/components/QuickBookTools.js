@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {Input, message } from 'antd';
 import CButton from "../../components/ui/Button";
 import AntdSelectFilter from "../../components/ui/AntdSelect/AntdSelect";
 import { viewBtnPrefix, dwnBtnPrefix, searchPrefix } from "../../Prefixes/QuickBookToolsPrefix";
-import useTransactionUpdate from "../../utils/hooks/useTransactionUpdate";
 import {
   setTableData,
   setFilterData,
@@ -13,19 +11,8 @@ import {
   setTransactionsLoading,
   setTransactionArray
 } from '../store/dataSlice';
-import {
-  setBookTypeList,
-  setAllTerminalsList
-} from '../store/stateSlice';
 import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
-import { 
-  apiGetBookTypeInfo, 
-  apiGetDayInfo, 
-  apiGetTerminal
-} from "../../services/TransactionService";
-import FileSaver from 'file-saver';
-import { getFormatDate} from "../../utils/dateFormatter"
 import appConfig from "../../configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
 
@@ -43,43 +30,20 @@ const QuickBookTools = () => {
   const outletData = useSelector((state) => state.quickbookStore.data.outletData);
   const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
   const bookTypeList = useSelector((state) => state.quickbookStore.state.bookTypeList);
+  const { 
+    dayInfoList,
+    allTerminalList
+  } = useSelector(state => state.quickbookStore.state);
   let userType = localStorage.getItem("mType");
   let uniqueId = localStorage.getItem("uniqueId");
   let merchantId = localStorage.getItem("mId");
 
 
   useEffect(() => {
-    getOutletsList();
-    getBookTypeInfo();
-    getDayInfo();
-  }, [userType]);
+    setDaysList(dayInfoList || []);
+    setOutletList(allTerminalList || []);
+  }, [dayInfoList,allTerminalList]);
 
-
-
-  
-  const getBookTypeInfo = async() => {
-    try{
-      let response = await apiGetBookTypeInfo();
-      dispatch(setBookTypeList(response?.data || []));
-    }catch(e){}
-  }
-  
-  const getDayInfo = async() => {
-    try{
-      let response = await apiGetDayInfo();
-      setDaysList(response?.data || []);
-    }catch(e){}
-  }
-
-  const getOutletsList = async () => {
-    // let options = {
-    //   Branch_Name : "ALL",Id : 0,Mobile_No : "91-9999999999",Sequence_No : "000",Terminal : "ALL"
-    // };
-    let newId = userType == 4 ? uniqueId : merchantId;
-    let response = await apiGetTerminal(newId);
-    dispatch(setAllTerminalsList(response || []));
-    setOutletList(response || []);
-  }
  
   const handleView = async () => {
     const payload = cloneDeep(tableData);

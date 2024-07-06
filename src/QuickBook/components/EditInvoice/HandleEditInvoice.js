@@ -25,6 +25,7 @@ const HandleEditInvoice = (props) => {
         allTerminalList,
         depositTypeList,
         depositModeList,
+        reasonsList
     } = useSelector(state => state.quickbookStore.state);
 
 
@@ -40,6 +41,11 @@ const HandleEditInvoice = (props) => {
             amount: pObj.Amount || null,
             petty_cash_details: pObj.Petty_Cash_Details || '',
         }
+        if (typeof newTemp.petty_cash_details === 'string') {
+            let findedObj = (reasonsList || []).find((eachItem) => eachItem.Type === newTemp.petty_cash_details);
+            newTemp.petty_cash_details = findedObj?.Id || null;
+        } 
+        
         return newTemp;
     }
 
@@ -167,7 +173,7 @@ const HandleEditInvoice = (props) => {
                 ((row.Date === getToday() || row.Date === getYesterDay() || row.Date === getDaybeforeYesterday()) ) ?
                     <HiOutlinePencil
                         size={20}
-                        style={{ color: "#5A87B2",width : 120,textAlign:'center' }}
+                        style={{ color: "#5A87B2",width : 80,textAlign:'start'}}
                         onClick={handleClickIcon}
                     /> : null
             }

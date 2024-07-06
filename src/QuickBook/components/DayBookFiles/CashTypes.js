@@ -158,7 +158,7 @@ const CashTypes = (props) => {
 
             {clickCount.map((eachItem, index) =>(
                 
-                <div className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2 relative" key={index}>
+                <div className="grid lg:grid-cols-3 grid-cols-1 gap-4 px-4 pb-2 relative" key={index}>
                     <div className="flex items-center">
                     <PaymentSelect
                         labelText = "Payment Type"
@@ -230,7 +230,7 @@ const CashTypes = (props) => {
                                 showInputBox("Enter Amount", 'online_bank_amount', "Amount", validateInputField, valObj)
                             }
                             {
-                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateUTRNumber, valObj, true, false, true,16)
+                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateUTRNumber, valObj, true, false, true,12)
                             }
                             <div className="col-span-3  flex flex-row relative items-center">
                                 {

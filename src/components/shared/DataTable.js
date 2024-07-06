@@ -205,13 +205,16 @@ const DataTable = forwardRef((props, ref) => {
                         <Tr key={headerGroup.id} style={{display:"flex",justifyContent:"space-between",alignItems:'center',marginTop : 10}}>
                         {/* <Tr key={headerGroup.id}> */}
                             {headerGroup.headers.map((header) => {
+                                let slFlag = header?.column?.id == "serial_no" ? true : false;
                                 return (
                                     <Th
                                         key={header.id}
                                         colSpan={header.colSpan}
                                         style={{
                                             width : 120,
-                                            textAlign : 'center',
+                                            textAlign : 'start',
+                                            width : slFlag? 80: 120,
+                                            paddingLeft : slFlag? 10: 0,
                                         }}
                                     >
                                         {header.isPlaceholder ? null : (
@@ -259,13 +262,23 @@ const DataTable = forwardRef((props, ref) => {
                                 return (
                                     <Tr key={row.id}  style={{display:"flex",justifyContent:"space-between",alignItems:'center'}} >
                                         {row.getVisibleCells().map((cell) => {
+                                          
+                                            let slFlag = cell?.column?.columnDef?.header == "Sl No" ? true : false;
                                             return (
                                                 <Td
                                                     key={cell.id}
                                                     style={{
-                                                        width : 120,
-                                                        textAlign : 'center',
+                                                        // width : 120,
+                                                        width : slFlag? 80: 120,
+                                                        paddingLeft : slFlag? 10: 0,
+                                                        minHeight : 80,
+                                                        height : "auto",
+                                                        textAlign : 'start',
                                                         wordWrap: 'break-word',
+                                                        // backgroundColor:"orange",
+                                                        // display: 'flex',
+                                                        // alignItems: 'start',
+                                                        // justifyContent: 'start'
                                                     }}
                                                 >
                                                     {flexRender(

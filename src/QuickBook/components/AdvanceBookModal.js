@@ -143,17 +143,18 @@ const AdvanceBookModal = (props) => {
             onSubmit={(values, { setSubmitting }) => {
                 handleSubmit(values,validateModal)
             }}
-            style={{ overflow: "auto" }}
         >
             {({setFieldValue, values }) => {
                 return (
-                    <Form>
+                    <Form className="h-full">
+                        <div className="h-[80%] overflow-y-scroll">
                         <ParagraphTag label="Details" />
-                        <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
                              <AntdInput
                                 text="Receipt Number"
                                 value='receipt_no'
                                 ph="Enter Receipt Number"
+                                maxLen = {30}
                             />
                               <AntdDatePicker
                                     labelText="Day"
@@ -174,6 +175,7 @@ const AdvanceBookModal = (props) => {
                                 text="Customer Name"
                                 value='customer_name'
                                 ph="Enter Customer Name"
+                                maxLen = {30}
                             />
                             <AntdInput
                                 text="Customer Mobile Number"
@@ -189,6 +191,7 @@ const AdvanceBookModal = (props) => {
                                 ph="Enter Amount"
                                 acceptOnlyNum={true}
                                 showPrefix={true}
+                                maxLen = {15}
                             />
                         </div>
 
@@ -213,8 +216,8 @@ const AdvanceBookModal = (props) => {
                             }}
                             handleSubmitBillModal = {() =>handleSubmit(values,false)}
                         />
-
-                        <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24" style={{ marginBottom: 20 }}>
+                        </div>
+                        <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
                             <CButton btnType="submit">
                                 Save
                             </CButton>

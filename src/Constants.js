@@ -99,6 +99,14 @@ const selectedValType = {
 const PERSIST_STORE_NAME = "quickBookRedux";
 
 const getStatusOfCurrentDate = (day) => {
+  
+  let selectedDate = moment(day);
+  let currentDate = moment().startOf('day');
+  return selectedDate.isSame(currentDate, 'day') ? true : false;
+}
+
+const _getStatusOfCurrentDate = (day) => {
+  
   let selectedDate = moment(day);
   let currentDate = moment().startOf('day');
   return selectedDate.isSame(currentDate, 'day') ? true : false;
@@ -106,5 +114,5 @@ const getStatusOfCurrentDate = (day) => {
 
 export {Options,HeaderSelectOptions,DepositType,DepositMode,
   PERSIST_STORE_NAME,DaysArr,SaleType,PartyCode,PaymentsArray,UPIARRAY,selectedValType,
-  getStatusOfCurrentDate,ReturnType
+  getStatusOfCurrentDate,ReturnType,_getStatusOfCurrentDate
 };

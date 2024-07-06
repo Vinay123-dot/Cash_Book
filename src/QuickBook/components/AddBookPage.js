@@ -75,18 +75,23 @@ const AddBookPage = (props) => {
     return dVal;
   }
 
+  const caseSensitiveFilterOption = (input, option) => {
+    return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+  };
+  
   return (
-    <div className="fixed inset-0 flex  flex-col  z-50" style={{ backgroundColor: "#e5e7eb" }}>
+    <div className="fixed inset-0 flex  flex-col  z-50" style={{ backgroundColor: "#e5e7eb"}}>
       <div className = {getHeaderCName(selectedValue)}>
         <Select
           showSearch
           style={{ width: 220, height: 40 }}
           placeholder="Search to Select"
           optionFilterProp="children"
-          filterOption={(input, option) => (option?.children ?? '').includes(input)}
-          filterSort={(optionA, optionB) =>
-            (optionA?.children ?? '').toLowerCase().localeCompare((optionB?.children ?? '').toLowerCase())
-          }
+          // filterOption={(input, option) => (option?.children ?? '').includes(input)}
+          // filterSort={(optionA, optionB) =>
+          //   (optionA?.children ?? '').toLowerCase().localeCompare((optionB?.children ?? '').toLowerCase())
+          // }
+          filterOption={caseSensitiveFilterOption}
           onChange={handleChange}
         >
           {(bookTypeList || []).filter((eachDoc)=>eachDoc.Id != 6).map((eachOpt, i) => (
@@ -115,7 +120,7 @@ const AddBookPage = (props) => {
         }
       </div>
 
-      <div className="w-100 h-full bg-white rounded-lg relative mx-3 mb-3 overflow-y-auto">
+      <div className=" mx-3 bg-white rounded-lg relative  h-[calc(100vh-7rem)]">
 
         <PettyCashModal showPettyCash={selectedValue === 4} onCancel={handleCancelSelectedVal} />
         <BankDepositModal showBankDeposit={selectedValue === 2} onCancel={handleCancelSelectedVal} />

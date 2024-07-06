@@ -36,31 +36,37 @@ const PettyCashEditModal = (props) => {
     const [showLoader, setShowLoader] = useState(false);
     const [selectedDate,setSelectedDate] = useState(selectedPettyCashObj?.date || null);
     const {
-        pettyCashBalance : pettyCash,
+        pettyCashBalance ,
         pettyCashRemBal : remPettyCash,
       } = useSelector(state => state.quickbookStore.state);
     const {
         reasonsList,
     } = useSelector(state => state.quickbookStore.state);
-    const [remPettybal, setRemPettybal] = useState(remPettyCash);
+    // const [remPettybal, setRemPettybal] = useState(remPettyCash);
     const [eModal,setEModal] = useState({
         eMessage : "",show : false
     })
     let uniqueId = localStorage.getItem("uniqueId");
 
-    useEffect(() => {
-        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
-        let balanceTemp = (selectedDate === null || checkDateStatus ||selectedDate === "" ) ? remPettyCash : pettyCash;
-        setRemPettybal(balanceTemp);
-    }, [remPettyCash,pettyCash,selectedDate])
+    
+    // useEffect(() => {
+    //     let checkDateStatus = getStatusOfCurrentDate(selectedDate);
+    //     let balanceTemp = (selectedDate === null || checkDateStatus ||selectedDate === "" ) ? remPettyCash : pettyCash;
+    //     setRemPettybal(balanceTemp);
+    // }, [remPettyCash,pettyCash,selectedDate])
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values,setFieldError) => {
         try {
             values.amount = Number(values.amount);
             values.key = uniqueId;
-            if(values.amount > remPettyCash) {
+            if(values.balance < 0){
+                setFieldError("balance","Balance should not be lessthan 0");
+                return ;
+            }
+            let isDateFlag = getStatusOfCurrentDate(values.date);
+            if(!isDateFlag && values.amount > (pettyCashBalance + Number(selectedPettyCashObj.amount))) {
                 setEModal({
-                    eMessage : "Given amount should be less than or equal to the pettycash balance",
+                    eMessage : `Given amount should be less than or equal to the pettycash opening balance. As you selected previous date. and your current pettycash balance is ${pettyCashBalance + Number(selectedPettyCashObj.amount)}`,
                     show : true
                 })
                 return ;
@@ -96,6 +102,7 @@ const PettyCashEditModal = (props) => {
             eMessage : ""
         })
     }
+    
     return (
         <Modal openModal={true}  ai={null} height ={400}>
             <>
@@ -104,16 +111,17 @@ const PettyCashEditModal = (props) => {
                     validationSchema={PettyCashValidations}
                     // innerRef={editFormikRef}
                     onSubmit={(values, { setErrors, resetForm, setFieldError }) => {
-                        handleSubmit(values, setErrors, resetForm, setFieldError);
+                        handleSubmit(values, setFieldError);
                     }}
                     style={{ overflow: "auto", position: "relative" }}
                 >
                     {({ setFieldValue, values }) => {
-                        values.balance = (remPettybal + Number(selectedPettyCashObj.amount)) - Number(values.amount);
+                        values.balance = (remPettyCash + Number(selectedPettyCashObj.amount)) - Number(values.amount);
                         return (
-                            <Form>
+                            <Form className="h-full">
+                                <div className="h-[80%] overflow-y-auto">
                                 <ParagraphTag label="Edit Details" />
-                                <div className="grid grid-cols-2 px-4 py-2 gap-10">
+                                <div className="grid grid-cols-2 px-4 pb-2 gap-4">
                                     <AntdDatePicker
                                         labelText="Day"
                                         name="date"
@@ -147,8 +155,8 @@ const PettyCashEditModal = (props) => {
                                         Arr={reasonsList}
                                     />
                                 </div>
-
-                                <div className="absolute flex flex-row-reverse gap-10  bottom-5 right-5">
+                                </div>
+                                <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
                                     <CButton btnType="submit">
                                         Save
                                     </CButton>

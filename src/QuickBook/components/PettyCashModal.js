@@ -4,12 +4,13 @@ import CButton from "../../components/ui/Button";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import AntdTextArea from "../../components/ui/AntdTextArea";
-import { DaysArr, getStatusOfCurrentDate } from "../../Constants";
+import { getStatusOfCurrentDate,_getStatusOfCurrentDate } from "../../Constants";
 import CustomizedTable from "../../components/ui/CustomizedTable";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setShowAddBookPage,
     setDataSavedModal,
+    setPettyCashRemainingBalance,
 } from '../store/stateSlice';
 import Modal from "../../components/shared/Modal";
 import { PettyCashValidations } from "../../Validations";
@@ -17,6 +18,7 @@ import ParagraphTag from "../../constants/PTag";
 import { apiStorePettyCashInfo } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
+import ErrorModal from "../../components/ui/ErrorModal";
 
 const initialValues = {
     id: 0,
@@ -76,29 +78,39 @@ const PettyCashModal = (props) => {
         reasonsList,
     } = useSelector(state => state.quickbookStore.state);
     let uniqueId = localStorage.getItem("uniqueId");
+    const [eModal,setEModal] = useState({
+        eMessage : "",show : false
+    })
+    const [storedPettyCash,setStoredPettyCash] = useState(commonPettyCash || 0);
 
-    useEffect(()=>{
-        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
-        let balanceTemp = (selectedDate === null || checkDateStatus ||selectedDate === "" ) ? remPettyCash : commonPettyCash;
-        setRemPettybal(balanceTemp);
-    },[remPettyCash,commonPettyCash,selectedDate])
 
     if (!showPettyCash) return null;
 
     const handleSubmit = async (values, setErrors, resetForm,setFieldError,setFieldValue) => {
 
         const { date, balance, amount, petty_cash_details } = values;
-        let isAllValuesPresent = date && balance && amount && petty_cash_details;
+        let isAllValuesPresent = date  && amount && petty_cash_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
         if(values.balance < 0){
             setFieldError("balance","Balance should not be lessthan 0");
             return ;
         }
-        if(values.amount > remPettyCash) {
-            setFieldError("amount","Balance should not be morethan pettycash balance");
+        let isDateFlag = getStatusOfCurrentDate(values.date);
+        if(!isDateFlag && values.amount > storedPettyCash) {
+            setEModal({
+                eMessage : `Given amount should be less than or equal to the pettycash opening balance. As you selected previous date. and your current pettycash balance is ${storedPettyCash}`,
+                show : true
+            })
             return ;
         }
+        if(!isDateFlag){
+            setStoredPettyCash(storedPettyCash - values.amount)
+        }
+        // if(values.amount > values.balance) {
+        //     setFieldError("amount","Balance should not be morethan pettycash balance");
+        //     return ;
+        // }
         let newTempObj = JSON.parse(JSON.stringify(values));
         let findObj = (reasonsList || []).find((eachDoc) => eachDoc.Id == petty_cash_details);
         newTempObj.petty_cash_details = findObj?.Type || ""; 
@@ -113,6 +125,13 @@ const PettyCashModal = (props) => {
             setRemPettybal(newTempObj.balance);
         }
 
+    }
+
+    const onEModalCancel = () => {
+        setEModal({
+            show : false,
+            eMessage : ""
+        })
     }
 
     const handleSavePettyCash = async () => {
@@ -174,22 +193,24 @@ const PettyCashModal = (props) => {
         })
     }
 
-    return (<>
+    return (<div className="h-full">
+        <div className="h-[80%] overflow-y-scroll">
         <Formik
             initialValues={initialValues}
             validationSchema={PettyCashValidations}
             onSubmit={(values, { setErrors, resetForm,setFieldError,setFieldValue }) => {
                 handleSubmit(values, setErrors, resetForm,setFieldError,setFieldValue);
             }}
-            style={{ overflow: "auto" }}
+            // style={{ overflow: "auto" }}
         >
             {({ setFieldValue,values }) => {
                 
                 values.balance = remPettybal - Number(values.amount);
                 return (
-                    <Form>
+                    <Form >
+                        
                         <ParagraphTag label = "Details"/>
-                        <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
                             {/* <AntdFormikSelect
                                 labelText="Day"
                                 name="date"
@@ -237,12 +258,11 @@ const PettyCashModal = (props) => {
             <CustomizedTable
                 data={pettyCashArr}
                 columns={columns}
-                handleEditClick={handleEditClick}
                 handleDeleteClick={handleDeleteClick}
             />
         </div>
-
-        <div className="relative flex flex-row-reverse gap-10  bottom-5 right-5">
+        </div>
+        <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
             <CButton
                 onClick={handleSavePettyCash}
                 isDisabled={getButtonStatus(pettyCashArr)}>
@@ -262,7 +282,10 @@ const PettyCashModal = (props) => {
         {
             showLoader && <Loader showLoading = {true}/>
         }
-    </>
+         { 
+            eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}  ai ="center"/>
+        }
+    </div>
     )
 }
 

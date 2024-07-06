@@ -62,14 +62,14 @@ const BankDepositModal = (props) => {
     })
     const [selectedDate,setSelectedDate] = useState(null);
     const [selectedType,setSelectedType] = useState(null);
-    const [remOpenBal, setRemOpenBal] = useState(remCommOpeningBal);
+    // const [remOpenBal, setRemOpenBal] = useState(remCommOpeningBal);
     let uniqueId = localStorage.getItem("uniqueId");
 
-    useEffect(() => {
-        let checkDateStatus = getStatusOfCurrentDate(selectedDate);
-        let balanceTemp = (checkArr.includes(selectedDate)|| checkDateStatus ) && selectedType !== 2 ? remCommOpeningBal : commOpeningBal;
-        setRemOpenBal(balanceTemp);
-    }, [commOpeningBal,remCommOpeningBal,selectedDate,selectedType])
+    // useEffect(() => {
+    //     let checkDateStatus = getStatusOfCurrentDate(selectedDate);
+    //     let balanceTemp = (checkArr.includes(selectedDate)|| checkDateStatus ) && selectedType !== 2 ? remCommOpeningBal : commOpeningBal;
+    //     setRemOpenBal(balanceTemp);
+    // }, [commOpeningBal,remCommOpeningBal,selectedDate,selectedType])
  
 
     useEffect(() => {
@@ -104,7 +104,8 @@ const BankDepositModal = (props) => {
             let newObj = JSON.parse(JSON.stringify(values));
             newObj.amount = Number(newObj.amount);
             newObj.total_receipt_amount = Number(newObj.total_receipt_amount);
-            if(newObj.amount > remOpenBal) {
+
+            if(newObj.amount > remCommOpeningBal) {
                 setEModal({
                     eMessage : "Given amount should be less than or equal to the remaining opening balance",
                     show : true
@@ -112,6 +113,23 @@ const BankDepositModal = (props) => {
                 setStartLoading(false);
                 return ;
             }
+           
+
+            let isDateFlag = getStatusOfCurrentDate(newObj.date);
+            let isCondFlag = (newObj.type == 1 && !isDateFlag) ||newObj.type == 2 || (newObj.type == 3 && !isDateFlag);
+          
+            if(isCondFlag && newObj.amount > commOpeningBal) {
+                    
+                    setEModal({
+                        eMessage : `Given amount should be less than or equal to the opening balance . ${newObj.type ==2 ?"":"As you selected previous date."}`,
+                        show : true
+                    })
+                    setStartLoading(false);
+                    return ;
+                }
+            
+            
+            
             if(newObj.total_receipt_amount > 0){
                 newObj.type = (newObj.amount === newObj.total_receipt_amount) ? 3 : 4;
             }
@@ -161,7 +179,7 @@ const BankDepositModal = (props) => {
                     id : advance_receipt_no
                 };
             let response = await apiVerifyAdvancedBookReceipt(data);
-            console.log("r",response)
+            
             if(response){
                 setEModal({
                     eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
@@ -202,16 +220,17 @@ const BankDepositModal = (props) => {
                 setSubmitting(true);
                 handleSubmit(values,setSubmitting);
             }}
-            style={{ overflow: "auto",position:"relative" }}
+            // style={{ overflow: "auto",position:"relative" }}
         >
             {({ setFieldValue, values }) => {
-                    values.remaining_balance =  remOpenBal - (Number(values.amount) || 0);
+                    values.remaining_balance =  remCommOpeningBal - (Number(values.amount) || 0);
                 
                    
                 return (
-                    <Form>
+                    <Form className="h-full">
+                        <div className="h-[80%]">
                          <ParagraphTag  label = "Details"/>
-                        <div className="grid grid-cols-1 gap-5 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
                             <AntdFormikSelect
                                 labelText="Type"
                                 name="type"
@@ -304,7 +323,7 @@ const BankDepositModal = (props) => {
                                 (values.return_type === 2 || !statusArr.includes(values.receipt_status)) &&
                                 <>
                                  <AntdInput
-                                        text= "Receipt Amount" 
+                                        text= {values.return_type === 2? "Return Amount":"Receipt Amount" }
                                         value= 'amount'
                                         ph="Enter Remaining Balance"
                                         showPrefix={true}
@@ -331,7 +350,8 @@ const BankDepositModal = (props) => {
                             }
                             
                         </div>
-                            <div className="flex flex-row-reverse gap-10 px-4 py-2 lg:absolute right-5 bottom-5">
+                        </div>
+                            <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
                             <CButton btnType = "submit">
                                 Save
                             </CButton>
