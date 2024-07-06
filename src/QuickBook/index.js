@@ -23,14 +23,14 @@ import {
 import { 
   setBookTypeList,
   setDayInfoList,
-  setOutletsList ,
   setReasonsList,
   setDepositTypeArray,
   setDepositModeArray,
   setPaymentTypeInfo,
   setUpiTypeInfo,
   setCustomerListInfo,
-  setSalesType
+  setSalesType,
+  setAllTerminalsList
 } from "./store/stateSlice";
 
 
@@ -83,7 +83,7 @@ const Quickbook = () => {
     // };
     let newId = userType == 4 ? uniqueId : merchantId;
     let response = await apiGetTerminal(newId);
-    dispatch(setOutletsList(response || []));
+    dispatch(setAllTerminalsList(response || []));
   }
 
   const getPettycashReasons = async () => {

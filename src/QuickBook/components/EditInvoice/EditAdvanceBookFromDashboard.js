@@ -124,9 +124,10 @@ const EditAdvBookFromDashboard = (props) => {
                 >
                     {({ setFieldValue, values }) => {
                         return (
-                            <Form style={{ overflow: "auto" }}>
+                            <Form className="h-full">
+                                 <div className="h-[80%] overflow-y-scroll">
                                 <ParagraphTag label="Details" />
-                                <div className="grid grid-cols-1 gap-10 px-4 py-2 lg:grid-cols-3 md:grid-cols-2">
+                                <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
                                     <AntdInput
                                         text="Receipt Number"
                                         value='receipt_no'
@@ -184,9 +185,9 @@ const EditAdvBookFromDashboard = (props) => {
                                     handleSubmitBillModal={() => handleSubmit(values, false)}
                                     handleCancelBillModal={() => { setShowBillModal(false); setValidateModal(true) }}
                                 />
+                                </div>
 
-
-                                <div className="flex flex-row-reverse gap-10 px-4 xl:pt-24" style={{ marginBottom: 20 }}>
+                                <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
                                     <CButton btnType="submit">
                                         Save
                                     </CButton>

@@ -1,5 +1,5 @@
 const appConfig = {
-    apiPrefix: 'https://sandbox.rampeylabs.com/api',  //web //sandbox
+    apiPrefix: 'https://web.rampeylabs.com/api',  //web //sandbox
     authenticatedEntryPath: '/transactions',
     unAuthenticatedEntryPath: '/signin',
     tourPath: '/',
