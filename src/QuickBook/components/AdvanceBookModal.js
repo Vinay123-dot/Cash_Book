@@ -89,7 +89,7 @@ const AdvanceBookModal = (props) => {
         try {
             setShowBillModal(false);
             let diffInAmount = Number(values.bill_value) - getTotalMoneyInDayBook(values);
-            let modalFlag = validateModal && (diffInAmount > 10 || diffInAmount < -10);
+            let modalFlag = validateModal && (diffInAmount != 0);
             if (modalFlag) {
                 setShowBillModal(true);
                 return;
@@ -169,7 +169,7 @@ const AdvanceBookModal = (props) => {
                             } */}
 
                             {
-                                showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", customerListInfo, setFieldValue)
+                                showSelectBox("Customer Type", "customer_type", "--Select Customer Type--", customerListInfo, setFieldValue)
                             }
                             <AntdInput
                                 text="Customer Name"
@@ -210,6 +210,7 @@ const AdvanceBookModal = (props) => {
                         <BillAmountModal 
                             billModal = {showBillModal} 
                             valuesObj = {values}
+                            isFromPaymentCol = {true}
                             handleCancelBillModal = {() =>{
                                 setShowBillModal(false);
                                 setValidateModal(true)

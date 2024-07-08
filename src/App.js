@@ -10,8 +10,8 @@ function App() {
   const searchParams = new URLSearchParams(window.location.search);
   const userType = searchParams.get('mType');
   const rawPersistData = searchParams.get('sessionData');
-  const uniqueId = searchParams.get('uniqueId') ||  "0000000000002085"; 
-  const merchantId = searchParams.get('mId') || "0000000000002085" ; 
+  const uniqueId = searchParams.get('uniqueId') ||  "0000000000053575"; 
+  const merchantId = searchParams.get('mId') || "0000000000053575" ; 
   // "0000000000053575"; sanbbox
   // "0000000000002085" ; web
 
