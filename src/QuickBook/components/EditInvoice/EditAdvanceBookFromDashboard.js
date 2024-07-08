@@ -62,7 +62,7 @@ const EditAdvBookFromDashboard = (props) => {
         try {
             setShowBillModal(false);
             let diffInAmount = Number(values.bill_value) - getTotalMoneyInDayBook(values);
-            let modalFlag = validateModal && (diffInAmount > 10 || diffInAmount < -10);
+            let modalFlag = validateModal && (diffInAmount != 0);
             if (modalFlag) {
                 setShowBillModal(true);
                 return;
@@ -182,6 +182,7 @@ const EditAdvBookFromDashboard = (props) => {
                                 <BillAmountModal
                                     billModal={showBillModal}
                                     valuesObj={values}
+                                    isFromPaymentCol = {true}
                                     handleSubmitBillModal={() => handleSubmit(values, false)}
                                     handleCancelBillModal={() => { setShowBillModal(false); setValidateModal(true) }}
                                 />

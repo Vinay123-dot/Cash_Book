@@ -315,13 +315,13 @@ const DayBookModal = (props) => {
                                     disableInput={!values.sales_type && true}
                                 />
                                 {
-                                    showSelectBox("Customer Type", "customer_type", "--Select CustomerType--", getCustomerList(requiredArrList.customerListInfo, values), setFieldValue)
+                                    showSelectBox("Customer Type", "customer_type", "--Select Customer Type--", getCustomerList(requiredArrList.customerListInfo, values), setFieldValue)
                                 }
                                 {
-                                    showInputBox("Bill Total Value", 'bill_value', "Bill TotalValue", validateInputField, values, false, true, true)
+                                    showInputBox("Bill Total Value", 'bill_value', "Bill Total Value", validateInputField, values, false, true, true)
                                 }
                                 {
-                                    showInputBox("Party Code", 'party_code', "PartyCode", validateInputField, values, false, false, false)
+                                    showInputBox("Party Code", 'party_code', "Party Code", validateInputField, values, false, false, false)
                                 }
                                 {
                                     showInputBox("Party Name", 'party_name', "Party Name", validateInputField, values, false, false, false)

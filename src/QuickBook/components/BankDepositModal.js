@@ -339,7 +339,7 @@ const BankDepositModal = (props) => {
                                     <AntdFormikSelect
                                         labelText="Store Id"
                                         name="store_id"
-                                        ph="--- Select StoreId---"
+                                        ph="--- Select Store Id---"
                                         handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                                         Arr={allTerminals}
                                     />

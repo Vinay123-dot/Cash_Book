@@ -91,10 +91,11 @@ const AdvanceBillDetails = (props) => {
             <ParagraphTag label = "Advance Bill Details" />
             <div className="flex px-4 py-2 items-center">
                 {
-                    showInputBox("Advance Receipt Number", 'advance_receipt_no', "AdvanceReceiptNumber", validateInputField, values, false, false, false)
+                    showInputBox("Advance Receipt Number", 'advance_receipt_no', "Advance Receipt Number", validateInputField, values, false, false, false)
                 }
                 <CButton
-                    className = "h-44 mt-10 ml-10"
+                    className = "h-44 mt-10 ml-5"
+                    style = {{width : 80,height : 32}}
                     isLoading = {verifyBtnLdng}
                     onClick = {() => handleVerifyAdvanceMoney(values)}
                 >

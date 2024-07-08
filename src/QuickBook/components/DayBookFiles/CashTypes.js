@@ -152,7 +152,10 @@ const CashTypes = (props) => {
             <div className="flex items-center mt-5">
 
                 <ParagraphTag label="Payment Details" />
-                <CButton onClick={handleButtonClick}>Add</CButton>
+                <CButton 
+                    onClick={handleButtonClick}
+                    style = {{width : 80,height : 36}}
+                >Add</CButton>
 
             </div>
 
@@ -163,11 +166,11 @@ const CashTypes = (props) => {
                     <PaymentSelect
                         labelText = "Payment Type"
                         name = {`paymentType${eachItem}`}
-                        ph = "--Select PaymentType--"
+                        ph = "--Select Payment Type--"
                         handleChange = {(name,val) =>handleSetFieldData(name,val,valObj)}
                         outputObj = {valObj}
                         Arr = {paymentListInfo}
-                        validation = {true}
+                        validation = {false}
                         validateField = {(val) => verifyPaymentType(val)}
                         key = {index+`paymentType${eachItem}`}
                     />
