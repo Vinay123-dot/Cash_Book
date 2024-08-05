@@ -205,7 +205,7 @@ export async function apiGetBookTypeServices(data) {
         url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${hType}&key=${key}&terminal_id=${terminal_id}&start_date=${fromDate}&end_date=${toDate}`;
     }
     if(filter_value){
-        url = `${url}&filter_value=${filter_value};`
+        url = `${url}&filter_value=${filter_value}`
     }
 
     const response = await axios.get(url,{headers});

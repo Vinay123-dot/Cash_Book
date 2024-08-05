@@ -94,6 +94,7 @@ const dataSlice = createSlice({
         },
         setTransactionArray: (state, action) => {
             state.transactionList = [];
+            state.totalPaymentCount = {};
         },
     },
     extraReducers: (builder) => {

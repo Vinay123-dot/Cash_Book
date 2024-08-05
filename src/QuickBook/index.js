@@ -147,7 +147,7 @@ const Quickbook = () => {
         <p className="text-black text-opacity-100 text-2xl font-bold leading-10 col-start-1 col-span-0 xl:col-span-1">Cash Book</p>
         <QuickBookHeader/>
       </div>
-      {![2,4,6].includes(cashbookData.book_type) && 
+      {![0,2,4,6].includes(cashbookData.book_type) && 
       <>
       <hr className="border border-[#F4F6F9]" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:gap-8 px-10 py-4">
