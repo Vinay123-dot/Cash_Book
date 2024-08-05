@@ -102,7 +102,7 @@ const PettyCashEditModal = (props) => {
             eMessage : ""
         })
     }
-    
+    console.log("ss",selectedPettyCashObj)
     return (
         <Modal openModal={true}  ai={null} height ={400}>
             <>
@@ -153,6 +153,11 @@ const PettyCashEditModal = (props) => {
                                         ph="Select Reason"
                                         handleChange={(name, selectedValue) => setFieldValue(name,selectedValue)}
                                         Arr={reasonsList}
+                                    />
+                                    <AntdInput
+                                        text="Comment"
+                                        value='petty_cash_extra_details'
+                                        ph="Enter Comment"
                                     />
                                 </div>
                                 </div>

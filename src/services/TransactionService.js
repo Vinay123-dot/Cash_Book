@@ -82,7 +82,12 @@ export async function apiGetBankDepositInfo(){
     })
 }
 
-
+export async function apiGetReturnType(){
+    return ApiServiceV2.fetchData({
+        url: '/v21/master/get_Bank_Deposit_Order_Cancel_Receipt_Types',
+        method: 'get',
+    })
+}
 
 export async function apiStoreBankDepositInfo(data){
     let url = `${appConfig.apiPrefix}/v21/bank_deposit/save_BankDeposit`;
@@ -190,13 +195,17 @@ export  function apiGetTestPettyCashRemainingBalance({uniqueId}){
 }
 
 export async function apiGetBookTypeServices(data) {
-    const {book_type,history_type,terminal_id,key,fromDate,toDate} = data;
+    const {book_type,history_type,terminal_id,key,fromDate,toDate,filter_value} = data;
     let hType = 0
     let url ;
     if(!fromDate && !toDate){
+        
         url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
     }else {
         url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${hType}&key=${key}&terminal_id=${terminal_id}&start_date=${fromDate}&end_date=${toDate}`;
+    }
+    if(filter_value){
+        url = `${url}&filter_value=${filter_value};`
     }
 
     const response = await axios.get(url,{headers});
@@ -223,7 +232,6 @@ export async function apiGetSalesTypeInfo(){
 }
 
 export async function apiUploadDayBookExcel(data) {
-    console.log("data",data)
     let url = `${appConfig.apiPrefix}/v21/day_book/upload_DayBook`;
     const response = await axios.post(url,data,{excelHeader});
     return response;

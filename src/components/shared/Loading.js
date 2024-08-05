@@ -12,7 +12,7 @@ const DefaultLoading = (props) => {
         asElement: Component,
         customLoader,
     } = props
-console.log("PROPS",props)
+
     return loading ? (
         <Component
             className={classNames(

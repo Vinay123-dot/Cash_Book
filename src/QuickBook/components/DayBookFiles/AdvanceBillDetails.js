@@ -53,7 +53,7 @@ const AdvanceBillDetails = (props) => {
                     id : advance_receipt_no
                 };
             let response = await apiVerifyAdvancedBookReceipt(data);
-            console.log("r",response)
+            
             if(response){
                 setEModal({
                     eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
@@ -66,7 +66,6 @@ const AdvanceBillDetails = (props) => {
            
             
         }catch(Err){
-            console.log("ERR..",Err);
             setEModal({
                 eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
                 show : true

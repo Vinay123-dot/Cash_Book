@@ -16,6 +16,7 @@ historyType = persistData?.auth?.session?.transactions
 export const getTransactions = createAsyncThunk(
     'quickbook/data/getTransactions',
     async (data) => {
+        console.log("DATA",data)
         const response = await apiGetBookTypeServices(data);
         return response;
     }
@@ -27,7 +28,7 @@ export const initialTableData = {
     history_type: 0,
     // pageNumber: 0,
     // recordsPerPage: 10,
-    // searchData: '',
+    filter_value: '',
     // sort: 1,
     book_type : 0,
     terminal_id : -1,
@@ -57,6 +58,7 @@ const dataSlice = createSlice({
         totalRecords: 0,
         toatalAmount: 0,
         transactionList: [],
+        totalPaymentCount : {},
         tableData: initialTableData,
         filterData: initialFilterData,
         outletData : intialOutletData,
@@ -69,6 +71,7 @@ const dataSlice = createSlice({
             state.totalRecords = 0
             state.toatalAmount = 0
             state.transactionList = []
+            state.totalPaymentCount = {}
             state.filterData = { ...initialFilterData }
             state.outletData = {...intialOutletData }
             state.tableData = { ...initialTableData, ...action.payload }
@@ -96,7 +99,8 @@ const dataSlice = createSlice({
     extraReducers: (builder) => {
         builder
           .addCase(getTransactions.fulfilled, (state, action) => {
-            state.transactionList = action.payload?.data || [];
+            state.transactionList = action.payload?.data?.datas || [];
+            state.totalPaymentCount = {...action.payload?.data} || {};
             state.totalTxn = action.payload?.totalTxn;
             state.totalRecords = action.payload?.totalRecords;
             // state.totalAmount = action.payload?.totalAmount; // Fixed typo in 'totalAmount'
@@ -109,21 +113,7 @@ const dataSlice = createSlice({
             state.loading = false;
           });
       },
-    // extraReducers: {
-    //     [getTransactions.fulfilled]: (state, action) => {
-    //         state.transactionList = action.payload?.transactionHistoryList
-    //         state.totalTxn = action.payload?.totalTxn
-    //         state.totalRecords = action.payload?.totalRecords
-    //         state.toatalAmount = action.payload?.toatalAmount
-    //         state.loading = false
-    //     },
-    //     [getTransactions.pending]: (state) => {
-    //         state.loading = true
-    //     },
-    //     [getTransactions.rejected]: (state) => {
-    //         state.loading = false
-    //     },
-    // },
+   
 })
 
 export const {

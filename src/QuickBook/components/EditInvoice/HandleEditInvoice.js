@@ -40,6 +40,7 @@ const HandleEditInvoice = (props) => {
             date:  pObj.Date ||null,
             amount: pObj.Amount || null,
             petty_cash_details: pObj.Petty_Cash_Details || '',
+            petty_cash_extra_details : pObj.Petty_Cash_Extra_Details || ""
         }
         if (typeof newTemp.petty_cash_details === 'string') {
             let findedObj = (reasonsList || []).find((eachItem) => eachItem.Type === newTemp.petty_cash_details);
@@ -80,7 +81,6 @@ const HandleEditInvoice = (props) => {
         return newObj;
     }
     const onCancelPettyCash = () => {
-        console.log("test")
         setSelectedModalVal(null);
     }
 

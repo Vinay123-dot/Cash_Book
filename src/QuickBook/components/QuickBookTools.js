@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
 import appConfig from "../../configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
+import { Input } from "antd";
 
 const QuickBookTools = () => {
 
@@ -94,7 +95,7 @@ const QuickBookTools = () => {
   // }
 
   const handleDateChange = (val) => {
-    console.log("v",val)
+    
     const newTableData = cloneDeep(tableData);
     newTableData.history_type = val?.historyType;
     newTableData.fromDate = val?.fromDate;
@@ -126,6 +127,14 @@ const QuickBookTools = () => {
     const newOutletData = cloneDeep(outletData);
     newOutletData.terminal_id = val;
     dispatch(setOutletData(newOutletData));
+    setTerminalErrMsg("");
+  }
+
+  const handleInputChange = (ev) => {
+    const newTableData = cloneDeep(tableData);
+    newTableData.pageNumber = 0;
+    newTableData.filter_value = ev.target.value;
+    dispatch(setTableData(newTableData));
     setTerminalErrMsg("");
   }
 
@@ -284,14 +293,14 @@ const QuickBookTools = () => {
             />
           </div>
         }
-        {/* <div className="flex flex-col">
+        <div className="flex flex-col">
           <Input
             prefix={searchPrefix}
             placeholder="Search"
-            className="w-full md:w-44"
-            // onChange = {handleInputChange}
+            className="w-full md:w-60 h-10 mb-4 md:mb-0"
+            onChange = {handleInputChange}
           />
-        </div> */}
+        </div>
       </div>
       {
         cashbookData.book_type != 6 && 

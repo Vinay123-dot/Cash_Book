@@ -11,12 +11,13 @@ import {
     setDataSavedModal
   } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
-import { DaysArr,getStatusOfCurrentDate,ReturnType } from "../../Constants";
+import { DaysArr,getStatusOfCurrentDate } from "../../Constants";
 import { 
     apiGetDepositModeInfo, 
     apiGetDepositTypeInfo,
     apiStoreBankDepositInfo,
-    apiVerifyAdvancedBookReceipt
+    apiVerifyAdvancedBookReceipt,
+    apiGetReturnType
     } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 import ErrorModal from "../../components/ui/ErrorModal";
@@ -44,14 +45,18 @@ const initialValues = {
     store_id : null,
     total_receipt_amount : null,
     receipt_status : "",
-    return_type : null
+    receipt_type_id : null,
+    person_name : "",
+    person_mobile : ""
 };
+
 
 const BankDepositModal = (props) => {
     const { showBankDeposit,onCancel } = props;
     const dispatch = useDispatch();
     const [depositList,setDepositList] = useState([]);
     const [depositModeList,setDepositModeList] = useState([]);
+    const [returnType,setReturnType] = useState([]);
     const commOpeningBal = useSelector(state => state.quickbookStore.state.commonCashBanalce);
     const remCommOpeningBal = useSelector(state => state.quickbookStore.state.remainingCommonBalance);
     const allTerminals = useSelector(state => state.quickbookStore.state.allTerminalList);
@@ -74,13 +79,14 @@ const BankDepositModal = (props) => {
 
     useEffect(() => {
         fetchDepositInfo();
+        fetchRerturnType();
     },[])
 
     const fetchDepositInfo = async() => {
         try{
             const [depositTypeResponse,depositModeResponse] = await Promise.all([
                 apiGetDepositTypeInfo(),
-                apiGetDepositModeInfo()
+                apiGetDepositModeInfo(),
             ])
             let newArr = [...depositTypeResponse?.data];
             let splicedObj = (newArr || []).splice(3,1);
@@ -94,7 +100,16 @@ const BankDepositModal = (props) => {
 
         }
     }
-    
+
+    const fetchRerturnType = async() => {
+        try{
+            const response = await apiGetReturnType();
+            setReturnType(response?.data || []);
+        }catch(e){
+
+        }
+    }
+   
     if (!showBankDeposit) return null;
 
   
@@ -161,7 +176,7 @@ const BankDepositModal = (props) => {
         setFieldValue("amount",null);
         setFieldValue("remaining_balance",null);
         setFieldValue("advance_receipt_no","");
-        setFieldValue("return_type",null);
+        setFieldValue("receipt_type_id",null);
     }
     const handleCancelBankDeposit = () => {
         dispatch(setShowAddBookPage(false));
@@ -224,8 +239,7 @@ const BankDepositModal = (props) => {
         >
             {({ setFieldValue, values }) => {
                     values.remaining_balance =  remCommOpeningBal - (Number(values.amount) || 0);
-                
-                   
+               
                 return (
                     <Form className="h-full">
                         <div className="h-[80%]">
@@ -254,7 +268,7 @@ const BankDepositModal = (props) => {
                                 
                             }
                             {
-                                values.type != null && [1,2].includes(values.type) &&
+                                values.type != null && [1,2,5].includes(values.type) &&
                                     <AntdInput
                                         text={"Amount"}
                                         value={'amount'}
@@ -290,14 +304,14 @@ const BankDepositModal = (props) => {
                                 values.type != null && values.type === 3 && 
                                 <AntdFormikSelect
                                     labelText="Receipt Type"
-                                    name="return_type"
+                                    name="receipt_type_id"
                                     ph="--- Select Receipt Type---"
                                     handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                    Arr={ReturnType}
+                                    Arr={returnType}
                                 />
                             }
                             {
-                                values.type != null && [3].includes(values.type)  && values.return_type === 1 && 
+                                values.type != null && [3].includes(values.type)  && values.receipt_type_id === 1 && 
                                 <div className="flex">
                                         <AntdInput
                                             text = "Receipt Number"
@@ -319,16 +333,16 @@ const BankDepositModal = (props) => {
                              
                             
                             {
-                                values.type === 3 && values.return_type !== null &&
-                                (values.return_type === 2 || !statusArr.includes(values.receipt_status)) &&
+                                values.type === 3 && values.receipt_type_id !== null &&
+                                (values.receipt_type_id === 2 || !statusArr.includes(values.receipt_status)) &&
                                 <>
                                  <AntdInput
-                                        text= {values.return_type === 2? "Return Amount":"Receipt Amount" }
+                                        text= {values.receipt_type_id === 2? "Return Amount":"Receipt Amount" }
                                         value= 'amount'
                                         ph="Enter Remaining Balance"
                                         showPrefix={true}
                                         acceptOnlyNum = {true}
-                                        disableInput = {values.return_type === 1}
+                                        disableInput = {values.receipt_type_id === 1}
                                         
                                     />
                                     <AntdInput
@@ -342,6 +356,27 @@ const BankDepositModal = (props) => {
                                         ph="--- Select Store Id---"
                                         handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                                         Arr={allTerminals}
+                                    />
+                                    {
+                                        ShowTextBoxInPC("Reason", 'reason', "Enter Reason")
+                                    }
+                                </>
+                            }
+                            {
+                                values.type === 5 &&
+                                <>
+                                    <AntdInput
+                                        text="Person Name"
+                                        value = 'person_name'
+                                        ph= "Person Name"
+                                    />
+                                    <AntdInput
+                                        text="Mobile Number"
+                                        value = 'person_mobile'
+                                        ph= "Mobile Number"
+                                        acceptOnlyNum={true}
+                                        maxLen = {10}
+                                        forMobileNum = {true}
                                     />
                                     {
                                         ShowTextBoxInPC("Reason", 'reason', "Enter Reason")

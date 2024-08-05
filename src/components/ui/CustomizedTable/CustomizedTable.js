@@ -41,6 +41,7 @@ const CTable = (props) => {
                                 <td style={thTdStyle} key={eachDoc.balance}>{eachDoc.amount}</td>
                                 <td style={thTdStyle} key={eachDoc.amount}>{eachDoc.balance}</td>
                                 <td style={thTdStyle} key={eachDoc.petty_cash_details}>{eachDoc.petty_cash_details}</td>
+                                <td style={thTdStyle} key={eachDoc.petty_cash_extra_details}>{eachDoc.petty_cash_extra_details}</td>
                                 <td style={thTdStyle}>
                                     {/* <button>
                                         <AiOutlineEdit 

@@ -26,6 +26,7 @@ const initialValues = {
     balance: '',
     amount: '',
     petty_cash_details: null,
+    petty_cash_extra_details : "",
 };
 
 const columns = [
@@ -33,6 +34,7 @@ const columns = [
     { id: "amount", name: "Amount" },
     { id: "balance", name: "Remaining Amount" },
     { id: "petty_cash_details", name: "Reason" },
+    { id: "petty_cash_extra_details", name: "Comment" },
     { id: "actions", name: "Actions" },
 ];
 
@@ -88,8 +90,8 @@ const PettyCashModal = (props) => {
 
     const handleSubmit = async (values, setErrors, resetForm,setFieldError,setFieldValue) => {
 
-        const { date, balance, amount, petty_cash_details } = values;
-        let isAllValuesPresent = date  && amount && petty_cash_details;
+        const { date, balance, amount, petty_cash_details,petty_cash_extra_details } = values;
+        let isAllValuesPresent = date  && amount && petty_cash_details && petty_cash_extra_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
         if(values.balance < 0){
@@ -122,6 +124,7 @@ const PettyCashModal = (props) => {
             setFieldValue("balance","");
             setFieldValue("amount","");
             setFieldValue("petty_cash_details",null);
+            setFieldValue("petty_cash_extra_details","");
             setRemPettybal(newTempObj.balance);
         }
 
@@ -241,6 +244,9 @@ const PettyCashModal = (props) => {
                                 handleChange={(name, selectedValue) => setFieldValue(name,selectedValue)}
                                 Arr={reasonsList}
                             />
+                            {
+                                ShowTextBoxInPC("Comment","petty_cash_extra_details","Enter Comment")
+                            }
                             
                             <div className="flex flex-col w-full md:w-60 py-7 mt-3">
                                 <CButton btnType="submit">

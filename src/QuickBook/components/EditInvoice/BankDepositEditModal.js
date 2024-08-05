@@ -95,7 +95,6 @@ const BankDepositEditModal = (props) => {
             }
             setShowLoader(false);
         } catch (e) {
-            console.log("e",e)
             setShowLoader(false);
         }
     }
@@ -135,7 +134,6 @@ const BankDepositEditModal = (props) => {
 
 
         } catch (Err) {
-            console.log("ERR..", Err);
             setEModal({
                 eMessage: Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
                 show: true

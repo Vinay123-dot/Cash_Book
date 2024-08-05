@@ -11,7 +11,7 @@ import { getFormatDate } from '../../../utils/dateFormatter';
 
 const DateTimePicker = (props) => {
     const { dialogType, handleCloseDialog, handleDate } = props
-    console.log("d", dialogType);
+  
     const [showDialog] = useState(true)
 
     const handleClose = useCallback(() => {
@@ -49,7 +49,6 @@ const DateTimePicker = (props) => {
                             )
                         }}
                         onChange={(newValue) => {
-                            console.log("n",newValue)
                             handleDate(
                                 getFormatDate(newValue, 'YYYY-MM-DD HH:mm:00'),
                                 'fromDate'
@@ -131,7 +130,6 @@ const DateTimePicker = (props) => {
                             )
                         }}
                         onChange={(newValue) => {
-                            console.log("n",newValue)
                             handleDate(
                                 getFormatDate(newValue, 'YYYY-MM-DD HH:mm:00'),
                                 'toDate'

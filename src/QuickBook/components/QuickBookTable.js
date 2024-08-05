@@ -43,7 +43,8 @@ const pettyCashColumns = [
         enableSorting: false,
     },
     // { header: 'Balance', accessorKey: 'Balance',enableSorting: false},
-    { header: "Reason", accessorKey: 'Petty_Cash_Details',enableSorting: false},
+    { header: "Type", accessorKey: 'Petty_Cash_Details',enableSorting: false},
+    { header: "Petty_Cash_Details", accessorKey: 'Petty_Cash_Extra_Details',enableSorting: false},
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
         accessorKey: 'action',

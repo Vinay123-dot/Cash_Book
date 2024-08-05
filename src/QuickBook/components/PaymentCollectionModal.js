@@ -89,7 +89,7 @@ const PaymentCollectionModal = (props) => {
 
             convertedObj.key = uniqueId;
             let response = await apiStorePaymentCollectionInfo([convertedObj]);
-            console.log("r",response)
+          
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
                 onCancel();

@@ -383,11 +383,13 @@ const DayBookModal = (props) => {
 
         </> :
         showUploadInvoice ? <UploadInvoiceModal onClose={handleCloseInvoiceModal} /> :
-            excelData.length >= 0 ? <>
+            excelData.length >= 0 ? <div style={{height:"100%"}}>
+            <div className="overflow-auto" style={{height:"87%"}}>
                 <DaybookTable
                     data = {excelData}
                     handleEditClick = {handleEditClick}
                 />
+            </div>
                 <EditModeInDayBook
                     isEditDayBookModal = {editDayBook.showEditDaybookModal}
                     editDayBookObj = {editDayBook.editDayBookObj}
@@ -410,7 +412,7 @@ const DayBookModal = (props) => {
                         Cancel
                     </CButton>
                 </div>
-            </> : null
+            </div> : null
              
     )
 }

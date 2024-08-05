@@ -10,6 +10,7 @@ const PettyCashValidations = Yup.object().shape({
             return Number(value) > 0;
         }),
     petty_cash_details: Yup.string().required('This field is required'),
+    petty_cash_extra_details : Yup.string().required('This field is required'),
 });
 
 export default PettyCashValidations;

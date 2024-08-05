@@ -212,6 +212,10 @@ const UploadModal = ({ onClose }) => {
   const [fileName, setFileName] = useState(null);
   const inputRef = useRef(null);
   const [loadingUPBtn,setLoadingUPBtn] = useState(false);
+  const [showErrorMessage,setShowErrorMessage] = useState({
+    flag : false,
+    Message : ""
+  });
 
   let uniqueId = localStorage.getItem("uniqueId");
 
@@ -225,10 +229,8 @@ const UploadModal = ({ onClose }) => {
     }
   };
   const handleChange = (e) => {
-    // console.log("ev",e.target.value);
 
     const file = e.target.files[0];
-    console.log("file",file)
     if (file) {
       setFileName(file.name);
       // setFile(e.target.value)
@@ -255,11 +257,22 @@ const UploadModal = ({ onClose }) => {
   const handleCancelBtn = () => {
     setFile(null);
     setFileName(null)
+    setShowErrorMessage({
+      flag : false,
+      Message : ""
+    });
     onClose();
   }
 
   const handleSubmitExcel = async() => {
     try{
+      if(!file){
+        setShowErrorMessage({
+          flag : true,
+          Message : "Please select file"
+        });
+        return;
+      }
       setLoadingUPBtn(true);
       const formData = new FormData();
       formData.append("key",uniqueId);
@@ -268,34 +281,47 @@ const UploadModal = ({ onClose }) => {
       setLoadingUPBtn(false);
       if(response?.status === 200) {
         onClose();
+        setShowErrorMessage({
+          flag : false,
+          Message : ""
+        });
       }
       
 
-    }catch(e){
+    }catch(ev){
       setLoadingUPBtn(false);
+      setShowErrorMessage({
+        flag : true,
+        Message : ev?.response?.data.detail || ""
+      });
     }
     
   }
 
   return (
-    <Modal openModal={true} height={200} width={400} jc="center" bStyle="dashed">
+    <Modal openModal={true} height={250} width={400} jc="center" bStyle="dashed">
       <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
         <div className="flex items-center justify-center px-8 mt-2 text-base text-black rounded-md">
-          {!file && (
+          { (!file || showErrorMessage.flag) && (
             <>
-              <input ref={inputRef} type="file" accept=".xlsx" id="input-file-upload" onChange={handleChange} className="hidden" />
+              <input ref={inputRef} type="file" accept=".xlsx, .csv"  id="input-file-upload" onChange={handleChange} className="hidden" />
               <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : ""}>
                 <div className="flex flex-col items-center justify-center">
                   <HiOutlineUpload size={44} style={{ color: "#5A87B2" }} />
                   <CButton onClick={onButtonClick} style={{borderRadius: 16,width:96,fontSize:12}}>Choose a file</CButton>
                   <p style={{fontSize: 14,color: "rgba(18, 18, 18, 0.38)"}}> or drop a file here</p>
-                  <p style={{fontSize: 16}}> <span className='text-red-600 text-2xl'>*</span>File supported .xls, .xlsx</p>
+                  {
+                    showErrorMessage.flag && (
+                        <p className='text-red-900 text-lg'>{showErrorMessage.Message}</p>
+                    )
+                  }
+                  <p style={{fontSize: 16}}> <span className='text-red-600 text-2xl'>*</span>File supported .csv, .xlsx</p>
                 </div>
               </label>
             </>
           )}
           {
-            file && (
+            (file && !showErrorMessage.flag) && (
               <div className="flex flex-col items-center justify-center">
                 <img src={excelIcon} style={{ width: 80, height: 80}} />
                 <p style={{fontSize: 14,color: "rgba(18, 18, 18, 0.38)"}}>{fileName||""}</p>
@@ -303,6 +329,8 @@ const UploadModal = ({ onClose }) => {
               </div>
             )
           }
+          
+          
         </div>
         {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
       </form>

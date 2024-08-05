@@ -59,7 +59,7 @@ const QuickBookStatusFilter = (props) => {
 
 
     const onStatusFilterChange = (selected) => {
-        console.log("s",selected);
+      
         
         if (selected === 6) {
             setFromDate('');

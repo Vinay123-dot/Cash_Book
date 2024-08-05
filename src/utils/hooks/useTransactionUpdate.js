@@ -6,8 +6,6 @@ function useTransactionUpdate() {
     const getTerminalList = async (values) => {
         try {
             const resp = await apiTerminalList(values)
-            
-            console.log("resip",resp)
             if (resp?.data?.status === 0) {
                 return {
                     status: 'success',
