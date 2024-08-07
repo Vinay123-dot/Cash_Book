@@ -65,7 +65,7 @@ const PettyCashModal = (props) => {
 
     const { showPettyCash, onCancel } = props;
     const dispatch = useDispatch();
-    const editFormikRef = useRef();
+    const pettyCashRef = useRef();
 
     const [pettyCashArr, setPettyCashArr] = useState([]);
     const [selectObjDetails, setSelectedObjDetails] = useState({
@@ -88,14 +88,14 @@ const PettyCashModal = (props) => {
 
     if (!showPettyCash) return null;
 
-    const handleSubmit = async (values, setErrors, resetForm,setFieldError,setFieldValue) => {
+    const handleSubmit = async (values) => {
 
         const { date, balance, amount, petty_cash_details,petty_cash_extra_details } = values;
         let isAllValuesPresent = date  && amount && petty_cash_details && petty_cash_extra_details;
         values.amount = Number(values.amount);
         values.key = uniqueId;
         if(values.balance < 0){
-            setFieldError("balance","Balance should not be lessthan 0");
+            pettyCashRef.current.setFieldError("balance","Balance should not be lessthan 0");
             return ;
         }
         let isDateFlag = getStatusOfCurrentDate(values.date);
@@ -119,13 +119,14 @@ const PettyCashModal = (props) => {
 
         if (isAllValuesPresent) {
             setPettyCashArr((prev) => [...prev, newTempObj]);
-            setErrors({});
-            setFieldValue("date",null);
-            setFieldValue("balance","");
-            setFieldValue("amount","");
-            setFieldValue("petty_cash_details",null);
-            setFieldValue("petty_cash_extra_details","");
+            pettyCashRef.current?.setTouched({});
+            pettyCashRef.current.setFieldValue("date",null);
+            pettyCashRef.current.setFieldValue("balance","");
+            pettyCashRef.current.setFieldValue("amount","");
+            pettyCashRef.current.setFieldValue("petty_cash_extra_details","");
+            pettyCashRef.current.setFieldValue("petty_cash_details",null);
             setRemPettybal(newTempObj.balance);
+       
         }
 
     }
@@ -200,27 +201,21 @@ const PettyCashModal = (props) => {
         <div className="h-[80%] overflow-y-scroll">
         <Formik
             initialValues={initialValues}
+            innerRef={pettyCashRef}
             validationSchema={PettyCashValidations}
-            onSubmit={(values, { setErrors, resetForm,setFieldError,setFieldValue }) => {
-                handleSubmit(values, setErrors, resetForm,setFieldError,setFieldValue);
+            onSubmit={(values, { setErrors, resetForm,setFieldError,setFieldValue}) => {
+                handleSubmit(values);
             }}
             // style={{ overflow: "auto" }}
         >
-            {({ setFieldValue,values }) => {
-                
+            {({ setFieldValue,values}) => {
                 values.balance = remPettybal - Number(values.amount);
                 return (
                     <Form >
                         
                         <ParagraphTag label = "Details"/>
                         <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
-                            {/* <AntdFormikSelect
-                                labelText="Day"
-                                name="date"
-                                ph="--- Select Day ---"
-                                handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
-                                Arr={DaysArr}
-                            /> */}
+                           
                             <AntdDatePicker
                             labelText="Day"
                             name="date"
