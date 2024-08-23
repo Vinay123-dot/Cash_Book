@@ -34,6 +34,8 @@ const CashTypes = (props) => {
     
     const validateReasonField = (value,allValues) => verifyReasonField(value,allValues);
 
+    const validateReferenceField = (value,allValues) => null;
+
     const validateUTRNumber = (value, allValues) => verifyUTRNum(value, allValues);
 
     const validateChequeNum = (value, allValues) => verifyChequeNum(value, allValues);
@@ -319,6 +321,9 @@ const CashTypes = (props) => {
             <div className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2">
                 {
                     showInputBox("Reason", 'reason', "Reason", validateReasonField, valObj, true, false, false)
+                }
+                {
+                    showInputBox("Reference Name", 'reference_name', "Reference Name", validateReferenceField, valObj, false, false, false)
                 }
 
             </div>

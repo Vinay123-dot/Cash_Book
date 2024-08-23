@@ -44,7 +44,8 @@ export const dayBookIntialObj = {
     reference_order_amount: null,
     party_code : "",
     party_name : "",
-    reason : ""
+    reason : "",
+    reference_name : "" //not there in api
 
 
 };

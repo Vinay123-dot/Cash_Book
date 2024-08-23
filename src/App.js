@@ -9,14 +9,12 @@ import { apiCreateSession } from './services/TransactionService';
 function App() {
   const searchParams = new URLSearchParams(window.location.search);
   const userType = searchParams.get('mType');
-  const rawPersistData = searchParams.get('sessionData');
-  const uniqueId = searchParams.get('uniqueId') ||  "0000000000053575"; 
-  const merchantId = searchParams.get('mId') || "0000000000053575" ; 
+  const uniqueId = searchParams.get('uniqueId') ; 
+  const merchantId = searchParams.get('mId'); 
   // "0000000000053575"; sanbbox
   // "0000000000002085" ; web
 
   localStorage.setItem("mType",userType);
-  localStorage.setItem("whoami",rawPersistData);
   localStorage.setItem("uniqueId",uniqueId);
   localStorage.setItem("mId",merchantId);
 

@@ -256,7 +256,7 @@ const QuickBookTools = () => {
 
   return (
     <div className="xl:flex justify-between py-2 px-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2  md:mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2  md:mb-2">
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"

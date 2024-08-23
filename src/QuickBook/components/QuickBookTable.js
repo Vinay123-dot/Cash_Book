@@ -77,9 +77,8 @@ const DayBookColumns = [
         },
         enableSorting: false,
     },
-    { header: 'UPI Type',accessorKey: 'UPI_Type', enableSorting: false },
     {
-        header: 'UPI Amount',
+        header: 'UPI',
         accessorKey: 'UPI_Amount',
         cell: (props) => {
             const row = props.row.original
@@ -132,6 +131,16 @@ const DayBookColumns = [
         },
         enableSorting: false,
     },
+    
+    {
+        header: 'Pending Amount',
+        accessorKey: 'Pending_Balance',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Pending_Balance)}</span>
+        },
+        enableSorting: false,
+    },
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
         accessorKey: 'action',
@@ -147,6 +156,60 @@ const AdvanceBookColumns = [
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
     { header: "Customer Name", accessorKey: 'Customer_Name', enableSorting: false},
     { header: 'Customer Mobile Number',accessorKey: 'Phone_No',enableSorting: false },
+    {
+        header: 'Cash',
+        accessorKey: 'Cash_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Cash_Amount)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'UPI',
+        accessorKey: 'UPI_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.UPI_Amount)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Debit Card',
+        accessorKey: 'Debit_Card_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Debit_Card_Amount)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Credit Card',
+        accessorKey: 'Credit_Card_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Credit_Card_Amount)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Bank',
+        accessorKey: 'Online_Bank_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Online_Bank_Amount)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Cheque',
+        accessorKey: 'Bank_Cheque_Amount',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Bank_Cheque_Amount)}</span>
+        },
+        enableSorting: false,
+    },
     {
         header: 'Advance Receipt Amount',
         accessorKey: 'Bill_Value',
@@ -200,9 +263,8 @@ const PaymentCollectionColumns = [
         },
         enableSorting: false,
     },
-    { header: 'UPI Type',accessorKey: 'UPI_Type', enableSorting: false },
     {
-        header: 'UPI Amount',
+        header: 'UPI',
         accessorKey: 'UPI_Amount',
         cell: (props) => {
             const row = props.row.original

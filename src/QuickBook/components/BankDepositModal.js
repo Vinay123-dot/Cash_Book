@@ -47,7 +47,8 @@ const initialValues = {
     receipt_status : "",
     receipt_type_id : null,
     person_name : "",
-    person_mobile : ""
+    person_mobile : "",
+    return_number : "" //only for return order
 };
 
 
@@ -356,6 +357,12 @@ const BankDepositModal = (props) => {
                                         ph="--- Select Store Id---"
                                         handleChange={(name, selectedValue) => setFieldValue(name, selectedValue)}
                                         Arr={allTerminals}
+                                    />
+                                    
+                                    <AntdInput // Newly added not there in api
+                                        text="Return Number"
+                                        value = 'return_number'
+                                        ph= "Return Number"
                                     />
                                     {
                                         ShowTextBoxInPC("Reason", 'reason', "Enter Reason")
