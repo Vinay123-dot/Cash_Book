@@ -2,7 +2,6 @@
 import React, { useState, memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../../components/ui/Button";
-import { DaysArr } from "../../../Constants";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useDispatch, useSelector } from "react-redux";
 import {

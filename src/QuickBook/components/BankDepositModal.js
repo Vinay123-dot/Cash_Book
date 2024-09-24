@@ -8,10 +8,11 @@ import { BankDepositTypeValidations } from "../../Validations";
 import { useDispatch,useSelector } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal
+    setDataSavedModal,
+    setSelectedBookType
   } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
-import { DaysArr,getStatusOfCurrentDate } from "../../Constants";
+import { getStatusOfCurrentDate } from "../../Constants";
 import { 
     apiGetDepositModeInfo, 
     apiGetDepositTypeInfo,
@@ -30,6 +31,11 @@ const ShowTextBoxInPC = (label, value, ph) => (
         ph={ph}
     />
 )
+const WITHDRAW_ID = 1;
+const DEPOSIT_ID = 2;
+const ORDER_CANCEL_ID = 3;
+const HEAD_OFFICE_ID = 5;
+
 const checkArr = ["",null];
 const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 const initialValues = {
@@ -53,7 +59,7 @@ const initialValues = {
 
 
 const BankDepositModal = (props) => {
-    const { showBankDeposit,onCancel } = props;
+    const { showBankDeposit } = props;
     const dispatch = useDispatch();
     const [depositList,setDepositList] = useState([]);
     const [depositModeList,setDepositModeList] = useState([]);
@@ -68,14 +74,8 @@ const BankDepositModal = (props) => {
     })
     const [selectedDate,setSelectedDate] = useState(null);
     const [selectedType,setSelectedType] = useState(null);
-    // const [remOpenBal, setRemOpenBal] = useState(remCommOpeningBal);
     let uniqueId = localStorage.getItem("uniqueId");
 
-    // useEffect(() => {
-    //     let checkDateStatus = getStatusOfCurrentDate(selectedDate);
-    //     let balanceTemp = (checkArr.includes(selectedDate)|| checkDateStatus ) && selectedType !== 2 ? remCommOpeningBal : commOpeningBal;
-    //     setRemOpenBal(balanceTemp);
-    // }, [commOpeningBal,remCommOpeningBal,selectedDate,selectedType])
  
 
     useEffect(() => {
@@ -132,12 +132,12 @@ const BankDepositModal = (props) => {
            
 
             let isDateFlag = getStatusOfCurrentDate(newObj.date);
-            let isCondFlag = (newObj.type == 1 && !isDateFlag) ||newObj.type == 2 || (newObj.type == 3 && !isDateFlag);
+            let isCondFlag = (newObj.type == WITHDRAW_ID && !isDateFlag) ||newObj.type == DEPOSIT_ID || (newObj.type == ORDER_CANCEL_ID && !isDateFlag);
           
             if(isCondFlag && newObj.amount > commOpeningBal) {
                     
                     setEModal({
-                        eMessage : `Given amount should be less than or equal to the opening balance . ${newObj.type ==2 ?"":"As you selected previous date."}`,
+                        eMessage : `Given amount should be less than or equal to the opening balance . ${newObj.type == DEPOSIT_ID ?"":"As you selected previous date."}`,
                         show : true
                     })
                     setStartLoading(false);
@@ -158,7 +158,7 @@ const BankDepositModal = (props) => {
             setSubmitting(false);
             if(response.message){
                 dispatch(setShowAddBookPage(false));
-                onCancel();
+                dispatch(setSelectedBookType(null));
                 dispatch(setDataSavedModal(true));
                 setStartLoading(false);
             }
@@ -182,7 +182,7 @@ const BankDepositModal = (props) => {
     const handleCancelBankDeposit = () => {
         dispatch(setShowAddBookPage(false));
         setVerifyBtnLdng(false);
-        onCancel();
+        dispatch(setSelectedBookType(null));
     }
 
     const handleVerifyAdvanceMoney = async(allVal,setFieldValue) => {
@@ -281,7 +281,7 @@ const BankDepositModal = (props) => {
                             }
                             
                             {
-                                values.type === 2 &&
+                                values.type === DEPOSIT_ID &&
                                 <AntdFormikSelect
                                     labelText="Deposit Mode"
                                     name="deposit_mode"
@@ -334,7 +334,7 @@ const BankDepositModal = (props) => {
                              
                             
                             {
-                                values.type === 3 && values.receipt_type_id !== null &&
+                                values.type === ORDER_CANCEL_ID && values.receipt_type_id !== null &&
                                 (values.receipt_type_id === 2 || !statusArr.includes(values.receipt_status)) &&
                                 <>
                                  <AntdInput
@@ -370,7 +370,7 @@ const BankDepositModal = (props) => {
                                 </>
                             }
                             {
-                                values.type === 5 &&
+                                values.type === HEAD_OFFICE_ID &&
                                 <>
                                     <AntdInput
                                         text="Person Name"

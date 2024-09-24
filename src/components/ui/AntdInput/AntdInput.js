@@ -11,11 +11,12 @@ const AntdInput = (props) => {
         showPrefix = false,acceptOnlyNum = false,
         validation = false,disableInput  = false,
         validateField,showAddBefore = false,
-        showAddBeforeValue ="" ,maxLen = 200,forMobileNum = false} = props;
+        showAddBeforeValue ="" ,maxLen = 200,forMobileNum = false,
+        handleChange} = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
-            <label htmlFor={value} className="my-2 text-start">{text}</label>
+            <label htmlFor={value} className="my-2 text-start text-black">{text}</label>
             <Field 
                 name={value} 
                 as={Input} 

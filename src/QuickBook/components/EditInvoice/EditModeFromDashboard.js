@@ -2,7 +2,6 @@
 import React, { useState,memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../../components/ui/Button";
-import { DaysArr } from "../../../Constants";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useDispatch,useSelector } from "react-redux";
@@ -58,12 +57,18 @@ const EditDayBookFromDashboard = (props) => {
     })
     let uniqueId = localStorage.getItem("uniqueId");
 
-  
-     
+     console.log("editA",editDayBookObj);
     const handleSubmit = async (values,validateModal) => {
         try {
             setShowBillModal(false);
-            if(Number(values.advance_receipt_amount) > values.remaining_balance ) {
+            let remainingBalance ;
+            if(editDayBookObj.advance_receipt_number && editDayBookObj.advance_receipt_number === values.advance_receipt_number){
+                remainingBalance = Number(editDayBookObj.advance_receipt_amount) + values.remaining_balance;
+            }else{
+                remainingBalance = values.remainingBalance;
+            }
+
+            if( Number(editDayBookObj.advance_receipt_amount) >= remainingBalance) {
                 setEModal({
                     eMessage : "Given amount should be less than or equal to the Advance Receipt Amount",
                     show : true
@@ -174,12 +179,10 @@ const EditDayBookFromDashboard = (props) => {
                     {({ setFieldValue, values }) => {
                         return (
                             <Form className="h-full">
-                                 <div className="h-[80%] overflow-y-scroll">
+                                <div className="h-[80%] overflow-y-scroll"> {/*   Main Div */}
                                 <ParagraphTag label="Details" />
                                 <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
-                                    {/* {
-                                        showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                                    } */}
+                                   
                                      <AntdDatePicker
                                         labelText="Day"
                                         name="date"
@@ -193,16 +196,13 @@ const EditDayBookFromDashboard = (props) => {
                                         ph = "--Select Sale Type--"
                                         handleChange = {(name, selectedValue) => handleChangeSalesType(name, selectedValue, setFieldValue, salesType)}
                                         Arr = {salesType}
+                                        isDisabled = {true}
                                     />
                                     <AntdInput
                                         text="Bill Number"
                                         value='bill_no'
                                         ph="Enter Bill Number"
                                         showAddBefore={true}
-                                        // showAddBeforeValue={
-                                        //     billNum + "/" + (values.sales_code ? values.sales_code + "/" : "")
-                                        // }
-                                        // disableInput={!values.sales_type && true}
                                         disableInput={true}
                                     />
                                     {
@@ -219,6 +219,7 @@ const EditDayBookFromDashboard = (props) => {
                                     }
                                 </div>
                                 {
+                                    // Payment Types
                                     values.sales_type === 1 &&
                                     <>
                                         <CashTypes
@@ -228,15 +229,19 @@ const EditDayBookFromDashboard = (props) => {
                                             upiTypeInfo = {upiTypeInfo}
                                             isFromEditObj = {true}
                                             pLength = {7}
+                                            showReferenceName = {true}
                                         />
-
-                                        <AdvanceBillDetails values={values} />
+                                                {/* Advance Receipt */}
+                                        <AdvanceBillDetails 
+                                            values={values} 
+                                            isFromEditDayBook = {true}
+                                        /> 
 
                                     </>
                                 }
 
-
-                                <ShowPaymentTypes paymentValues={values} />
+                                {/* Show all paymentTypes */}
+                                <ShowPaymentTypes paymentValues={values} />  
                                 <BillAmountModal
                                     billModal={showBillModal}
                                     valuesObj={values}

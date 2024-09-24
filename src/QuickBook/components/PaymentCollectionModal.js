@@ -2,13 +2,13 @@
 import React, { useEffect, useState, memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
-import { DaysArr } from "../../Constants";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import { useDispatch } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal
+    setDataSavedModal,
+    setSelectedBookType
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import {
@@ -39,7 +39,7 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 
 const PaymentCollectionModal = (props) => {
 
-    const { showPaymentColModal, onCancel } = props;
+    const { showPaymentColModal } = props;
     const dispatch = useDispatch();
     const [paymentListInfo, setPaymentListInfo] = useState([]);
     const [upiTypeInfo, setUpiTypeInfo] = useState([]);
@@ -92,7 +92,7 @@ const PaymentCollectionModal = (props) => {
           
             if (response.message) {
                 dispatch(setShowAddBookPage(false));
-                onCancel();
+                dispatch(setSelectedBookType(null));
                 dispatch(setDataSavedModal(true));
                 setValidateModal(true);
                 setEModal({
@@ -201,7 +201,7 @@ const PaymentCollectionModal = (props) => {
                                     Save
                                 </CButton>
                                 <CButton onClick={() => {
-                                    onCancel();
+                                     dispatch(setSelectedBookType(null));
                                     dispatch(setShowAddBookPage(false))
                                     setEModal({
                                         eMessage : "",

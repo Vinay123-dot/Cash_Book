@@ -273,6 +273,33 @@ export async function apiCreateSession(data){
     let url = `${appConfig.apiPrefix}/v21/session/add_Session`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
+};
+
+export async function apiDeleteDayBook(data){
+    let url = `${appConfig.apiPrefix}/v21/day_book/delete_DayBook`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+}
+
+export async function apiDeleteAdvanceBook(data){
+    let url = `${appConfig.apiPrefix}/v21/advance_book/delete_AdvancedBook`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+}
+
+export async function apiDeletePaymentModal(data){
+    let url = `${appConfig.apiPrefix}/v21/payment_collection/delete_PaymentCollection`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
 }
 
 

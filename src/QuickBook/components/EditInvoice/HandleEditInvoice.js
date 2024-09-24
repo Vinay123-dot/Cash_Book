@@ -1,224 +1,288 @@
-import React, { useMemo, useState, useRef, useEffect,useCallback } from 'react'
+import React, { useMemo, useState, useRef, useEffect,useCallback } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch, useSelector } from 'react-redux'
+import { HiOutlinePencil,HiOutlineTrash } from "react-icons/hi";
 import PettyCashEditModal from "./PettyCashEditModal";
 import EditDayBookFromDashboard from "./EditModeFromDashboard";
 import EditAdvBookFromDashboard from './EditAdvanceBookFromDashboard';
 import BankDepositEditModal from './BankDepositEditModal';
-import { getDaybeforeYesterday, getToday, getYesterDay } from '../../../utils/dateFormatter';
-import { HiOutlinePencil } from "react-icons/hi";
-import { allPaymentTypes, getConvertedObj,selectedValType,
-        advanceModalConObj,paymentCollectionConObj } from '../CompConstants';
+import { getDaybeforeYesterday, getToday, getYesterDay } from 'utils/dateFormatter';
 import EditPaymentColFromDashboard from './EditPaymentColFromDashboard';
+import DataModal from 'components/ui/DataModal';
+import { getTransactions,setMainPageLoader } from 'QuickBook/store/dataSlice';
+import useConversions from 'assets/hooks/useConversions';
+import useBankBalance from 'assets/hooks/useBankBalance';
+import { 
+  apiDeleteAdvanceBook, 
+  apiDeleteDayBook, 
+  apiDeletePaymentModal 
+} from 'services/TransactionService';
 
 
 
+const removeEditAndDelete = ["Invoiced","ORDER CANCELLED"];
+const removeDelete = ["Partially Refunded", "Partially Invoiced"];
 
 const HandleEditInvoice = (props) => {
 
     const { row } = props;
+    const dispatch = useDispatch();
+    const { 
+        convertToSmallPettyCashObj,
+        convertToSmallBankDepositObj,
+        createNewDaybookObj,
+        createNewAdvanceBookObj,
+        createNewPaymentColObj } = useConversions();
     const [seletedModalVal, setSelectedModalVal] = useState(null);
+    const tableData = useSelector((state) => state.quickbookStore.data.tableData);
+    const filterData = useSelector((state) => state.quickbookStore.data.filterData);
+    const outletData = useSelector((state) => state.quickbookStore.data.outletData);
     const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
+    const bookTypeList = useSelector((state) => state.quickbookStore.state.bookTypeList);
     const {
-        salesType,
-        customerListInfo,
-        upiTypeInfo,
-        allTerminalList,
-        depositTypeList,
-        depositModeList,
-        reasonsList
+        allTerminalList
     } = useSelector(state => state.quickbookStore.state);
+    const [modalInfo,setModalInfo] = useState({
+        showModal : false,
+        showOnlyInfo : false,
+        apiCall : false,
+        Info : "",
+        bookType : null,
+        selectedId : null
+    });
+    let userType = localStorage.getItem("mType");
+    let uniqueId = localStorage.getItem("uniqueId");
+    const { allBalance, getBankBalance } = useBankBalance(uniqueId);
 
+    const UpdateModalInfo = ({modalFlag = false,Info ='',bookType = null, selectedId = null,OnlyInfoModal = false,apiCall = false}) => {
+        setModalInfo((prev) =>(
+            {
+                ...prev,
+                showModal : modalFlag,
+                showOnlyInfo : OnlyInfoModal,
+                apiCall : apiCall,
+                Info : Info,
+                bookType : bookType,
+                selectedId : selectedId
+            }
+        ))
+    };
 
-    const handleClickIcon = () => {
-        setSelectedModalVal(cashbookData.book_type);
-    }
+    const handleClickDelete = () => {
+        UpdateModalInfo({
+            modalFlag : true,
+            Info : "Do you want to delete this record?",
+            bookType : cashbookData.book_type,
+            selectedId : row.Id
+        });
+    };
     
-
-    const convertToSmallPettyCashObj = (pObj) => {
-        let newTemp = {
-            id: pObj.Id || 0,
-            date:  pObj.Date ||null,
-            amount: pObj.Amount || null,
-            petty_cash_details: pObj.Petty_Cash_Details || '',
-            petty_cash_extra_details : pObj.Petty_Cash_Extra_Details || ""
-        }
-        if (typeof newTemp.petty_cash_details === 'string') {
-            let findedObj = (reasonsList || []).find((eachItem) => eachItem.Type === newTemp.petty_cash_details);
-            newTemp.petty_cash_details = findedObj?.Id || null;
-        } 
-        
-        return newTemp;
-    }
-
-    const convertToSmallBankDepositObj = (pObj) => {
-        let newObj = {
-            id: pObj.Id || 0,
-            deposit_mode : pObj.Deposit_Mode || null,
-            store_id : pObj.Store_Id || null,
-            advance_receipt_no : pObj.Advance_Receipt_No || "",
-            remaining_balance : pObj.Remaining_Balance || null,
-            date : pObj.Date || null,
-            type : pObj.Type || null,
-            reason : pObj.Reason || "",
-            bill_number : pObj.Bill_Number ||  "",
-            amount : pObj.Amount || "",
-            total_receipt_amount : null,
-            receipt_status : ""
-        };
-        if (typeof newObj.store_id === 'string') {
-            let findedObj = (allTerminalList || []).find((eachItem) => eachItem.Terminal === newObj.store_id);
-            newObj.store_id = findedObj?.Id || null;
-        } 
-        
-        if (typeof newObj.deposit_mode === 'string') {
-            let findedObj = (depositModeList || []).find((eachItem) => eachItem.Type === newObj.deposit_mode);
-            newObj.deposit_mode = findedObj?.Id || null;
-        } 
-        if (typeof newObj.type === 'string') {
-            let findedObj = (depositTypeList || []).find((eachItem) => eachItem.Type === newObj.type);
-            newObj.type = findedObj?.Id || null;
-        } 
-        return newObj;
-    }
-    const onCancelPettyCash = () => {
-        setSelectedModalVal(null);
-    }
-
-    const createNewDaybookObj = (row) => {
-        let paymentIndex = 0;
-        let newCount = [];
-        let newObj = {...getConvertedObj(row)};
-        let  saleTypeObj = (salesType || []).find((eachDoc) => eachDoc.Type === newObj?.sales_type);
-        newObj["sales_type"] = saleTypeObj?.Id || null;
-
-        if (typeof newObj.customer_type === 'string') {
-            let findedObj = (customerListInfo || []).find((eachItem) => eachItem.Type === newObj.customer_type);
-            newObj.customer_type = findedObj?.Id || null;
-        } 
-        
-        if (typeof newObj.upi_type === 'string') {
-            let findedObj = (upiTypeInfo || []).find((eachItem) => eachItem.Type === newObj.upi_type);
-            newObj.upi_type = findedObj?.Id || null;
-        } 
-        
-        for (let key in newObj) {
-            if ( allPaymentTypes.includes(key) && newObj[key] > 0) {
-                newObj[`paymentType${paymentIndex}`] = selectedValType[key];
-                newCount.push(paymentIndex);
-              paymentIndex++;
+    const onSubmitModal = async() => {
+        try{
+            const { bookType,selectedId } = modalInfo;
+            UpdateModalInfo({
+                modalFlag : false,
+                Info : "",
+                bookType : cashbookData.book_type,
+                selectedId : row.Id
+            });
+            dispatch(setMainPageLoader(true));
+            let response;
+            if(bookType == 1){
+                response = await apiDeleteAdvanceBook([selectedId]);
+            }else if(bookType == 3) {
+                response = await apiDeleteDayBook([selectedId]);
+            }else if(bookType == 5) {
+                response = await apiDeletePaymentModal([selectedId]);
             }
+            checkStatusOfResponse(response,selectedId);
+            
+        }catch(Err){
+            dispatch(setMainPageLoader(false));
+            UpdateModalInfo({
+                modalFlag : true,
+                OnlyInfoModal : true,
+                Info : Err?.message,
+            });
         }
-        newObj.PaymentCountArr = newCount;
-        return newObj;
-        
+    };
+
+    const secondaryUpdateFun = ({mFlag = true, InfoModal = true,Info = "",apiCall = false}) => {
+        dispatch(setMainPageLoader(false));
+        UpdateModalInfo({
+            modalFlag : mFlag,
+            OnlyInfoModal : InfoModal,
+            Info : Info,
+            apiCall : apiCall
+        });
+    };
+
+    const checkStatusOfResponse = (res,ID) => {
+        if(res.status === 200) {
+            let idsArray = res.data || {};
+            if(idsArray?.ids_not_present?.includes(ID)){
+                secondaryUpdateFun({Info : "The selected record is not present in table"});
+                return ;
+            }
+            if(idsArray?.ids_not_deleted?.includes(ID)) {
+                secondaryUpdateFun({Info : "The selected record is used in other transactions. Unable to delete it"});
+                return ;
+            }
+            if(idsArray?.deleted_ids?.includes(ID)) {
+                secondaryUpdateFun({Info : "The selected record is deleted sucessfully",apiCall : true});
+                return ;
+            }
+            dispatch(setMainPageLoader(false));
+        } else {
+            dispatch(setMainPageLoader(false));
+            secondaryUpdateFun({Info : "Unable to delete this record"});
+        }
     }
 
-    const createNewAdvanceBookObj = (row) => {
-        let paymentIndex = 0;
-        let newCount = [];
-        let newObj = {...advanceModalConObj(row)};
-
-        if (typeof newObj.customer_type === 'string') {
-            let findedObj = (customerListInfo || []).find((eachItem) => eachItem.Type === newObj.customer_type);
-            newObj.customer_type = findedObj?.Id || null;
-        } 
-        
-        if (typeof newObj.upi_type === 'string') {
-            let findedObj = (upiTypeInfo || []).find((eachItem) => eachItem.Type === newObj.upi_type);
-            newObj.upi_type = findedObj?.Id || null;
-        } 
-        
-        for (let key in newObj) {
-            if ( allPaymentTypes.includes(key) && newObj[key] > 0) {
-                newObj[`paymentType${paymentIndex}`] = selectedValType[key];
-                newCount.push(paymentIndex);
-              paymentIndex++;
+    const handleCallTransactionAPI = async () => {
+        try{
+            const { apiCall } = modalInfo;
+            UpdateModalInfo({});
+            if(apiCall) {
+                const payload = cloneDeep(tableData);
+                const newFilterData = cloneDeep(filterData);
+                const newCashBookData = cloneDeep(cashbookData);
+                const newOutletData = cloneDeep(outletData);
+            
+                const newTableData = cloneDeep(payload);
+                let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
+                let outletInStrng = (allTerminalList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
+                let newObj = { 
+                  ...newTableData, 
+                  ...newFilterData,
+                  ...newCashBookData,
+                  ...newOutletData,
+                  book_type:bookTypeInStrng?.Type,
+                  terminal_id: userType == 7? uniqueId : outletInStrng.Terminal ,
+                  key: uniqueId
+                  }
+                dispatch(getTransactions(newObj));
+                getBankBalance();
             }
+            
+        }catch(Err){
+            console.log("Err...",Err)
+            dispatch(setMainPageLoader(false));
         }
-        newObj.PaymentCountArr = newCount;
-        return newObj;
         
-    }
+    };
+    
+    const handleClickIcon = () => setSelectedModalVal(cashbookData.book_type);
+    const onCancelPettyCash = () => setSelectedModalVal(null);
+    const onModalCancel = () => UpdateModalInfo({});
+    const checkForOtherBooks = (sObj) => {
+        let datesArr = [getToday(),getYesterDay(),getDaybeforeYesterday()];
+        let newFlag = cashbookData.book_type !== 1 && cashbookData.book_type !== 2 && datesArr.includes(sObj.Date);
+        return newFlag ? true : false;
+    };
 
-    const createNewPaymentColObj = (row) => {
-        let paymentIndex = 0;
-        let newCount = [];
-        let newObj = {...paymentCollectionConObj(row)};
+    const checkForAdvancebook = (sObj) => {
+        return cashbookData.book_type === 1 && !removeEditAndDelete.includes(sObj.Status) ? true : false;
+    };
 
-        if (typeof newObj.customer_type === 'string') {
-            let findedObj = (customerListInfo || []).find((eachItem) => eachItem.Type === newObj.customer_type);
-            newObj.customer_type = findedObj?.Id || null;
-        } 
-        
-        if (typeof newObj.upi_type === 'string') {
-            let findedObj = (upiTypeInfo || []).find((eachItem) => eachItem.Type === newObj.upi_type);
-            newObj.upi_type = findedObj?.Id || null;
-        } 
-        
-        for (let key in newObj) {
-            if ( allPaymentTypes.includes(key) && newObj[key] > 0) {
-                newObj[`paymentType${paymentIndex}`] = selectedValType[key];
-                newCount.push(paymentIndex);
-              paymentIndex++;
-            }
-        }
-        newObj.PaymentCountArr = newCount;
-        return newObj;
-        
+    const checkForBankDeposit = (sObj) => {
+      const ENABLED_TYPES = ['WITHDRAWAL','DEPOSIT','HEAD OFFICE EXPENSES',''];
+      return cashbookData.book_type === 2 && ENABLED_TYPES.includes(sObj.Type) ? true : false;
     }
 
     return (
-        <>
-            {
-                ((row.Date === getToday() || row.Date === getYesterDay() || row.Date === getDaybeforeYesterday()) ) ?
-                    <HiOutlinePencil
-                        size={20}
-                        style={{ color: "#5A87B2",width : 80,textAlign:'start'}}
-                        onClick={handleClickIcon}
-                    /> : null
-            }
-            {
-                seletedModalVal === 4 &&
-                <PettyCashEditModal
-                    selectedPettyCashObj = {convertToSmallPettyCashObj(row)}
-                    handleCancelPettyCash = {onCancelPettyCash}
+      <>
+        {
+            checkForBankDeposit(row) && (
+            <div className="flex space-x-2 pl-3">
+                <HiOutlinePencil
+                    className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                    onClick={handleClickIcon}
                 />
-            }
-            
-            {
-                seletedModalVal === 3 && 
-                <EditDayBookFromDashboard
-                    editDayBookObj = {createNewDaybookObj(row)}
-                    handleCloseEditModal={onCancelPettyCash}
-                /> 
-            }
-            {
-                seletedModalVal === 1 && 
-                <EditAdvBookFromDashboard
-                    editDayBookObj = {createNewAdvanceBookObj(row)}
-                    handleCloseEditModal={onCancelPettyCash}
-                /> 
-            }
-             {
-                seletedModalVal === 5 && 
-                <EditPaymentColFromDashboard
-                    editDayBookObj = {createNewPaymentColObj(row)}
-                    handleCloseEditModal={onCancelPettyCash}
-                /> 
-            }
-
-            {
-                seletedModalVal === 2 &&
-                <BankDepositEditModal
-                    editDayBookObj = {convertToSmallBankDepositObj(row)}
-                    handleCloseEditModal = {onCancelPettyCash}
+                {/* <HiOutlineTrash
+                    className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                    onClick={handleClickDelete}
+                /> */}
+          </div>)
+        }
+        {
+            checkForOtherBooks(row) && (
+            <div className="flex space-x-2 pl-3">
+                <HiOutlinePencil
+                    className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                    onClick={handleClickIcon}
                 />
-            }
+                {
+                  cashbookData.book_type !== 4 &&
+                  <HiOutlineTrash
+                    className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                    onClick={handleClickDelete}
+                  />
+                }
+                
+          </div>)
+        }
+        {
+            checkForAdvancebook(row) && 
+            <div className="flex space-x-2 pl-3">
+              <HiOutlinePencil
+                className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                onClick={handleClickIcon}
+              />
+              {!removeDelete.includes(row.Status) && (
+                <HiOutlineTrash
+                  className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                  onClick={handleClickDelete}
+                />
+              )}
+            </div>
+        }
 
+        {seletedModalVal === 4 && (
+          <PettyCashEditModal
+            selectedPettyCashObj={convertToSmallPettyCashObj({ pObj: row })}
+            handleCancelPettyCash={onCancelPettyCash}
+          />
+        )}
 
+        {seletedModalVal === 3 && (
+          <EditDayBookFromDashboard
+            editDayBookObj={createNewDaybookObj({ pObj: row })}
+            handleCloseEditModal={onCancelPettyCash}
+          />
+        )}
+        {seletedModalVal === 1 && (
+          <EditAdvBookFromDashboard
+            editDayBookObj={createNewAdvanceBookObj({ pObj: row })}
+            handleCloseEditModal={onCancelPettyCash}
+          />
+        )}
+        {seletedModalVal === 5 && (
+          <EditPaymentColFromDashboard
+            editDayBookObj={createNewPaymentColObj({ pObj: row })}
+            handleCloseEditModal={onCancelPettyCash}
+          />
+        )}
 
-        </>
-    )
+        {seletedModalVal === 2 && (
+          <BankDepositEditModal
+            editDayBookObj={convertToSmallBankDepositObj({ pObj: row })}
+            handleCloseEditModal={onCancelPettyCash}
+          />
+        )}
+        {modalInfo.showModal && (
+          <DataModal
+            displayText={modalInfo.Info}
+            handleCancel={onModalCancel}
+            handleClickOk={handleCallTransactionAPI}
+            handleVerify={onSubmitModal}
+            cancelBtnText="CANCEL"
+            okBtnText="SUBMIT"
+            displayOnlyInfo={modalInfo.showOnlyInfo}
+          />
+        )}
+      </>
+    );
 }
 
 export default HandleEditInvoice;

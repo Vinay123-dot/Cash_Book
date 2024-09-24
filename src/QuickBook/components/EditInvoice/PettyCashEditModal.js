@@ -4,7 +4,7 @@ import CButton from "../../../components/ui/Button";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import AntdTextArea from "../../../components/ui/AntdTextArea";
-import { DaysArr,getStatusOfCurrentDate } from "../../../Constants";
+import { getStatusOfCurrentDate } from "../../../Constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setShowAddBookPage,
@@ -102,7 +102,7 @@ const PettyCashEditModal = (props) => {
             eMessage : ""
         })
     }
-    console.log("ss",selectedPettyCashObj)
+  
     return (
         <Modal openModal={true}  ai={null} height ={400}>
             <>

@@ -23,7 +23,7 @@ const Table = React.forwardRef((props, ref) => {
     )
 
     return (
-        <div className={classNames(oveerflow && 'overflow-auto h-[55.5vh]')}>
+        <div className={classNames(oveerflow && 'overflow-auto min-h-[60.5vh] max-h-[65vh]')}>
             <Component className={tableClass} {...rest} ref={ref}>
                 {children}
             </Component>

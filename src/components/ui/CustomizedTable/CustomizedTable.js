@@ -1,6 +1,5 @@
 import React from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
-import { DaysArr } from "../../../Constants";
 
 const tableStyle = {
     borderCollapse: 'collapse',
@@ -15,10 +14,6 @@ const thTdStyle = {
 const CTable = (props) => {
     const { columns, data,handleEditClick,handleDeleteClick } = props;
 
-    const getSelectedDay = (selectedVal) => {
-       let res = DaysArr.find((eachDoc)=> eachDoc.Id === selectedVal);
-       return res?.Type;
-    }
    
     return (
         <div className = "w-full px-5 min-h-[80px] h-full">

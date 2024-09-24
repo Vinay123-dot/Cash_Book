@@ -14,7 +14,7 @@ const persistConfig = {
 }
 
 const store = configureStore({
-    reducer: persistReducer(persistConfig, rootReducer()),
+    reducer: persistReducer(persistConfig, rootReducer),
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             immutableCheck: false,

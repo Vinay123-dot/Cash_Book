@@ -4,7 +4,7 @@ import CButton from "../../../components/ui/Button";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import AntdTextArea from "../../../components/ui/AntdTextArea";
-import { DaysArr,getStatusOfCurrentDate,ReturnType } from "../../../Constants";
+import { getStatusOfCurrentDate,ReturnType } from "../../../Constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setDataSavedModal,

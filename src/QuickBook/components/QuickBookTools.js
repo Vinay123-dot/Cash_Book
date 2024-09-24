@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import appConfig from "../../configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
 import { Input } from "antd";
+import { setMainPageLoader } from "../store/dataSlice";
 
 const QuickBookTools = () => {
 
@@ -192,7 +193,8 @@ const QuickBookTools = () => {
     let sendingTId = allData.terminal_id === "ALL" ? 0 : allData.terminal_id;
     const tId = userType == 4 ? sendingTId : uniqueId;
     // Enable loading state
-    dispatch(setTransactionsLoading(true));
+    dispatch(setMainPageLoader(true));
+    // dispatch(setTransactionsLoading(true));
     let url;
     if(fromDate && toDate) {
       let hType = 0;
@@ -205,7 +207,7 @@ const QuickBookTools = () => {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            dispatch(setTransactionsLoading(false));
+          dispatch(setMainPageLoader(false));
             throw new Error('Network response was not ok');
         }
 
@@ -225,11 +227,11 @@ const QuickBookTools = () => {
         URL.revokeObjectURL(blobUrl);
 
         // Disable loading state after download completes
-        dispatch(setTransactionsLoading(false));
+        dispatch(setMainPageLoader(false));
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
         // Disable loading state in case of error
-        dispatch(setTransactionsLoading(false));
+        dispatch(setMainPageLoader(false));
     }
 };
 
@@ -256,7 +258,7 @@ const QuickBookTools = () => {
 
   return (
     <div className="xl:flex justify-between py-2 px-10">
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2  md:mb-2">
+      <div className={`grid grid-cols-1 md:grid-cols-3 ${userType == 4 ? 'lg:grid-cols-6' : 'lg:grid-cols-5'}`}>
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"
@@ -273,13 +275,6 @@ const QuickBookTools = () => {
             message = {durationErrMsg}
             options={daysList}
           />
-          {/* <AntdSelectFilter
-            placeholder="Select Duration"
-            options={daysList}
-            onStatusChange={handleTimeperiodChange}
-            value = {filterData.history_type}
-            message = {durationErrMsg}
-          /> */}
         </div>
         {
           userType === "4" &&
@@ -297,28 +292,92 @@ const QuickBookTools = () => {
           <Input
             prefix={searchPrefix}
             placeholder="Search"
-            className="w-full md:w-60 h-10 mb-4 md:mb-0"
+            className="w-full md:w-48 lg:w-44 h-10 mb-4 md:mb-0"
             onChange = {handleInputChange}
           />
         </div>
-      </div>
-      {
-        cashbookData.book_type != 6 && 
-        <CButton
-          onClick={handleView}
-          className="mr-5"
-        >
-          {viewBtnPrefix} View
-        </CButton>
-      }
-      
-      <CButton onClick={handleDownload}>
+        <div className="flex flex-col">
+        {
+          cashbookData.book_type != 6 && 
+          <CButton
+            onClick={handleView}
+            className="mr-5"
+          >
+            {viewBtnPrefix} View
+          </CButton>
+        }
+        </div>
+        <div className="flex flex-col">
+        <CButton onClick={handleDownload}>
         {dwnBtnPrefix} Download
       </CButton>
+        </div>
+        
+       
+      </div>
     </div>
 
 
   )
+
+  // return (
+  //   <div className="xl:flex justify-between py-2 px-10">
+  //     <div className="grid grid-cols-1  grid-cols-6">
+  //       <div className="flex flex-col">
+  //         <AntdSelectFilter
+  //           placeholder="Select Cash Book"
+  //           options={getBookTypeList(bookTypeList,outletData)}
+  //           onStatusChange={handleCashBookChange}
+  //           value = {cashbookData.book_type}
+  //           message = {errorMessage}
+  //         />
+  //       </div>
+
+  //       <div className="flex flex-col">
+  //         <QuickBookStatusFilter
+  //           onDateChange= {handleDateChange}
+  //           message = {durationErrMsg}
+  //           options={daysList}
+  //         />
+  //       </div>
+  //       {
+  //         userType === "4" &&
+  //         <div className="flex flex-col">
+  //           <AntdSelectFilter
+  //             placeholder="Select Outlet"
+  //             options={getTerminalList(outletList,cashbookData)}
+  //             onStatusChange={handleOutletStatusChange}
+  //             value = {outletData.terminal_id}
+  //             message = {terminalErrMsg}
+  //           />
+  //         </div>
+  //       }
+  //       <div className="flex flex-col">
+  //         <Input
+  //           prefix={searchPrefix}
+  //           placeholder="Search"
+  //           className="w-full md:w-44 h-10 mb-4 md:mb-0"
+  //           onChange = {handleInputChange}
+  //         />
+  //       </div>
+  //     </div>
+  //     {/* {
+  //       cashbookData.book_type != 6 && 
+  //       <CButton
+  //         onClick={handleView}
+  //         className="mr-5"
+  //       >
+  //         {viewBtnPrefix} View
+  //       </CButton>
+  //     }
+      
+  //     <CButton onClick={handleDownload}>
+  //       {dwnBtnPrefix} Download
+  //     </CButton> */}
+  //   </div>
+
+
+  // )
 
 
 

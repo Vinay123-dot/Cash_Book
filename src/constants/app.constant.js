@@ -27,4 +27,19 @@ export const HISTORY_TYPE = {
     4: 'This Month',
     5: 'This Year',
     6: 'Custom Range',
-}
+};
+
+export const slicedCustomerTypeObj = {
+    "INDEPENDENT WORKSHOP" : "IW",
+    "INDEPENDENTWORKSHOP" : "IW",
+    "CO-DISTRIBUTOR" : "DIS",
+    "CO-DEALER" : "DEA",
+    "MASS" : "MA",
+    "WALK-IN CUSTOMER" : "WC",
+    "TRADERS" : "TR"
+};
+
+export const INDEPENDENTWORKSHOP = "INDEPENDENTWORKSHOP";
+export const INDEPENDENT_WORKSHOP = "INDEPENDENT WORKSHOP";
+
+export const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];

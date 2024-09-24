@@ -19,6 +19,7 @@ const BankDepositColumns = [
         enableSorting: false,
     },
     { header: 'Deposit Mode',accessorKey: 'Deposit_Mode', enableSorting: false},
+    { header: 'Return Number',accessorKey: 'Return_Number', enableSorting: false },
     // { header: "Remaining Balance",accessorKey: 'Remaining_Balance', enableSorting: false},
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
@@ -44,7 +45,7 @@ const pettyCashColumns = [
     },
     // { header: 'Balance', accessorKey: 'Balance',enableSorting: false},
     { header: "Type", accessorKey: 'Petty_Cash_Details',enableSorting: false},
-    { header: "Petty_Cash_Details", accessorKey: 'Petty_Cash_Extra_Details',enableSorting: false},
+    { header: "Petty Cash Details", accessorKey: 'Petty_Cash_Extra_Details',enableSorting: false},
     {
         header: '‎ ‎ ‎ ‎ Action ‎ ‎  ‎  ‎  ',
         accessorKey: 'action',
@@ -59,12 +60,24 @@ const DayBookColumns = [
     { header: 'Bill No',accessorKey: 'Bill_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
+    { header: 'Reference Name',accessorKey: 'Reference_Name',enableSorting: false },
+    { header: 'Party Code',accessorKey: 'Party_Code',enableSorting: false },
+    { header: 'Receipt No.',accessorKey: 'Advance_Receipt_No', enableSorting: false },
     {
         header: 'Bill Value',
         accessorKey: 'Bill_Value',
         cell: (props) => {
             const row = props.row.original
             return <span>{amountFormatter(row?.Bill_Value)}</span>
+        },
+        enableSorting: false,
+    },
+    {
+        header: 'Excel Bill Value',
+        accessorKey: 'Excel_Bill_Value',
+        cell: (props) => {
+            const row = props.row.original
+            return <span>{amountFormatter(row?.Excel_Bill_Value)}</span>
         },
         enableSorting: false,
     },
@@ -154,6 +167,7 @@ const AdvanceBookColumns = [
     { header: 'Receipt No.',accessorKey: 'Receipt_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
+    { header: 'Party Code',accessorKey: 'Party_Code',enableSorting: false },
     { header: "Customer Name", accessorKey: 'Customer_Name', enableSorting: false},
     { header: 'Customer Mobile Number',accessorKey: 'Phone_No',enableSorting: false },
     {
@@ -245,6 +259,7 @@ const PaymentCollectionColumns = [
     { header: 'Bill No',accessorKey: 'Bill_No', enableSorting: false },
     { header: 'Date',accessorKey: 'Date',enableSorting: false,},
     { header: 'Customer Type',accessorKey: 'Customer_Type',enableSorting: false },
+    { header: 'Party Code',accessorKey: 'Party_Code',enableSorting: false },
     {
         header: 'Collected Amount',
         accessorKey: 'Bill_Value',
@@ -526,7 +541,7 @@ const getTableColumns = (bookType) => {
                 //     total: totalRecords,
                 // }}
                 // onPaginationChange={onPaginationChange}
-                loading={loading}
+                // loading={loading}
             />
         </>
     )

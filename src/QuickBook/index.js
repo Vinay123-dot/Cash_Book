@@ -33,6 +33,8 @@ import {
   setSalesType,
   setAllTerminalsList
 } from "./store/stateSlice";
+import { DISABLED_TRANSACTION_COUNT_PAGES } from "../Constants";
+import { setTransactionsLoading } from "./store/dataSlice";
 
 
 injectReducer('quickbookStore', reducer);
@@ -42,7 +44,7 @@ const userList = ["4", "7"];
 const Quickbook = () => {
 
   const dispatch = useDispatch();
-  const mainPageLoader = useSelector(state => state.quickbookStore.state.mainPageLoader);
+  const mainPageLoader = useSelector(state => state.quickbookStore.data.mainPageLoader);
   const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
   let uniqueId = localStorage.getItem("uniqueId");
   let userType = localStorage.getItem("mType");
@@ -51,6 +53,7 @@ const Quickbook = () => {
   useEffect(() => {
 
     if(userList.includes(userType)) {
+      console.log("SecondTime")
       getOutletsList();
       getPettycashReasons();
       getBookTypeInfo();
@@ -143,23 +146,26 @@ const Quickbook = () => {
  
   return !userList.includes(userType) ? <PageNotFound /> :
     <AdaptableCard className="h-full overflow-hidden border-0 rounded-none" bodyClass="p-0">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:gap-8 px-10 py-4">
+      <QuickBookHeader/>
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:gap-8 px-10 py-4">
         <p className="text-black text-opacity-100 text-2xl font-bold leading-10 col-start-1 col-span-0 xl:col-span-1">Cash Book</p>
         <QuickBookHeader/>
-      </div>
-      {![0,2,4,6].includes(cashbookData.book_type) && 
-      <>
-      <hr className="border border-[#F4F6F9]" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:gap-8 px-10 py-4">
+      </div> */}
+      {
+        !DISABLED_TRANSACTION_COUNT_PAGES.includes(cashbookData.book_type) && 
         <TransactionCount/>
-      </div>
-      </>
+          // <>
+          //   <hr className="border border-[#F4F6F9]" />
+          //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:gap-8 px-10 py-4">
+          //     <TransactionCount/>
+          //   </div>
+          // </>
       
       }
       
       <hr className="border border-[#F4F6F9]" />
       <AdaptableCard
-        className="h-full pt-4 border-0 rounded-none"
+        className="h-full border-0 rounded-none"
         bodyClass="h-full p-0"
       >
         <QuickBookTools />

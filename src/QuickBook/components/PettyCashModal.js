@@ -11,6 +11,7 @@ import {
     setShowAddBookPage,
     setDataSavedModal,
     setPettyCashRemainingBalance,
+    setSelectedBookType,
 } from '../store/stateSlice';
 import Modal from "../../components/shared/Modal";
 import { PettyCashValidations } from "../../Validations";
@@ -63,7 +64,7 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashModal = (props) => {
 
-    const { showPettyCash, onCancel } = props;
+    const { showPettyCash } = props;
     const dispatch = useDispatch();
     const pettyCashRef = useRef();
 
@@ -147,7 +148,7 @@ const PettyCashModal = (props) => {
         if (response.message) {
             setShowLoader(false);
             dispatch(setShowAddBookPage(false));
-            onCancel();
+            dispatch(setSelectedBookType(null));
             dispatch(setDataSavedModal(true));
 
         }
@@ -271,7 +272,7 @@ const PettyCashModal = (props) => {
             </CButton>
             <CButton onClick={() => {
                 setPettyCashArr([]);
-                onCancel();
+                dispatch(setSelectedBookType(null));
                 dispatch(setShowAddBookPage(false))
             }
             }
