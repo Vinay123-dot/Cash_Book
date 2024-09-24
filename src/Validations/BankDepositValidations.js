@@ -48,6 +48,12 @@ const BankDepositTypeValidations = Yup.object({
   //     then: (schema) => schema.required('This field is required'),
   //     otherwise: (schema) => schema.notRequired()
   //   }),
+  return_number : Yup.string()
+    .when("type", {
+      is: (val) => val == 3,
+      then: (schema) => schema.required('This field is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
   reason: Yup.string()
     .when("type", {
       is: (val) => val == 3,

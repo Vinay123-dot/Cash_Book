@@ -22,7 +22,7 @@ const AntdSelectFilter = (props) => {
         <>
             <Select
                 showSearch
-                className = "w-full md:w-52 h-10"
+                className = "w-full md:w-48 lg:w-40 xl:w-44 h-10"
                 placeholder = {placeholder}
                 optionFilterProp = "children"
                 filterOption={caseSensitiveFilterOption}

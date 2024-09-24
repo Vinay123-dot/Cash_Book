@@ -21,8 +21,9 @@ import {
 
 
 const CashTypes = (props) => {
+    const { valObj,paymentListInfo,upiTypeInfo,pLength = 6,  isFromEditObj = false,  showReferenceName = false } = props;
     
-    const { valObj,paymentListInfo,upiTypeInfo,pLength = 6,  isFromEditObj = false } = props;
+    
     const { setFieldValue } = useFormikContext();
     const [clickCount, setClickCount] = useState(isFromEditObj ?[...valObj.PaymentCountArr]  :[0]);
 
@@ -323,7 +324,7 @@ const CashTypes = (props) => {
                     showInputBox("Reason", 'reason', "Reason", validateReasonField, valObj, true, false, false)
                 }
                 {
-                    showInputBox("Reference Name", 'reference_name', "Reference Name", validateReferenceField, valObj, false, false, false)
+                    showReferenceName && showInputBox("Reference Name", 'reference_name', "Reference Name", validateReferenceField, valObj, false, false, false)
                 }
 
             </div>

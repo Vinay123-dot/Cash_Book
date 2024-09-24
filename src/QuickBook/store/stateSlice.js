@@ -9,7 +9,6 @@ const stateSlice = createSlice({
         commonCashBanalce : 0,
         remainingCommonBalance : 0,
         pettyCashRemBal : 0,
-        mainPageLoader : false,
         showdayBookFields : false,
         showUploadInvoice : false,
         selectedCustomer: {},
@@ -25,7 +24,8 @@ const stateSlice = createSlice({
         upiTypeInfo : [],
         customerListInfo : [],
         salesType : [],
-        allTerminalList : []
+        allTerminalList : [],
+        selectedBookType : null
     },
     reducers: {
         setSelectedCustomer: (state, action) => {
@@ -45,9 +45,6 @@ const stateSlice = createSlice({
         },
         setCommonCashBalance: (state,action) => {
             state.commonCashBanalce = action.payload;
-        },
-        setMainPageLoader: (state,action) => {
-            state.mainPageLoader = action.payload;
         },
         setShowDayBookFields : (state,action) => {
             state.showdayBookFields = action.payload;
@@ -96,6 +93,9 @@ const stateSlice = createSlice({
         },
         setAllTerminalsList : (state,action) => {
             state.allTerminalList = action.payload;
+        },
+        setSelectedBookType : (state,action) => {
+            state.selectedBookType = action.payload;
         }
 
     },
@@ -110,7 +110,6 @@ export const {
     setDataSavedModal,
     setPettyCashBalance,
     setCommonCashBalance,
-    setMainPageLoader,
     setShowDayBookFields,
     setShowUploadInvoice,
     setRemainingCommonBalance,
@@ -126,7 +125,8 @@ export const {
     setCustomerListInfo,
     setSalesType,
     setEditedDaybookObj,
-    setAllTerminalsList
+    setAllTerminalsList,
+    setSelectedBookType,
     
 } = stateSlice.actions
 

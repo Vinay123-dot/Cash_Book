@@ -5,6 +5,7 @@ const RupeePrefix = (
         style={{
             fontSize: 12,
         }}
+        className="text-gray-300"
     />
 );
 

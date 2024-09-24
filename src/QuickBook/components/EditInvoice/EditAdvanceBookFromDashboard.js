@@ -2,7 +2,6 @@
 import React, { useState, memo } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../../components/ui/Button";
-import { DaysArr, selectedValType } from "../../../Constants";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdInput from "../../../components/ui/AntdInput";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,10 +35,11 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 />
 )
 
+const DISABLEDTYPES = ["Invoiced","ORDER CANCELLED","Partially Refunded", "Partially Invoiced"];
 
 const EditAdvBookFromDashboard = (props) => {
 
-    const { editDayBookObj,handleCloseEditModal,} = props;
+    const { editDayBookObj,handleCloseEditModal} = props;
     const dispatch = useDispatch();
     const {
         paymentTypeInfo,
@@ -132,10 +132,8 @@ const EditAdvBookFromDashboard = (props) => {
                                         text="Receipt Number"
                                         value='receipt_no'
                                         ph="Enter Receipt Number"
+                                        disableInput = {DISABLEDTYPES.includes(editDayBookObj.status)}
                                     />
-                                    {/* {
-                                        showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                                    } */}
                                      <AntdDatePicker
                                         labelText="Day"
                                         name="date"
@@ -166,6 +164,7 @@ const EditAdvBookFromDashboard = (props) => {
                                         ph="Enter Amount"
                                         acceptOnlyNum={true}
                                         showPrefix={true}
+                                        disableInput = {DISABLEDTYPES.includes(editDayBookObj.status)}
                                     />
                                 </div>
                                 <CashTypes

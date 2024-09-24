@@ -22,7 +22,7 @@ const AntdDatePicker = (props) => {
 
   return (
     <div className="flex flex-col w-full md:w-60 mt-1">
-      <label htmlFor={"test"} className="text-start mb-3">{labelText}</label>
+      <label htmlFor={"test"} className="text-start mb-3 text-black">{labelText}</label>
       <DatePicker
         id={name}
         format={dateFormat}

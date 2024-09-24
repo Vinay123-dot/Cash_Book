@@ -259,10 +259,15 @@ const DataTable = forwardRef((props, ref) => {
                             .getRowModel()
                             .rows
                             .map((row) => {
+                                let newObj = row.original;
+                                // let bgColor = newObj?.Bill_Value > 0 && newObj?.Excel_Bill_Value > 0 && newObj?.Bill_Value !== newObj?.Excel_Bill_Value ? "rgba(255, 0, 0, 0.7)": "transparent";
+                                let textColor = newObj?.Bill_Value > 0 && newObj?.Excel_Bill_Value > 0 && newObj?.Bill_Value !== newObj?.Excel_Bill_Value ? "red": "black";
+                    
                                 return (
-                                    <Tr key={row.id}  style={{display:"flex",justifyContent:"space-between",alignItems:'center'}} >
+                                    <Tr key={row.id}  
+                                        style={{display:"flex",justifyContent:"space-between",alignItems:'center'}} 
+                                    >
                                         {row.getVisibleCells().map((cell) => {
-                                          
                                             let slFlag = cell?.column?.columnDef?.header == "Sl No" ? true : false;
                                             return (
                                                 <Td
@@ -275,10 +280,8 @@ const DataTable = forwardRef((props, ref) => {
                                                         height : "auto",
                                                         textAlign : 'start',
                                                         wordWrap: 'break-word',
-                                                        // backgroundColor:"orange",
-                                                        // display: 'flex',
-                                                        // alignItems: 'start',
-                                                        // justifyContent: 'start'
+                                                        color : textColor
+
                                                     }}
                                                 >
                                                     {flexRender(

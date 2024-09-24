@@ -1,7 +1,7 @@
 import React, { useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Select } from "antd";
-import DayBookModal from "./DayBookModal";
+import DaybookPage from "./DaybookFolder";
 import AdvanceBookModal from "./AdvanceBookModal";
 import BankDepositModal from "./BankDepositModal";
 import PettyCashModal from "./PettyCashModal";
@@ -13,6 +13,7 @@ import {
   setCommonCashBalance,
   setShowDayBookFields,
   setShowUploadInvoice,
+  setSelectedBookType
 } from '../store/stateSlice';
 import CButton from "../../components/ui/Button";
 import amountFormatter from "../../utils/amountFormatter";
@@ -23,40 +24,25 @@ const AddBookPage = (props) => {
   const { openPage } = props;
 
   const dispatch = useDispatch();
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [showBtnsForDbook,setShowBtnsForDBook] = useState(true);
   const {
     pettyCashBalance : pettyCash,
     commonCashBanalce : bankBalance,
     remainingCommonBalance : remainingOpeningBal,
     pettyCashRemBal : pettyCashRem,
-    bookTypeList
+    bookTypeList,
+    selectedBookType
   } = useSelector(state => state.quickbookStore.state);
   let uniqueId = localStorage.getItem("uniqueId");
   let userType = localStorage.getItem("mType");
 
-  const handleChange = (value) => setSelectedValue(value);
+  const handleChange = (value) => dispatch(setSelectedBookType(value));
 
   if (!openPage) return null;
 
-  const handleCancelSelectedVal = () => {
-    setSelectedValue(null);
-    setShowBtnsForDBook(true);
-    // getCommonOpeningBalance();
-  };
-
-
-  const getCommonOpeningBalance = async () => {
-    try {
-      let response = await apiGetCommonOpeningBalance({ uniqueId, date: getToday() });
-      dispatch(setCommonCashBalance(response?.opening_balance));
-    } catch (e) {}
-  }
 
   const handleManagePages = (flag) => {
     dispatch(setShowDayBookFields(flag));
     dispatch(setShowUploadInvoice(!flag));
-    setShowBtnsForDBook(false);
   }
 
   const showDayBookButtons = () => (
@@ -81,7 +67,7 @@ const AddBookPage = (props) => {
   
   return (
     <div className="fixed inset-0 flex  flex-col  z-50" style={{ backgroundColor: "#e5e7eb"}}>
-      <div className = {getHeaderCName(selectedValue)}>
+      <div className = {getHeaderCName(selectedBookType)}>
         <Select
           showSearch
           style={{ width: 220, height: 40 }}
@@ -102,39 +88,41 @@ const AddBookPage = (props) => {
         </Select>
 
         {
-          userType == 7 && [2,4].includes(selectedValue) &&
+          userType == 7 && [2,4].includes(selectedBookType) &&
           <div className="flex flex-col">
             <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Opening Balance</label>
-            <p className="text-2xl">{amountFormatter(selectedValue === 4 ? pettyCash : bankBalance)}</p>
+            <p className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCash : bankBalance)}</p>
           </div>
         }
         {
-          userType == 7 && [2,4].includes(selectedValue) && 
+          userType == 7 && [2,4].includes(selectedBookType) && 
           <div className="flex flex-col">
             <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Remaining Balance</label>
-            <p className="text-2xl">{amountFormatter(selectedValue === 4 ? pettyCashRem : remainingOpeningBal)}</p>
+            <p className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCashRem : remainingOpeningBal)}</p>
           </div>
         }
         {
-          selectedValue === 3 && showDayBookButtons()
+          selectedBookType === 3 && showDayBookButtons()
         }
       </div>
 
       <div className=" mx-3 bg-white rounded-lg relative  h-[calc(100vh-7rem)]">
 
-        <PettyCashModal showPettyCash={selectedValue === 4} onCancel={handleCancelSelectedVal} />
-        <BankDepositModal showBankDeposit={selectedValue === 2} onCancel={handleCancelSelectedVal} />
-        <AdvanceBookModal showAdvanceBook={selectedValue === 1} onCancel={handleCancelSelectedVal} />
-        <DayBookModal 
-          showDaybookModal={selectedValue === 3} 
-          onCancel={handleCancelSelectedVal} 
-        />
-        <PaymentCollectionModal showPaymentColModal = {selectedValue === 5} onCancel={handleCancelSelectedVal} />
+        <PettyCashModal showPettyCash={selectedBookType === 4}/>
+        <BankDepositModal showBankDeposit={selectedBookType === 2} />
+        <AdvanceBookModal showAdvanceBook={selectedBookType === 1} />
+        {
+          selectedBookType === 3 && <DaybookPage/>
+        }
+        {/* <DayBookModal 
+          showDaybookModal={selectedBookType === 3}
+        /> */}
+        <PaymentCollectionModal showPaymentColModal = {selectedBookType === 5} />
 
       </div>
       {
         // (!selectedValue || selectedValue === 3) && showBtnsForDbook &&
-        !selectedValue &&
+        !selectedBookType &&
         <div className= "absolute flex flex-row-reverse gap-10  bottom-10 right-10">
           <CButton
             btnType="submit"
@@ -144,8 +132,8 @@ const AddBookPage = (props) => {
           </CButton>
           <CButton
             onClick={() => {
-              setSelectedValue(null);
-              dispatch(setShowAddBookPage(false))
+              dispatch(setSelectedBookType(null));
+              dispatch(setShowAddBookPage(false));
             }}
             type="cancel"
           >

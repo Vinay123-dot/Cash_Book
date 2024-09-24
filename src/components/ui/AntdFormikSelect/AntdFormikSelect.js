@@ -17,7 +17,7 @@ const AntdFormikSelect = (props) => {
 
     return (
         <div className="flex flex-col w-full md:w-60">
-            <label htmlFor={name} className="my-2 text-start">{labelText}</label>
+            <label htmlFor={name} className="my-2 text-start text-black">{labelText}</label>
             <Field 
                 name={name} 
                 error={error}

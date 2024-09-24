@@ -1,0 +1,316 @@
+import React,{useState,useEffect, useContext} from "react";
+import { useDispatch ,useSelector} from "react-redux";
+import DaybookTable from "./DaybookTable";
+import CButton from "../../../components/ui/Button";
+import { convertTONumbers, getConvertedObj, getTotalMoneyInDayBook } from "../CompConstants";
+import { 
+    setSelectedBookType, 
+    setShowAddBookPage, 
+    setShowDayBookFields, 
+    setShowUploadInvoice ,
+    setDataSavedModal
+} from "../../store/stateSlice";
+import { DaybookDataContext } from "../../../context/DaybookContext";
+import { apiGetDayBookExcelData, apiStoreDayBookInfo } from "../../../services/TransactionService";
+import { INDEPENDENT_WORKSHOP, INDEPENDENTWORKSHOP, slicedCustomerTypeObj } from "../../../constants/app.constant";
+import BillAmountModal from "../DayBookFiles/BillAmountModal";
+
+
+
+
+const DaybookExcel = (props) => {
+
+    const dispatch = useDispatch();
+    const {daybooKData,setDaybookData} = useContext(DaybookDataContext);
+    const {
+        customerListInfo
+    } = useSelector(state => state.quickbookStore.state);
+    let uniqueId = localStorage.getItem("uniqueId");
+    const [showBillModal,setShowBillModal] = useState(false);
+    const [selectedObj,setSelectedObj] = useState({});
+
+    
+    const showLoader = (loaderFlag) =>  setDaybookData((prev) => ({...prev,showDaybookLoader:loaderFlag}));
+    
+
+    useEffect(() => {
+        if(daybooKData.getUploadExcelData){
+            getExcelTrasaction();
+        }
+    },[daybooKData.getUploadExcelData])
+
+    const getCustomerType = (cType) => {
+        if (typeof cType === 'string') {
+            let findedObj;
+            if(cType === INDEPENDENTWORKSHOP){
+                findedObj = customerListInfo.find((eachItem) => eachItem.Type === INDEPENDENT_WORKSHOP);
+            }else{
+               findedObj = customerListInfo.find((eachItem) =>eachItem.Type === cType);
+            }
+            
+            return findedObj?.Id || null;
+        } ;
+        return null;
+    }
+ 
+    const getExcelTrasaction = async () => {
+        try {
+            let newObj = {
+                terminal_id: uniqueId,
+                key: uniqueId
+            };
+            showLoader(true);
+            let resposne = await apiGetDayBookExcelData(newObj);
+            let modifiedArr = [];
+            (resposne?.data || []).forEach((eachItem) => {
+                if(eachItem?.Issales_Report === 1) {
+                    
+                    let newDoc = getConvertedObj(eachItem);
+                    newDoc.issales_report = 0;
+                    newDoc.sales_code = "CSI";
+                    newDoc.sales_type = 1;
+                    newDoc.checked = false;
+                    newDoc.key = uniqueId;
+                    newDoc.displayedCusType = slicedCustomerTypeObj[newDoc.customer_type] || "";
+                    newDoc.customer_type = getCustomerType(newDoc.customer_type);
+
+                    modifiedArr.push(newDoc);
+                }
+            })
+            setDaybookData((prev) => (
+                {
+                    ...prev,
+                    excelArray:modifiedArr,
+                    getUploadExcelData:false,
+                    showDaybookLoader : false
+                }));
+                // showLoader(false);
+        } catch (e) {
+            showLoader(false);
+        }
+    };
+
+    const ErrModal = ({Eflag = false,EMsg = ""}) => {
+        setDaybookData((prev) => ({
+            ...prev,
+            showErrorModal : Eflag,
+            errorMessage : EMsg,
+        }))
+    };
+
+    const handleSaveSelectedExcelArray = async() => {
+        try{
+            showLoader(true);
+            let response = await apiStoreDayBookInfo(daybooKData.selectedExcelArray);
+            if (response.message) {
+                dispatch(setDataSavedModal(true));
+                dispatch(setShowDayBookFields(false));
+                ErrModal({});
+                setDaybookData((prev) => ({
+                    ...prev,
+                    excelArray: [],
+                    selectedExcelArray : [],
+                    receiptsArray : []
+                  }));
+                getExcelTrasaction();
+            };
+            showLoader(false);
+        }catch(Err){
+            ErrModal({
+                Eflag : true,
+                EMsg : Err?.response?.data?.detail || "Failed to submit data.Please Check the details again"
+            });
+            showLoader(false);
+        }
+    }
+
+    const getFinalAdvanceReceiptNum = (mainObj) => {
+      if(mainObj.advance_receipt_no && Number(mainObj.remaining_balance) <= 0){
+        return ''
+      }
+      return mainObj.advance_receipt_no;
+    }
+
+    const onClickCheckbox = (selObj) => {
+      const { advance_receipt_amount,remaining_balance,advance_receipt_no } = selObj;
+      setShowBillModal(false);
+      setSelectedObj(selObj);
+
+      if (Number(advance_receipt_amount) <= remaining_balance && 
+            (!advance_receipt_no || advance_receipt_amount)) { 
+             UpdateExcelArrayFun(selObj);
+             UpdateSelectedExcelArr(selObj);
+      }
+
+      !selObj.checked && CheckAmount(selObj);
+    };
+
+    const UpdateExcelArrayFun = (selObj) => {
+        
+      const updatedExcelArray = (daybooKData.excelArray || []).map(
+        (eachDoc) => {
+          if (eachDoc.id === selObj.id) {
+            return {
+              ...eachDoc,
+              checked: !eachDoc.checked,
+              pending_balance : Number(selObj.bill_value) - getTotalMoneyInDayBook(selObj)
+              //update pending balacne here.
+            };
+          }
+          return eachDoc;
+        }
+
+      );
+      setDaybookData((prev) => ({
+        ...prev,
+        excelArray: updatedExcelArray,
+      }));
+    };
+
+    const UpdateSelectedExcelArr = (selObj) => {
+      let findExcelObj = (daybooKData.selectedExcelArray || []).find(
+        (eachDoc) => eachDoc.id === selObj.id
+      );
+    
+      if (findExcelObj) {
+        const updatedExcelArray = (daybooKData.selectedExcelArray || []).filter(
+          (eachDoc) => eachDoc.id !== selObj.id
+        );
+        console.log("IF BLOCk")
+        setDaybookData((prev) => ({
+          ...prev,
+          selectedExcelArray: updatedExcelArray,
+        }));
+      } else {
+        console.log("ELSE BLOCk")
+        let convertedObj = convertTONumbers(selObj);
+        convertedObj.pending_balance =
+          Number(selObj.bill_value) - getTotalMoneyInDayBook(selObj);
+    
+        let finalAdvanceRecNum = getFinalAdvanceReceiptNum(selObj);
+    
+        const newExcelArray = [
+          ...(daybooKData.selectedExcelArray || []),
+          { ...selObj, ...convertedObj, advance_receipt_no: finalAdvanceRecNum },
+        ];
+    
+        setDaybookData((prev) => ({
+          ...prev,
+          selectedExcelArray: newExcelArray,
+        }));
+      }
+    };
+    
+
+    const onCancelBillModal = (selObj) => {
+        setShowBillModal(false);
+       const updatedExcelArray = (daybooKData.excelArray || []).map(
+         (eachDoc) => {
+           if (selObj.id === eachDoc.id) {
+             return {
+               ...eachDoc,
+               checked: false
+             };
+           }
+           return eachDoc;
+         }
+ 
+       );
+ 
+       setDaybookData((prev) => ({
+         ...prev,
+         excelArray: updatedExcelArray,
+       }));
+       UpdateSelectedExcelArr(selObj);
+    };
+
+    const onInputChange = (id, field, value) => {
+        const updatedData = (daybooKData.excelArray || []).map((item) => {
+          if (item.id === id) {
+            return { ...item, [field]: value};
+          }
+          return item;
+        });
+        setDaybookData((prev) => ({
+          ...prev,
+          excelArray: updatedData,
+        }));
+    };
+
+    const CheckAmount = (selObj) => {
+      const { advance_receipt_no,advance_receipt_amount,remaining_balance,bill_value } = selObj;
+
+        if(advance_receipt_no && !advance_receipt_amount) {
+          ErrModal({
+            Eflag: true,
+            EMsg: "Please enter advance receipt amount or remove the receipt number",
+          });
+          return;
+        }
+        if (Number(advance_receipt_amount) > remaining_balance) {
+            ErrModal({
+              Eflag: true,
+              EMsg: "Given amount should be less than or equal to the Advance Receipt Amount",
+            });
+            return;
+          }
+          let diffInAmount = Number(bill_value) - getTotalMoneyInDayBook(selObj);
+          let modalFlag = (diffInAmount > 10 || diffInAmount < -10);
+          if (modalFlag) {
+            setShowBillModal(true);
+            return;
+        }
+    }
+
+    const getSelectedRecordsCount = () => {
+        const selectedRecords = (daybooKData.excelArray || []).filter((item) => item.checked === true);
+        return selectedRecords.length || 0;
+    }
+    const getDisabledStatus = () => {
+        const findObj = (daybooKData.excelArray || []).find((eachDoc) => eachDoc.checked === true);
+        return findObj?.checked ? true : false;
+    }
+
+    return (
+        <div className="h-full flex flex-col">
+            <div className="flex-grow overflow-auto">
+                <DaybookTable
+                    data = {daybooKData.excelArray}
+                    handleClickCheckbox = {onClickCheckbox}
+                    handleInputChange = {onInputChange}
+                />
+            </div>
+              
+                <div className="p-5 flex justify-between">
+                    <p>Number of selected Records : {getSelectedRecordsCount()}</p>
+                    <div className="flex space-x-4">
+                    <CButton 
+                        onClick={handleSaveSelectedExcelArray} 
+                        isDisabled = {!getDisabledStatus()}
+                    >
+                        Save
+                    </CButton>
+                    <CButton onClick={() => {
+                        dispatch(setSelectedBookType(null));
+                        dispatch(setShowAddBookPage(false))
+                        dispatch(setShowDayBookFields(false));
+                        dispatch(setShowUploadInvoice(false));
+                    }} type="cancel"
+                    >
+                        Cancel
+                    </CButton>
+
+                    </div>
+                   
+                </div>
+                <BillAmountModal
+                    billModal = {showBillModal}
+                    valuesObj = {selectedObj}
+                    handleSubmitBillModal = {() => setShowBillModal(false)}
+                    handleCancelBillModal = {() =>onCancelBillModal(selectedObj)}
+                />
+            </div>
+    )
+};
+
+export default DaybookExcel;

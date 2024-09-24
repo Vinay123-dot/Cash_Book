@@ -16,7 +16,7 @@ historyType = persistData?.auth?.session?.transactions
 export const getTransactions = createAsyncThunk(
     'quickbook/data/getTransactions',
     async (data) => {
-        console.log("DATA",data)
+       
         const response = await apiGetBookTypeServices(data);
         return response;
     }
@@ -54,6 +54,7 @@ const dataSlice = createSlice({
     name: 'quickbookStore/data',
     initialState: {
         loading: false,
+        mainPageLoader : false,
         totalTxn: 0,
         totalRecords: 0,
         toatalAmount: 0,
@@ -96,22 +97,28 @@ const dataSlice = createSlice({
             state.transactionList = [];
             state.totalPaymentCount = {};
         },
+        
+        setMainPageLoader: (state,action) => {
+            state.mainPageLoader = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
           .addCase(getTransactions.fulfilled, (state, action) => {
             state.transactionList = action.payload?.data?.datas || [];
-            state.totalPaymentCount = {...action.payload?.data} || {};
+            state.totalPaymentCount = {...action.payload?.data?.amounts} || {};
             state.totalTxn = action.payload?.totalTxn;
             state.totalRecords = action.payload?.totalRecords;
             // state.totalAmount = action.payload?.totalAmount; // Fixed typo in 'totalAmount'
             state.loading = false;
+            state.mainPageLoader = false;
           })
           .addCase(getTransactions.pending, (state) => {
-            state.loading = true;
+            state.mainPageLoader = true;
           })
           .addCase(getTransactions.rejected, (state) => {
-            state.loading = false;
+            state.mainPageLoader = false;
+            // state.loading = false;
           });
       },
    
@@ -124,7 +131,8 @@ export const {
     setTransactionsLoading,
     setOutletData,
     setCashBookData,
-    setTransactionArray
+    setTransactionArray,
+    setMainPageLoader
 } = dataSlice.actions
 
 export default dataSlice.reducer

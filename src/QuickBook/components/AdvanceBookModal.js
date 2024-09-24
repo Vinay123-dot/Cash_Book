@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form } from 'formik';
 import CButton from "../../components/ui/Button";
-import { DaysArr,selectedValType } from "../../Constants";
 import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
 import AntdInput from "../../components/ui/AntdInput";
 import { useDispatch } from "react-redux";
 import {
     setShowAddBookPage,
-    setDataSavedModal
+    setDataSavedModal,
+    setSelectedBookType
 } from '../store/stateSlice';
 import ParagraphTag from "../../constants/PTag";
 import {
@@ -41,7 +41,7 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 
 const AdvanceBookModal = (props) => {
 
-    const { showAdvanceBook, onCancel } = props;
+    const { showAdvanceBook } = props;
     const dispatch = useDispatch();
     const [clickCount, setClickCount] = useState([0]);
     const [paymentListInfo, setPaymentListInfo] = useState([]);
@@ -108,7 +108,7 @@ const AdvanceBookModal = (props) => {
                     show : false
                 })
                 dispatch(setShowAddBookPage(false));
-                onCancel();
+                dispatch(setSelectedBookType(null));
                 dispatch(setDataSavedModal(true));
                 setValidateModal(true);
 
@@ -164,9 +164,6 @@ const AdvanceBookModal = (props) => {
                                     isFromAdvance = {true}
                                     handleChange = {(date,dateString) => setFieldValue("date",dateString)}
                                 />
-                            {/* {
-                                showSelectBox("Day", "date", "--Select Day--", DaysArr, setFieldValue)
-                            } */}
 
                             {
                                 showSelectBox("Customer Type", "customer_type", "--Select Customer Type--", customerListInfo, setFieldValue)
@@ -227,7 +224,7 @@ const AdvanceBookModal = (props) => {
                                     eMessage : "",
                                     show : false
                                 })
-                                onCancel();
+                                dispatch(setSelectedBookType(null));
                                 dispatch(setShowAddBookPage(false));
                                 }} type="cancel"
                             >

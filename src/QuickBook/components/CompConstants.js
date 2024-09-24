@@ -115,6 +115,7 @@ const getConvertedObj = (tempObj) => {
         pg_order_amount: tempObj.Pg_Order_Amount || null,
         reference_order: tempObj.Reference_Order ||null,
         reference_order_amount:tempObj.Reference_Order_Amount || null,
+        reference_name : tempObj.Reference_Name || ""
     
     
     };

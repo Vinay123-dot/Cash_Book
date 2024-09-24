@@ -33,7 +33,30 @@ module.exports = {
         black: '#000000',
         white: '#FFFFFF',
     },
-
+    width : {
+      'DialogWidth' : "420px"
+    },
+    minWidth: {
+      'modalWidth': '350px',
+    },
+    minHeight: {
+      'modalHeight': '220px',
+    },
+    maxWidth: {
+      'maxModalWidth': '450px',
+    },
+    maxHeight: {
+      'maxModalHeight': '300px',
+    },
+    keyframes: {
+      modalSlide: {
+        '0%': { transform: 'translateY(-100%)', opacity: 0 },
+        '100%': { transform: 'translateY(0)', opacity: 1 },
+      },
+    },
+    animation: {
+      modalSlide: 'modalSlide 0.5s ease-out forwards',
+    },
     },
   },
   plugins: [],

@@ -1,9 +1,8 @@
-import React , {useState} from "react";
+import React , {useEffect, useState} from "react";
 import ParagraphTag from "../../../constants/PTag";
 import AntdInput from "../../../components/ui/AntdInput";
 import CButton from "../../../components/ui/Button";
 import { useFormikContext } from 'formik';
-import { DaysArr,selectedValType } from "../../../Constants";
 import { apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
 import { verifyInputField } from "../CompConstants";
 import ErrorModal from "../../../components/ui/ErrorModal";
@@ -13,7 +12,7 @@ const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 
 const AdvanceBillDetails = (props) => {
 
-    const { values } = props; 
+    const { values,isFromEditDayBook = false } = props; 
     const { setFieldValue } = useFormikContext();
     const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
     const [eModal,setEModal] = useState({
@@ -21,29 +20,43 @@ const AdvanceBillDetails = (props) => {
     })
     let uniqueId = localStorage.getItem("uniqueId");
 
-    const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true) => {
-        return (
-            <AntdInput
-                text = {txt}
-                value = {val}
-                ph = {placeHolder}
-                showPrefix = {prefix}
-                acceptOnlyNum = {onlyNum}
-                validation = {validation}
-                validateField = {(value) => func(value, values, val)}
-            />
-        )
-    }
+    useEffect(() => {
+      if (isFromEditDayBook) {
+        handleVerifyAdvanceMoney(values);
+      }
+    }, [isFromEditDayBook]);
+
+    const showInputBox = ({
+      text = "",
+      value = "",
+      placeHolder = "",
+      func = validateInputField,
+      values = {},
+      validation = true,
+      prefix = true,
+      onlyNum = true,
+    }) => {
+      return (
+        <AntdInput
+          text={text}
+          value={value}
+          ph={placeHolder}
+          showPrefix={prefix}
+          acceptOnlyNum={onlyNum}
+          validation={validation}
+          validateField={(value) => func(value, values, value)}
+        />
+      );
+    };
 
     const onEModalCancel = () => {
-        setEModal({
-            show : false,
-            eMessage : ""
-        })
-    }
+      setEModal({
+        show: false,
+        eMessage: "",
+      });
+    };
 
-
-    const handleVerifyAdvanceMoney = async(allVal) => {
+    const handleVerifyAdvanceMoney = async(allVal,isFromVerify) => {
         const {advance_receipt_no} = allVal;
         try {
             if(!advance_receipt_no) return console.log("test")
@@ -57,10 +70,12 @@ const AdvanceBillDetails = (props) => {
             if(response){
                 setEModal({
                     eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
-                    show : statusArr.includes(response?.Status) ?true :false
+                    show : statusArr.includes(response?.Status) ? true : false
                 })
-                setFieldValue("advance_customer_name",response?.Customer_Name || "");
-                setFieldValue("remaining_balance",response?.Remaining_Balance || 0);
+                let cName = statusArr.includes(response?.Status) ? "" : response?.Customer_Name;
+                let rBal = statusArr.includes(response?.Status) ? 0 : response?.Remaining_Balance;
+                setFieldValue("advance_customer_name",cName);
+                setFieldValue("remaining_balance",rBal);
                 setVerifyBtnLdng(false);
             }
            
@@ -70,6 +85,11 @@ const AdvanceBillDetails = (props) => {
                 eMessage : Err?.response?.data?.detail || "Failed you to submit data.Please Check the details again",
                 show : true
             })
+            if(!isFromVerify) {
+                setFieldValue("advance_customer_name","");
+                setFieldValue("advance_receipt_amount",0);
+            }
+            setFieldValue("remaining_balance", 0);
             setVerifyBtnLdng(false);
         }
         
@@ -80,9 +100,14 @@ const AdvanceBillDetails = (props) => {
         return verifyInputField(value, allValues, type);
 
     }
-
-    
-
+    const onHandleChange = (event) => {
+        if(!event.target.value){
+            setFieldValue("advance_customer_name","");
+            setFieldValue("advance_receipt_amount",0);
+            setFieldValue("remaining_balance", 0);
+        }
+        setFieldValue("advance_receipt_no",event.target.value);
+    }
 
     return (
         <>
@@ -90,13 +115,23 @@ const AdvanceBillDetails = (props) => {
             <ParagraphTag label = "Advance Bill Details" />
             <div className="flex px-4 py-2 items-center">
                 {
-                    showInputBox("Advance Receipt Number", 'advance_receipt_no', "Advance Receipt Number", validateInputField, values, false, false, false)
+                    showInputBox({
+                        text : "Advance Receipt Number",
+                        value : 'advance_receipt_no',
+                        placeHolder : "Advance Receipt Number",
+                        func : validateInputField,
+                        values,
+                        validation : false,
+                        prefix : false,
+                        onlyNum : false,
+                    })
                 }
                 <CButton
                     className = "h-44 mt-10 ml-5"
                     style = {{width : 80,height : 32}}
                     isLoading = {verifyBtnLdng}
-                    onClick = {() => handleVerifyAdvanceMoney(values)}
+                    isDisabled = {verifyBtnLdng}
+                    onClick = {() => handleVerifyAdvanceMoney(values,true)}
                 >
                     Verify
                 </CButton>
@@ -113,8 +148,13 @@ const AdvanceBillDetails = (props) => {
                         <p className="text-start">{values.advance_customer_name || "--"}</p>
                     </div>
                     {
-                        showInputBox("Amount", 'advance_receipt_amount', "Amount", validateInputField, values)
-                    }
+                    showInputBox({
+                        text : "Amount",
+                        value : 'advance_receipt_amount',
+                        placeHolder : "Amount",
+                        values,
+                    })
+                }
                    
                 </div>
             }
