@@ -271,46 +271,118 @@ const DaybookExcel = (props) => {
         return findObj?.checked ? true : false;
     }
 
+    const calculateSums = (transactions) => {
+      return transactions.reduce(
+        (totals, transaction) => {
+          if (transaction.checked) {
+            totals.cash += transaction.cash_amount
+              ? parseFloat(transaction.cash_amount)
+              : 0;
+            totals.upi += transaction.upi_amount
+              ? parseFloat(transaction.upi_amount)
+              : 0;
+            totals.credit_card += transaction.credit_card_amount
+              ? parseFloat(transaction.credit_card_amount)
+              : 0;
+            totals.bank += transaction.online_bank_amount
+              ? parseFloat(transaction.online_bank_amount)
+              : 0;
+            totals.cheque += transaction.bank_cheque_amount
+              ? parseFloat(transaction.bank_cheque_amount)
+              : 0;
+            totals.pGateway += transaction.pg_order_amount
+              ? parseFloat(transaction.pg_order_amount)
+              : 0;
+            totals.refOrder += transaction.reference_order_amount
+              ? parseFloat(transaction.reference_order_amount)
+              : 0;
+          }
+          return totals;
+        },
+        {
+          cash: 0,
+          upi: 0,
+          credit_card: 0,
+          bank: 0,
+          pGateway: 0,
+          refOrder: 0,
+          cheque: 0,
+        }
+      );
+    };
+    
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex-grow overflow-auto">
-                <DaybookTable
-                    data = {daybooKData.excelArray}
-                    handleClickCheckbox = {onClickCheckbox}
-                    handleInputChange = {onInputChange}
-                />
-            </div>
-              
-                <div className="p-5 flex justify-between">
-                    <p>Number of selected Records : {getSelectedRecordsCount()}</p>
-                    <div className="flex space-x-4">
-                    <CButton 
-                        onClick={handleSaveSelectedExcelArray} 
-                        isDisabled = {!getDisabledStatus()}
-                    >
-                        Save
-                    </CButton>
-                    <CButton onClick={() => {
-                        dispatch(setSelectedBookType(null));
-                        dispatch(setShowAddBookPage(false))
-                        dispatch(setShowDayBookFields(false));
-                        dispatch(setShowUploadInvoice(false));
-                    }} type="cancel"
-                    >
-                        Cancel
-                    </CButton>
+      <div className="h-full flex flex-col">
+        <div className="flex-grow overflow-auto">
+          <DaybookTable
+            data={daybooKData.excelArray}
+            handleClickCheckbox={onClickCheckbox}
+            handleInputChange={onInputChange}
+          />
+        </div>
 
-                    </div>
-                   
-                </div>
-                <BillAmountModal
-                    billModal = {showBillModal}
-                    valuesObj = {selectedObj}
-                    handleSubmitBillModal = {() => setShowBillModal(false)}
-                    handleCancelBillModal = {() =>onCancelBillModal(selectedObj)}
-                />
+        <div className="p-5 flex flex-col lg:flex-row justify-between">
+          <div className="w-full flex md:justify-between  md:items-center flex-col md:flex-row flex-wrap mr-2">
+            <p>Selected Records : {getSelectedRecordsCount()}</p>
+            <p>Cash : {calculateSums(daybooKData.excelArray).cash}</p>
+            <p>UPI : {calculateSums(daybooKData.excelArray).upi}</p>
+            <p>Card : {calculateSums(daybooKData.excelArray).credit_card}</p>
+            <p>Bank : {calculateSums(daybooKData.excelArray).bank}</p>
+            <p>P_Gateway : {calculateSums(daybooKData.excelArray).pGateway}</p>
+            <p>Ref Order : {calculateSums(daybooKData.excelArray).refOrder}</p>
+            <p>Cheque : {calculateSums(daybooKData.excelArray).cheque}</p>
+           
+          </div>
+          {/* <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-9 bg-blue-500">
+            <p className="col-span-2 bg-red-500">Selected Records : {getSelectedRecordsCount()}</p>
+            <p>Cash : {getSelectedRecordsCount()}</p>
+            <p>Upi : {getSelectedRecordsCount()}</p>
+            <p>Card : {getSelectedRecordsCount()}</p>
+            <p>Bank : {getSelectedRecordsCount()}</p>
+            <p>P_Gateway : {getSelectedRecordsCount()}</p>
+            <p>Ref Order : {getSelectedRecordsCount()}</p>
+            <p>Cheque : {getSelectedRecordsCount()}</p>
+
+            <div className="flex items-center">
+            <input
+              type="checkbox"
+              className="cursor-pointer w-5 h-5"
+              // checked={eachDoc.checked}
+              // onChange={() => handleClickCheckbox(eachDoc)}
+            />
+            <p className="ml-0.5">Select All</p>
             </div>
-    )
+           
+          </div> */}
+
+          <div className="flex space-x-4">
+            <CButton
+              onClick={handleSaveSelectedExcelArray}
+              isDisabled={!getDisabledStatus()}
+            >
+              Save
+            </CButton>
+            <CButton
+              onClick={() => {
+                dispatch(setSelectedBookType(null));
+                dispatch(setShowAddBookPage(false));
+                dispatch(setShowDayBookFields(false));
+                dispatch(setShowUploadInvoice(false));
+              }}
+              type="cancel"
+            >
+              Cancel
+            </CButton>
+          </div>
+        </div>
+        <BillAmountModal
+          billModal={showBillModal}
+          valuesObj={selectedObj}
+          handleSubmitBillModal={() => setShowBillModal(false)}
+          handleCancelBillModal={() => onCancelBillModal(selectedObj)}
+        />
+      </div>
+    );
 };
 
 export default DaybookExcel;

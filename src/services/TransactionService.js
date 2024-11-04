@@ -1,8 +1,7 @@
 import ApiServiceV2 from "./ApiServiceV2";
-import ApiService from "./ApiService";
 import axios from "axios";
 import appConfig from "../configs/app.config";
-import { getToday, getYesterDay,getDaybeforeYesterday } from "../utils/dateFormatter";
+import { getToday,getDaybeforeYesterday } from "../utils/dateFormatter";
 
 const headers = {
     'Content-Type': 'application/json',

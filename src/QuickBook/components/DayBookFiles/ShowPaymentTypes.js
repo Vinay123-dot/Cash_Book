@@ -36,9 +36,9 @@ const ShowPaymentTypes = (props) => {
                 {
                     paymentValues.credit_card_amount && <p className="text-start  text-black"> Credit Card - {amountFormatter(paymentValues.credit_card_amount || 0)}</p>
                 }
-                {
+                {/* {
                     paymentValues.debit_card_amount && <p className="text-start  text-black"> Debit Card - {amountFormatter(paymentValues.debit_card_amount ||0)}</p>
-                }
+                } */}
                 {
                     paymentValues.pg_order_amount && <p className="text-start  text-black"> Payment Gateway - {amountFormatter(paymentValues.pg_order_amount || 0)}</p>
                 }
