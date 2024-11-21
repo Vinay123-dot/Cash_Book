@@ -42,4 +42,21 @@ export const slicedCustomerTypeObj = {
 export const INDEPENDENTWORKSHOP = "INDEPENDENTWORKSHOP";
 export const INDEPENDENT_WORKSHOP = "INDEPENDENT WORKSHOP";
 
+export const TERMINAL_ID = "7";
+export const ADVANCEBOOK_ID = 1;
+export const BANKDEPOSIT_ID = 2;
+export const DAYTRANSACTIONS_ID = 3;
+export const PETTYCASH_ID = 4;
+export const PAYMENTCOLLECTION_ID = 5;
+export const WITHDRAW_ID = 1;
+export const DEPOSIT_ID = 2;
+export const ORDER_CANCEL_ID = 3;
+export const PARTIALLY_REFUNDED = 4;
+export const HEAD_OFFICE_ID = 5;
+export const ADVANCE_RECEIPT_CANCEL = 1;
+export const RETURN_ORDER = 2;
+
+export const ALLOW_AMOUNT_FILEDS = [WITHDRAW_ID,DEPOSIT_ID,HEAD_OFFICE_ID,];
+export const ALLOW_REMAINNG_FIELDS = [WITHDRAW_ID,DEPOSIT_ID];
+
 export const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];

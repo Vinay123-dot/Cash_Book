@@ -1,18 +1,17 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Input } from "antd";
 import { Field, ErrorMessage } from "formik";
-import RupeePrefix from "../../../Prefixes/RupeeSign";
-
-
+import RupeePrefix from "Prefixes/RupeeSign";
 
 const AntdInput = (props) => {
     const { 
-        error,text,value , ph, 
+        text,value , ph, 
         showPrefix = false,acceptOnlyNum = false,
         validation = false,disableInput  = false,
         validateField,showAddBefore = false,
         showAddBeforeValue ="" ,maxLen = 200,forMobileNum = false,
-        handleChange} = props;
+        } = props;
   
     return (
         <div className="flex flex-col w-full md:w-60">
@@ -29,7 +28,7 @@ const AntdInput = (props) => {
                     if (!/^[0-9.]+$/.test(event.key) && acceptOnlyNum && !forMobileNum) {
                         event.preventDefault()
                     }
-                    if (!/^[0-9]+$/.test(event.key) && acceptOnlyNum && forMobileNum) {
+                    if (!/^\d+$/.test(event.key) && acceptOnlyNum && forMobileNum) {
                         event.preventDefault()
                     }
                 }}
@@ -45,4 +44,31 @@ const AntdInput = (props) => {
 
 export default AntdInput;
 
-// prefix={flag && prefix} 
+AntdInput.propTypes = {
+    text : PropTypes.string,
+    value : PropTypes.string , 
+    ph : PropTypes.string, 
+    showPrefix : PropTypes.bool,
+    acceptOnlyNum : PropTypes.bool,
+    validation : PropTypes.bool,
+    disableInput : PropTypes.bool,
+    validateField : PropTypes.func,
+    showAddBefore : PropTypes.bool,
+    showAddBeforeValue : PropTypes.string ,
+    maxLen : PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([undefined]),
+    ]),
+    forMobileNum : PropTypes.bool,
+}
+
+AntdInput.defaultProps = {
+    showPrefix : false,
+    acceptOnlyNum : false,
+    validation : false,
+    disableInput : false,
+    showAddBefore : false,
+    showAddBeforeValue : "",
+    maxLen : 200,
+    forMobileNum : false,
+}

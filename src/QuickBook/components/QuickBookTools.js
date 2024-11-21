@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from "react";
-import CButton from "../../components/ui/Button";
-import AntdSelectFilter from "../../components/ui/AntdSelect/AntdSelect";
-import { viewBtnPrefix, dwnBtnPrefix, searchPrefix } from "../../Prefixes/QuickBookToolsPrefix";
+import { useDispatch, useSelector } from 'react-redux'
+import { Input } from "antd";
+import CButton from "components/ui/Button";
+import AntdSelectFilter from "components/ui/AntdSelect/AntdSelect";
+import {
+  viewBtnPrefix,
+  dwnBtnPrefix,
+  searchPrefix
+} from "Prefixes/QuickBookToolsPrefix";
 import {
   setTableData,
   setFilterData,
   getTransactions,
   setOutletData,
   setCashBookData,
-  setTransactionsLoading,
-  setTransactionArray
+  setTransactionArray,
+  setMainPageLoader
 } from '../store/dataSlice';
-import { useDispatch, useSelector } from 'react-redux'
 import cloneDeep from 'lodash/cloneDeep';
-import appConfig from "../../configs/app.config";
+import appConfig from "configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
-import { Input } from "antd";
-import { setMainPageLoader } from "../store/dataSlice";
+
 
 const QuickBookTools = () => {
 
   const dispatch = useDispatch();
-
   const [outletList, setOutletList] = useState([]);
   const [daysList,setDaysList] = useState([]);
   const [errorMessage,setErrorMessage] = useState("");
@@ -38,8 +41,6 @@ const QuickBookTools = () => {
   } = useSelector(state => state.quickbookStore.state);
   let userType = localStorage.getItem("mType");
   let uniqueId = localStorage.getItem("uniqueId");
-  let merchantId = localStorage.getItem("mId");
-
 
   useEffect(() => {
     setDaysList(dayInfoList || []);
@@ -83,17 +84,7 @@ const QuickBookTools = () => {
       }
     dispatch(getTransactions(newObj));
   }
-  // const handleInputChange = (e) => {
-  //   const {value : val} = e.target;
-  //   const newTableData = cloneDeep(tableData)
-  //   newTableData.searchData = val
-  //   if (typeof val === 'string' && val.length > 1) {
-  //     dispatch(setTableData(newTableData))
-  //   }
-  //   if (typeof val === 'string' && val.length === 0) {
-  //     dispatch(setTableData(newTableData))
-  //   }
-  // }
+
 
   const handleDateChange = (val) => {
     
@@ -102,23 +93,11 @@ const QuickBookTools = () => {
     newTableData.fromDate = val?.fromDate;
     newTableData.toDate = val?.toDate;
     newTableData.pageNumber = 0;
-  // dispatch(setTransactions({ historyType: newTableData.historyType }))
     dispatch(setTableData(newTableData));
     const newFilterData = cloneDeep(filterData);
     newFilterData.history_type = val?.historyType;
     dispatch(setFilterData(newFilterData));
     setDurationErrMsg("");
-  }
-
-  const handleTimeperiodChange = (val) => {
-    const newTableData = cloneDeep(tableData);
-    newTableData.pageNumber = 0;
-    dispatch(setTableData(newTableData));
-    const newFilterData = cloneDeep(filterData);
-    newFilterData.history_type = val;
-    dispatch(setFilterData(newFilterData));
-    setDurationErrMsg("");
-    
   }
 
   const handleOutletStatusChange = (val) => {
@@ -192,9 +171,7 @@ const QuickBookTools = () => {
     const { book_type, history_type,fromDate,toDate } = allData;
     let sendingTId = allData.terminal_id === "ALL" ? 0 : allData.terminal_id;
     const tId = userType == 4 ? sendingTId : uniqueId;
-    // Enable loading state
     dispatch(setMainPageLoader(true));
-    // dispatch(setTransactionsLoading(true));
     let url;
     if(fromDate && toDate) {
       let hType = 0;
@@ -301,7 +278,7 @@ const QuickBookTools = () => {
           cashbookData.book_type != 6 && 
           <CButton
             onClick={handleView}
-            className="mr-5"
+            className="mr-5 w-40 h-9 rounded-md bg-[#5A87B2]"
           >
             {viewBtnPrefix} View
           </CButton>
@@ -316,71 +293,7 @@ const QuickBookTools = () => {
        
       </div>
     </div>
-
-
   )
-
-  // return (
-  //   <div className="xl:flex justify-between py-2 px-10">
-  //     <div className="grid grid-cols-1  grid-cols-6">
-  //       <div className="flex flex-col">
-  //         <AntdSelectFilter
-  //           placeholder="Select Cash Book"
-  //           options={getBookTypeList(bookTypeList,outletData)}
-  //           onStatusChange={handleCashBookChange}
-  //           value = {cashbookData.book_type}
-  //           message = {errorMessage}
-  //         />
-  //       </div>
-
-  //       <div className="flex flex-col">
-  //         <QuickBookStatusFilter
-  //           onDateChange= {handleDateChange}
-  //           message = {durationErrMsg}
-  //           options={daysList}
-  //         />
-  //       </div>
-  //       {
-  //         userType === "4" &&
-  //         <div className="flex flex-col">
-  //           <AntdSelectFilter
-  //             placeholder="Select Outlet"
-  //             options={getTerminalList(outletList,cashbookData)}
-  //             onStatusChange={handleOutletStatusChange}
-  //             value = {outletData.terminal_id}
-  //             message = {terminalErrMsg}
-  //           />
-  //         </div>
-  //       }
-  //       <div className="flex flex-col">
-  //         <Input
-  //           prefix={searchPrefix}
-  //           placeholder="Search"
-  //           className="w-full md:w-44 h-10 mb-4 md:mb-0"
-  //           onChange = {handleInputChange}
-  //         />
-  //       </div>
-  //     </div>
-  //     {/* {
-  //       cashbookData.book_type != 6 && 
-  //       <CButton
-  //         onClick={handleView}
-  //         className="mr-5"
-  //       >
-  //         {viewBtnPrefix} View
-  //       </CButton>
-  //     }
-      
-  //     <CButton onClick={handleDownload}>
-  //       {dwnBtnPrefix} Download
-  //     </CButton> */}
-  //   </div>
-
-
-  // )
-
-
-
 }
 
 export default QuickBookTools;

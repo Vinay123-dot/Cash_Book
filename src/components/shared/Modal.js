@@ -28,7 +28,7 @@ const childrenDiv = {
 
 const Modal = (props) => {
 
-  const { openModal,width = 565,height = 327,header,children,jc = null,ai = "center" ,bStyle = "none"} = props;
+  const { openModal,width = 565,height = 327,children,jc = null,ai = "center" ,bStyle = "none"} = props;
 
   if (!openModal) return null;
 
@@ -46,3 +46,20 @@ const Modal = (props) => {
 }
 
 export default Modal;
+
+// Modal.propTypes = {
+//   openModal : PropTypes.bool,
+//   width : PropTypes.number,
+//   height : PropTypes.number,
+//   children : PropTypes.node,
+//   jc : PropTypes.d,
+//   ai "center" ,bStyle = "none"
+// };
+
+// Modal.defaultProps = {
+//   width : 565,
+//   height : 327,
+//   jc : null,
+//   ai : "center",
+//   bStyle : "none"
+// };

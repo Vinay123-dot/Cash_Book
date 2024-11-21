@@ -1,8 +1,10 @@
 import React,{useState,useEffect, useContext} from "react";
 import { useDispatch ,useSelector} from "react-redux";
-import DaybookTable from "./DaybookTable";
-import CButton from "../../../components/ui/Button";
-import { convertTONumbers, getConvertedObj, getTotalMoneyInDayBook } from "../CompConstants";
+import {
+  convertTONumbers,
+  getConvertedObj,
+  getTotalMoneyInDayBook
+} from "../CompConstants"
 import { 
     setSelectedBookType, 
     setShowAddBookPage, 
@@ -10,12 +12,19 @@ import {
     setShowUploadInvoice ,
     setDataSavedModal
 } from "../../store/stateSlice";
-import { DaybookDataContext } from "../../../context/DaybookContext";
-import { apiGetDayBookExcelData, apiStoreDayBookInfo } from "../../../services/TransactionService";
-import { INDEPENDENT_WORKSHOP, INDEPENDENTWORKSHOP, slicedCustomerTypeObj } from "../../../constants/app.constant";
+import { DaybookDataContext } from "context/DaybookContext";
+import {
+  apiGetDayBookExcelData,
+  apiStoreDayBookInfo,
+} from "services/TransactionService";
+import {
+  INDEPENDENT_WORKSHOP,
+  INDEPENDENTWORKSHOP,
+  slicedCustomerTypeObj
+} from "constants/app.constant";
+import DaybookTable from "./DaybookTable";
+import CButton from "components/ui/Button";
 import BillAmountModal from "../DayBookFiles/BillAmountModal";
-
-
 
 
 const DaybookExcel = (props) => {
@@ -256,10 +265,7 @@ const DaybookExcel = (props) => {
           }
           let diffInAmount = Number(bill_value) - getTotalMoneyInDayBook(selObj);
           let modalFlag = (diffInAmount > 10 || diffInAmount < -10);
-          if (modalFlag) {
-            setShowBillModal(true);
-            return;
-        }
+          modalFlag && setShowBillModal(true);
     }
 
     const getSelectedRecordsCount = () => {
@@ -268,7 +274,7 @@ const DaybookExcel = (props) => {
     }
     const getDisabledStatus = () => {
         const findObj = (daybooKData.excelArray || []).find((eachDoc) => eachDoc.checked === true);
-        return findObj?.checked ? true : false;
+        return !! findObj?.checked ;
     }
 
     const calculateSums = (transactions) => {
@@ -331,29 +337,7 @@ const DaybookExcel = (props) => {
             <p>P_Gateway : {calculateSums(daybooKData.excelArray).pGateway}</p>
             <p>Ref Order : {calculateSums(daybooKData.excelArray).refOrder}</p>
             <p>Cheque : {calculateSums(daybooKData.excelArray).cheque}</p>
-           
           </div>
-          {/* <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-9 bg-blue-500">
-            <p className="col-span-2 bg-red-500">Selected Records : {getSelectedRecordsCount()}</p>
-            <p>Cash : {getSelectedRecordsCount()}</p>
-            <p>Upi : {getSelectedRecordsCount()}</p>
-            <p>Card : {getSelectedRecordsCount()}</p>
-            <p>Bank : {getSelectedRecordsCount()}</p>
-            <p>P_Gateway : {getSelectedRecordsCount()}</p>
-            <p>Ref Order : {getSelectedRecordsCount()}</p>
-            <p>Cheque : {getSelectedRecordsCount()}</p>
-
-            <div className="flex items-center">
-            <input
-              type="checkbox"
-              className="cursor-pointer w-5 h-5"
-              // checked={eachDoc.checked}
-              // onChange={() => handleClickCheckbox(eachDoc)}
-            />
-            <p className="ml-0.5">Select All</p>
-            </div>
-           
-          </div> */}
 
           <div className="flex space-x-4">
             <CButton

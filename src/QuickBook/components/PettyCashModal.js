@@ -64,7 +64,6 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashModal = (props) => {
 
-    const { showPettyCash } = props;
     const dispatch = useDispatch();
     const pettyCashRef = useRef();
 
@@ -87,7 +86,6 @@ const PettyCashModal = (props) => {
     const [storedPettyCash,setStoredPettyCash] = useState(commonPettyCash || 0);
 
 
-    if (!showPettyCash) return null;
 
     const handleSubmit = async (values) => {
 

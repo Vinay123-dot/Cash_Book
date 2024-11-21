@@ -1,10 +1,11 @@
 import React,{useState} from "react";
-import ParagraphTag from "../../../constants/PTag";
-import CButton from "../../../components/ui/Button";
-import PaymentSelect from "../../../components/ui/PaymentSelect/PaymentSelect";
-import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
-import AntdInput from "../../../components/ui/AntdInput";
+import PropTypes from 'prop-types';
 import { useFormikContext } from 'formik';
+import ParagraphTag from "constants/PTag";
+import CButton from "components/ui/Button";
+import PaymentSelect from "components/ui/PaymentSelect/PaymentSelect";
+import AntdFormikSelect from "components/ui/AntdFormikSelect";
+import AntdInput from "components/ui/AntdInput";
 import { AiOutlineDelete } from "react-icons/ai";
 import { 
     verifyInputField, 
@@ -13,12 +14,15 @@ import {
     verifyUpiType,
     verifyInputTextField,
     verifyUTRNum,
-    verifyChequeNum
+    verifyChequeNum,
+    UPI,CASH,
+    BANK,
+    CHEQUE,
+    CREDITCARD,
+    DEBITCARD,
+    PAYMENTGATEWAY,
+    REFERENCEORDER 
  } from "../CompConstants";
-import { 
-    UPI,CASH,BANK,CHEQUE,CREDITCARD,DEBITCARD,PAYMENTGATEWAY,REFERENCEORDER 
-} from "../CompConstants";
-
 
 const CashTypes = (props) => {
     const { valObj,paymentListInfo,upiTypeInfo,pLength = 6,  isFromEditObj = false,  showReferenceName = false } = props;
@@ -83,8 +87,7 @@ const CashTypes = (props) => {
 
    const handleSetUPIData = (name,selectedVal) => setFieldValue(name,selectedVal);
     
-
-    const showInputBox = (txt, val, placeHolder, func, values, validation = true, prefix = true, onlyNum = true,mLen) => {
+    const showInputBox = ({txt, val, placeHolder, func, validation = true, prefix = true, onlyNum = true,mLen}) => {
         return (
             <AntdInput
                 text={txt}
@@ -93,14 +96,11 @@ const CashTypes = (props) => {
                 showPrefix={prefix}
                 acceptOnlyNum={onlyNum}
                 validation={validation}
-                validateField={(value) => func(value, values, val)}
+                validateField={(value) => func(value, valObj, val)}
                 maxLen = {mLen}
             />
         )
-    }
-
-    
-    
+    };
 
     const handleRemoveFromList = (selectedItem,valObj) => {
         setFieldValue(`paymentType${selectedItem}`,null);
@@ -164,7 +164,7 @@ const CashTypes = (props) => {
 
             {clickCount.map((eachItem, index) =>(
                 
-                <div className="grid lg:grid-cols-3 grid-cols-1 gap-4 px-4 pb-2 relative" key={index}>
+                <div className="grid lg:grid-cols-3 grid-cols-1 gap-4 px-4 pb-2 relative" key={eachItem}>
                     <div className="flex items-center">
                     <PaymentSelect
                         labelText = "Payment Type"
@@ -205,7 +205,7 @@ const CashTypes = (props) => {
                             />
                             <div className="col-span-1 flex flex-row relative items-center">
                                 {
-                                    showInputBox("Enter Amount", 'upi_amount', "Amount", validateInputField, valObj)
+                                    showInputBox({txt:"Enter Amount", val:'upi_amount', placeHolder:"Amount", func:validateInputField})
                                 }
                                 {
                                     index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -221,7 +221,7 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === CASH &&
                         <div className="col-span-2  flex flex-row relative items-center">
                             {
-                                showInputBox("Enter Amount", 'cash_amount', "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Enter Amount", val:'cash_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
                                 index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -233,14 +233,15 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === BANK && 
                         <>
                             {
-                                showInputBox("Enter Amount", 'online_bank_amount', "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Enter Amount", val:'online_bank_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
-                                showInputBox("UTR Number", 'online_bank_trans_no', "UTR Number", validateUTRNumber, valObj, true, false, true,12)
+                                showInputBox({txt:"UTR Number", val:'online_bank_trans_no', placeHolder:"UTR Number", func:validateUTRNumber,prefix: false,mLen:12})
                             }
+
                             <div className="col-span-3  flex flex-row relative items-center">
                                 {
-                                    showInputBox("Bank Name", "online_bank_name", "Bank Name", validateInputTextField, valObj, true, false, false)
+                                    showInputBox({txt:"Bank Name", val:'online_bank_name', placeHolder:"Bank Name", func:validateInputTextField,prefix: false,onlyNum:false})
                                 }
                                 {
                                     index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -253,14 +254,14 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === CHEQUE &&
                         <>
                             {
-                                showInputBox("Amount", "bank_cheque_amount", "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Amount", val:'bank_cheque_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
-                                showInputBox("Cheque Number", "bank_cheque_no", "Cheque Number", validateChequeNum, valObj, true, false, false)
+                                showInputBox({txt:"Cheque Number", val:'bank_cheque_no', placeHolder:"Cheque Number", func:validateChequeNum,prefix: false,onlyNum:false})
                             }
                             <div className="col-span-3  flex flex-row relative items-center">
                                 {
-                                    showInputBox("Bank", "bank_cheque_name", "Bank Name", validateInputTextField, valObj, true, false, false)
+                                    showInputBox({txt:"Bank", val:'bank_cheque_name', placeHolder:"Bank Name", func:validateInputTextField,prefix: false,onlyNum:false})
                                 }
                                 {
                                     index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -272,7 +273,7 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === CREDITCARD &&
                         <div className="col-span-2  flex flex-row relative items-center">
                             {
-                                showInputBox("Amount", "credit_card_amount", "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Amount", val:'credit_card_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
                                 index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -284,7 +285,7 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === DEBITCARD &&
                         <div className="col-span-2 flex flex-row relative items-center">
                             {
-                                showInputBox("Amount", "debit_card_amount", "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Amount", val:'debit_card_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
                                 index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -296,7 +297,7 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === PAYMENTGATEWAY &&
                         <div className="col-span-2 flex flex-row relative items-center">
                             {
-                                showInputBox("Amount", "pg_order_amount", "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Amount", val:'pg_order_amount', placeHolder:"Amount", func:validateInputField})
                             }
                             {
                                 index !== 0 && showDeleteIcon(eachItem,valObj)
@@ -308,8 +309,9 @@ const CashTypes = (props) => {
                         valObj[`paymentType${eachItem}`] === REFERENCEORDER &&
                         <div className="col-span-2 flex flex-row relative items-center">
                             {
-                                showInputBox("Amount", "reference_order_amount", "Amount", validateInputField, valObj)
+                                showInputBox({txt:"Amount", val:'reference_order_amount', placeHolder:"Amount", func:validateInputField})
                             }
+
                             {
                                 index !== 0 && showDeleteIcon(eachItem,valObj)
                             }
@@ -321,15 +323,30 @@ const CashTypes = (props) => {
             }
             <div className="grid lg:grid-cols-3 grid-cols-1 gap-10 px-4 py-2">
                 {
-                    showInputBox("Reason", 'reason', "Reason", validateReasonField, valObj, true, false, false)
+                    showInputBox({txt:"Reason", val:'reason', placeHolder:"Bank Name", func:validateReasonField,prefix: false,onlyNum:false})
                 }
                 {
-                    showReferenceName && showInputBox("Reference Name", 'reference_name', "Reference Name", validateReferenceField, valObj, false, false, false)
+                    showReferenceName && showInputBox({txt:"Reference Name", val:'reference_name', placeHolder:"Reference Name", func:validateReferenceField,prefix: false,onlyNum:false,validation: false})
                 }
-
+ 
             </div>
         </>
     )
 };
 
 export default CashTypes;
+
+CashTypes.propTypes = {
+    valObj : PropTypes.object,
+    paymentListInfo : PropTypes.array,
+    upiTypeInfo : PropTypes.array,
+    pLength : PropTypes.number,
+    isFromEditObj : PropTypes.bool,
+    showReferenceName : PropTypes.bool
+};
+
+CashTypes.defaultProps = {
+    pLength : 6,  
+    isFromEditObj : false, 
+    showReferenceName : false
+};

@@ -39,7 +39,6 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 
 const PaymentCollectionModal = (props) => {
 
-    const { showPaymentColModal } = props;
     const dispatch = useDispatch();
     const [paymentListInfo, setPaymentListInfo] = useState([]);
     const [upiTypeInfo, setUpiTypeInfo] = useState([]);
@@ -68,9 +67,6 @@ const PaymentCollectionModal = (props) => {
         } catch (e) { }
     }
 
-  
-
-    if (!showPaymentColModal) return null;
 
   
 

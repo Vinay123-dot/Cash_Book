@@ -112,7 +112,14 @@ export async function apiStorePettyCashInfo(data){
     let url = `${appConfig.apiPrefix}/v21/petty_cash/save_PettyCash`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
-}
+};
+
+export const apiVerifyReturnOrder = async(data) => {
+    console.log("d",data)
+    let url = `${appConfig.apiPrefix}/v21/day_book/verify_daybook?key=${data.key}&Bill_No=${data.Bill_No}`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
+};
 
 
 
@@ -213,7 +220,6 @@ export async function apiGetBookTypeServices(data) {
 
 export async function apiGetDayBookExcelData(data) {
     const {terminal_id,key} = data;
-    let book_type = "Day Transactions";
     let history_type = 0;
     let startDate = getDaybeforeYesterday();
     let endDate = getToday();
@@ -294,6 +300,24 @@ export async function apiDeleteAdvanceBook(data){
 
 export async function apiDeletePaymentModal(data){
     let url = `${appConfig.apiPrefix}/v21/payment_collection/delete_PaymentCollection`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+}
+
+export async function apiDeleteBankDeposit(data){
+    let url = `${appConfig.apiPrefix}/v21/bank_deposit/delete_BankDeposit`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+}
+
+export async function apiDeletePettyCash(data){
+    let url = `${appConfig.apiPrefix}/v21/petty_cash/delete_pettycash`;
     const response = await axios.delete(url,{
         data,
         headers

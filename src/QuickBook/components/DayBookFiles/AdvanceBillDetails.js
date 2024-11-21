@@ -1,14 +1,14 @@
 import React , {useEffect, useState} from "react";
-import ParagraphTag from "../../../constants/PTag";
-import AntdInput from "../../../components/ui/AntdInput";
-import CButton from "../../../components/ui/Button";
+import PropTypes from "prop-types";
 import { useFormikContext } from 'formik';
-import { apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
+import ParagraphTag from "constants/PTag";
+import AntdInput from "components/ui/AntdInput";
+import CButton from "components/ui/Button";
 import { verifyInputField } from "../CompConstants";
-import ErrorModal from "../../../components/ui/ErrorModal";
-import amountFormatter from "../../../utils/amountFormatter";
-
-const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
+import ErrorModal from "components/ui/ErrorModal";
+import amountFormatter from "utils/amountFormatter";
+import { statusArr } from "constants/app.constant";
+import { apiVerifyAdvancedBookReceipt } from "services/TransactionService";
 
 const AdvanceBillDetails = (props) => {
 
@@ -59,18 +59,19 @@ const AdvanceBillDetails = (props) => {
     const handleVerifyAdvanceMoney = async(allVal,isFromVerify) => {
         const {advance_receipt_no} = allVal;
         try {
-            if(!advance_receipt_no) return console.log("test")
-                setVerifyBtnLdng(true);
-                const data = {
-                    key : uniqueId,
-                    id : advance_receipt_no
-                };
+            if (!advance_receipt_no) return;
+            
+            setVerifyBtnLdng(true);
+            const data = {
+                key: uniqueId,
+                id: advance_receipt_no
+            };
             let response = await apiVerifyAdvancedBookReceipt(data);
             
             if(response){
                 setEModal({
                     eMessage : statusArr.includes(response?.Status) ? "This receipt number is already used" : "",
-                    show : statusArr.includes(response?.Status) ? true : false
+                    show : !!statusArr.includes(response?.Status)
                 })
                 let cName = statusArr.includes(response?.Status) ? "" : response?.Customer_Name;
                 let rBal = statusArr.includes(response?.Status) ? 0 : response?.Remaining_Balance;
@@ -95,19 +96,9 @@ const AdvanceBillDetails = (props) => {
         
     }
 
-
     const validateInputField = (value, allValues, type) => {
         return verifyInputField(value, allValues, type);
-
-    }
-    const onHandleChange = (event) => {
-        if(!event.target.value){
-            setFieldValue("advance_customer_name","");
-            setFieldValue("advance_receipt_amount",0);
-            setFieldValue("remaining_balance", 0);
-        }
-        setFieldValue("advance_receipt_no",event.target.value);
-    }
+    };
 
     return (
         <>
@@ -167,3 +158,12 @@ const AdvanceBillDetails = (props) => {
 };
 
 export default AdvanceBillDetails;
+
+AdvanceBillDetails.propTypes = {
+    values : PropTypes.object,
+    isFromEditDayBook : PropTypes.bool 
+};
+
+AdvanceBillDetails.defaultProps = {
+    isFromEditDayBook : false
+};
