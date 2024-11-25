@@ -13,7 +13,6 @@ function App() {
   const merchantId = searchParams.get('mId'); 
   // "0000000000053575"; sanbbox
   // "0000000000002085" ; web
-
   localStorage.setItem("mType",userType);
   localStorage.setItem("uniqueId",uniqueId);
   localStorage.setItem("mId",merchantId);
@@ -25,8 +24,7 @@ function App() {
   const AddCreateSession = async() => {
     try{
       let data = {id : uniqueId,type: userType}
-      let response = await apiCreateSession(data);
-      console.log("res",response);
+      await apiCreateSession(data);
     }catch(e){
 
     }

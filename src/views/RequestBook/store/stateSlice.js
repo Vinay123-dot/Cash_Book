@@ -2,18 +2,32 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const stateSlice = createSlice({
     name : "requestBook/state",
-    intialState : {
-        manageRequestModal : false
+    initialState : {
+        manageRequestModal : false,
+        showErrModal : false,
+        ErrModalMsg : "",
+        getRequestBook : false,
+        activeTab : 0,
     },
     reducers : {
         setManageRequestModal : (state,action) => {
             state.manageRequestModal = action.payload;
+        },
+        setActiveTab : (state,action) => {
+            state.activeTab = action.payload;
+        },
+        setManageModal : (state,action) => {
+            state.showErrModal = action.payload.showErrModal;
+            state.ErrModalMsg = action.payload.ErrModalMsg;
+            state.getRequestBook = action.payload.getRequestBook;
         }
     }
 });
 
 export const {
-    setManageRequestModal
+    setManageRequestModal,
+    setActiveTab,
+    setManageModal
 } = stateSlice.actions;
 
 export default stateSlice.reducer;

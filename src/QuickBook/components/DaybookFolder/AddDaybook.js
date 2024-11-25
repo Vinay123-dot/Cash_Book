@@ -21,11 +21,14 @@ import {
     setShowDayBookFields,
     setDataSavedModal
 } from "../../store/stateSlice";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 const AddDaybook = () => {
 
     const dispatch = useDispatch();
     const addBookRef = useRef();
+    const { fetchRequestedDates } = useFetchReqBook();
     const { daybooKData, setDaybookData } = useContext(DaybookDataContext);
     const [billNum,setBillNum] = useState("");
     const [showBillModal,setShowBillModal] = useState(false);
@@ -34,6 +37,11 @@ const AddDaybook = () => {
 
   useEffect(() => {
     getTerminal();
+    getRequiredDates();
+
+    return () => {
+      dispatch(setApprovedDates([]));
+    }
   },[])
 
     const getTerminal = async() => {
@@ -47,6 +55,15 @@ const AddDaybook = () => {
             setDaybookData((prev) => ({...prev,showDaybookLoader : false}));
         }
     }
+
+    const getRequiredDates = async() => {
+      try{
+         let response = await fetchRequestedDates({book_name : "Petty Cash"});
+         dispatch(setApprovedDates(response || []));
+      }catch(Err){
+
+      }
+  }
 
   const handleChangeSalesType = (name, sValue) => {
     addBookRef?.current?.setFieldValue(name, sValue);

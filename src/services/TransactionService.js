@@ -114,6 +114,12 @@ export async function apiStorePettyCashInfo(data){
     return response.data;
 };
 
+export async function apiSaveRequestBook(data) {
+    let url = `${appConfig.apiPrefix}/v21/request_book/save_RequestBook`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
+}
+
 export const apiVerifyReturnOrder = async(data) => {
     console.log("d",data)
     let url = `${appConfig.apiPrefix}/v21/day_book/verify_daybook?key=${data.key}&Bill_No=${data.Bill_No}`;
@@ -266,13 +272,7 @@ export async function apiGetPettyCashReason(id){
     return response.data;
 }
 
-// export async function apiGetBookTypeServices(data) {
-//     return ApiService.fetchData({
-//         url: '/v21/book_type/get_BookType',
-//         method: 'get',
-//         data,
-//     })
-// }
+
 
 export async function apiCreateSession(data){
     let url = `${appConfig.apiPrefix}/v21/session/add_Session`;
@@ -318,6 +318,29 @@ export async function apiDeleteBankDeposit(data){
 
 export async function apiDeletePettyCash(data){
     let url = `${appConfig.apiPrefix}/v21/petty_cash/delete_pettycash`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+};
+
+
+export async function apiGetRequestHistory(data) {
+    const { terminal_id,key,history_type = 4,book_name,fromDate,toDate } = data;
+    let tempUrl = `${appConfig.apiPrefix}/v21/request_book/get_RequestBook?book_type=${book_name}&key=${key}&terminal_id=${terminal_id}`
+    let url;
+    if(!fromDate || !toDate){
+        url = `${tempUrl}&history_type=${history_type}`
+    }else{
+        url = `${tempUrl}&history_type=${0}&fromDate=${fromDate}&toDate=${toDate}`;
+    }
+    const response = await axios.get(url,{headers});
+    return response;
+};
+
+export async function apiDeleteRequestBook(data){
+    let url = `${appConfig.apiPrefix}/v21/request_book/delete_RequestBook`;
     const response = await axios.delete(url,{
         data,
         headers

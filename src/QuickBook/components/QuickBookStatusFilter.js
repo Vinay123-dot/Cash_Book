@@ -9,9 +9,10 @@ import dayjs from 'dayjs';
 const {RangePicker} = DatePicker;
 
 const QuickBookStatusFilter = (props) => {
-    const { onDateChange, message,options } = props
+    const { onDateChange, message,options,isFromReqHistory = false,disableMsg = false } = props
 
-    const tableData = useSelector((state) => state.quickbookStore.data.tableData);
+    const { tableData } = useSelector((state) => state.quickbookStore.data);
+    const { reqHistoryData } = useSelector(state => state.requestBook.reqData);
     const [isDateRange,setIsDateRange] = useState(false);
 
     const onStatusFilterChange = (selected) => {
@@ -59,9 +60,10 @@ const QuickBookStatusFilter = (props) => {
                 // options={daysList}
                 options = {options}
                 onStatusChange={onStatusFilterChange}
-                value = {tableData.history_type}
+                value = {!isFromReqHistory ? tableData.history_type : reqHistoryData.historyType}
                 message = {message}
-                customData = {getCustomData(tableData)}
+                customData = {getCustomData( !isFromReqHistory ? tableData : reqHistoryData)}
+                showMessage = {!disableMsg}
             />
         }
         </>
@@ -74,4 +76,11 @@ QuickBookStatusFilter.propTypes = {
     onDateChange : PropTypes.func, 
     message : PropTypes.string,
     options : PropTypes.array,
+    isFromReqHistory : PropTypes.bool,
+    disableMsg : PropTypes.bool
+};
+
+QuickBookStatusFilter.defaultProps = {
+    isFromReqHistory : false,
+    disableMsg : false
 };

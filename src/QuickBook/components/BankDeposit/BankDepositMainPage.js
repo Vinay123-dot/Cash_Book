@@ -14,6 +14,8 @@ import BankDepositForm from "./BankDepositForm";
 import useBankDeposit from "utils/hooks/useBankDeposit";
 import { BankDepositIntialVal } from "IntialValues/BankDeposit";
 import { apiStoreBankDepositInfo } from "services/TransactionService";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
 
 const RESET_LIST = ["total_receipt_amount","amount","receipt_status"];
 
@@ -21,6 +23,7 @@ const BankDepositMainPage = (props) => {
  
     const dispatch = useDispatch();
     const bankFormRef = useRef();
+    const { fetchRequestedDates } = useFetchReqBook();
     const {bankDepositData,setBankDepositData} = useContext(BankDepositContext);
     const { fetchRequiredData,verifyAdvanceReceipt,verifyReturnOrder } = useBankDeposit();
     const remCommOpeningBal = useSelector(state => state.quickbookStore.state.remainingCommonBalance);
@@ -29,6 +32,11 @@ const BankDepositMainPage = (props) => {
     
     useEffect(() => {
         fetchApi();
+        getRequiredDates();
+        
+        return () => {
+          dispatch(setApprovedDates([]));
+        }
     },[])
 
     const fetchApi = async() => {
@@ -45,6 +53,15 @@ const BankDepositMainPage = (props) => {
 
         }
     };
+
+    const getRequiredDates = async() => {
+      try{
+         let response = await fetchRequestedDates({book_name : "Bank Deposits"});
+         dispatch(setApprovedDates(response || []));
+      }catch(Err){
+
+      }
+  }
 
     const onUpdateReducer = ({
         returnOrderResponseData = {},
@@ -83,18 +100,6 @@ const BankDepositMainPage = (props) => {
               dispatch(setSelectedBookType(null));
               dispatch(setDataSavedModal(true));
             }
-            // if(bankResponse?.message){
-            //   let newRes = JSON.parse(JSON.stringify(bankDepositData.returnOrderResponseData));
-            //   newRes.Pending_Balance = newRes.Pending_Balance - (newObj.amount || 0);
-
-            //   let finalObj = {...createNewDaybookObj({ pObj: newRes })};
-            //   let finalOutput = {...convertTONumbers(finalObj),key : uniqueId};
-  
-            //   let dayBookResponse = await apiStoreDayBookInfo([finalOutput]);
-             
-              
-            // }
-            
             
         }catch(Err){
           onUpdateReducer({})
@@ -150,6 +155,10 @@ const BankDepositMainPage = (props) => {
             setValue({
               label: "amount",
               value: response?.responseData?.Pending_Balance || 0,
+            });
+            setValue({
+              label: 'daybook_id',
+              value : response?.responseData?.Id || null
             })
         }catch(Err){
             onUpdateReducer({

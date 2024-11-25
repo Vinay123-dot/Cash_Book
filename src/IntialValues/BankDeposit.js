@@ -16,7 +16,8 @@ const BankDepositIntialVal = {
     person_mobile : "",
     return_number : "", //only for return order,
     sales_type : null,
-    sales_code : null
+    sales_code : null,
+    daybook_id : null
 };
 
 export {

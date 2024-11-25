@@ -32,6 +32,7 @@ module.exports = {
         },
         black: '#000000',
         white: '#FFFFFF',
+        swinkpayBlue : '#5A87B2'
     },
     width : {
       'DialogWidth' : "420px"

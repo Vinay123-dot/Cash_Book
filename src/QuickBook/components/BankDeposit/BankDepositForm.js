@@ -27,8 +27,8 @@ const ShowTextBoxInPC = (label, value, ph) => (
         ph={ph}
     />
 );
-const list = ["date","deposit_mode","reason","amount","remaining_balance","advance_receipt_no","receipt_type_id",];
-const sub_list = ["advance_receipt_no","amount","bill_number","store_id","return_number","reason","receipt_status"];
+const list = ["date","deposit_mode","reason","amount","remaining_balance","advance_receipt_no","receipt_type_id","daybook_id"];
+const sub_list = ["advance_receipt_no","amount","bill_number","store_id","return_number","reason","receipt_status","daybook_id"];
 
 const BankDepositForm = (props) => {
 
@@ -44,7 +44,7 @@ const BankDepositForm = (props) => {
       list.forEach((eachItem) =>
         setValue({
           label: eachItem,
-          value: eachItem === "advance_receipt_no" ? "" : null,
+          value: ["advance_receipt_no","bill_number","return_number","reason","receipt_status","daybook_id"].includes(eachItem) ? "" : null,
         })
       );
       setValue({ label: name, value: val });
@@ -54,7 +54,7 @@ const BankDepositForm = (props) => {
       sub_list.forEach((eachItem) =>
         setValue({
           label: eachItem,
-          value: ["advance_receipt_no","bill_number","return_number","reason","receipt_status"].includes(eachItem) ? "" : null,
+          value: ["advance_receipt_no","bill_number","return_number","reason","receipt_status","daybook_id"].includes(eachItem) ? "" : null,
         })
       );
       setValue({ label: name, value: val });
@@ -92,11 +92,13 @@ const BankDepositForm = (props) => {
       let salesObj = (bankDepositData.salesType || []).find(
         (eachDoc) => eachDoc.Id === sValue
       );
+      setValue({ label : "daybook_id",value : null});
+      setValue({label: "daybook_id",value : null})
       setValue({ label: "sales_type", value: salesObj?.Type || "" });
       setValue({ label: name, value: sValue });
     };
     
-
+console.log("v",values)
     return (
       <Form className="h-full">
         <div className="h-[80%]">
@@ -175,7 +177,7 @@ const BankDepositForm = (props) => {
                   isLoading={bankDepositData.verifyBtnLoading}
                   onClick={() => handleVerifyAdvanceMoney(values?.advance_receipt_no)}
                 >
-                  {get}
+                  {"verify"}
                 </CButton>
               </div>
             )}

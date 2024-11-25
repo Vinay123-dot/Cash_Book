@@ -7,7 +7,7 @@ const mainDiv = {
   backgroundColor: "rgba(52, 52, 52, 0.6)",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 999,
+  zIndex: 10,
   top: 0,
   left: 0,
   height: "100vh",
@@ -22,7 +22,7 @@ const childrenDiv = {
   // width: 565,
   borderRadius: 8,
   backgroundColor: "white",
-  padding: 16,
+  // padding: 16,
   // height: 327,
 }
 

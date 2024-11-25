@@ -25,7 +25,7 @@ const Header = () => {
     const { getBankBalance } = useBankBalance(uniqueId);
   
     useEffect(() => {
-        userType == 7 && getBankBalance();
+        userType === TERMINAL_ID && getBankBalance();
      
     },[userType])
 

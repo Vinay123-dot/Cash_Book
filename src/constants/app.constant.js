@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 export const APP_NAME = 'SwinkPay'
 
 export const PERSIST_STORE_NAME = 'whoami'
@@ -39,6 +40,12 @@ export const slicedCustomerTypeObj = {
     "TRADERS" : "TR"
 };
 
+export const STATUS_TYPES = [
+    { Id : 0, Type : "Pending"},
+    { Id : 1, Type : "Sucess"},
+    { Id : 2 , Type : "Rejected"}
+];
+
 export const INDEPENDENTWORKSHOP = "INDEPENDENTWORKSHOP";
 export const INDEPENDENT_WORKSHOP = "INDEPENDENT WORKSHOP";
 
@@ -55,8 +62,15 @@ export const PARTIALLY_REFUNDED = 4;
 export const HEAD_OFFICE_ID = 5;
 export const ADVANCE_RECEIPT_CANCEL = 1;
 export const RETURN_ORDER = 2;
+export const USER_LIST = ["4", "7"];
 
 export const ALLOW_AMOUNT_FILEDS = [WITHDRAW_ID,DEPOSIT_ID,HEAD_OFFICE_ID,];
 export const ALLOW_REMAINNG_FIELDS = [WITHDRAW_ID,DEPOSIT_ID];
 
 export const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
+
+export const compareDate = (givenDate) => {
+    const today = dayjs().startOf("day");
+    const given = dayjs(givenDate, "YYYY-MM-DD");
+return !!(given.isAfter(today, "day") || given.isSame(today, "day"))
+}

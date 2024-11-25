@@ -12,7 +12,7 @@ const DataModal = (props) => {
     displayOnlyInfo = false,
     handleClickOk
   } = props;
-console.log("d",displayOnlyInfo)
+
   return (
     <div
       className="fixed w-screen h-screen flex justify-center items-center top-0 left-0"

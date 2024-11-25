@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Loading from "./Loading";
 
 const loaderStyle = "fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 z-50";
@@ -13,3 +14,7 @@ const Loader = (props) => {
 }
 
 export default Loader;
+
+Loader.propTypes = {
+    showLoading: PropTypes.bool.isRequired
+};
