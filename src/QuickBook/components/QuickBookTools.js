@@ -20,6 +20,7 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import appConfig from "configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
+import { MERCHANT_ID } from "constants/app.constant";
 
 
 const QuickBookTools = () => {
@@ -63,7 +64,7 @@ const QuickBookTools = () => {
         setDurationErrMsg('Please select duration')
         return;
     }
-    if( userType == 4 && newOutletData?.terminal_id < 0) {
+    if( userType === MERCHANT_ID && newOutletData?.terminal_id < 0) {
       setTerminalErrMsg('Please Select terminal')
       return;
     }
@@ -235,15 +236,17 @@ const QuickBookTools = () => {
 
   return (
     <div className="xl:flex justify-between py-2 px-10">
-      <div className={`grid grid-cols-1 md:grid-cols-3 ${userType == 4 ? 'lg:grid-cols-6' : 'lg:grid-cols-5'}`}>
+      <div className={`grid grid-cols-1 md:grid-cols-3 ${userType == MERCHANT_ID ? 'lg:grid-cols-6' : 'lg:grid-cols-5'}`}>
         <div className="flex flex-col">
           <AntdSelectFilter
             placeholder="Select Cash Book"
             options={getBookTypeList(bookTypeList,outletData)}
             onStatusChange={handleCashBookChange}
             value = {cashbookData.book_type}
-            message = {errorMessage}
           />
+          <p className="text-base font-normal ml-2 mt-2 text-red-700">
+            {errorMessage}
+          </p>
         </div>
 
         <div className="flex flex-col">
@@ -254,15 +257,17 @@ const QuickBookTools = () => {
           />
         </div>
         {
-          userType === "4" &&
+          userType === MERCHANT_ID &&
           <div className="flex flex-col">
             <AntdSelectFilter
               placeholder="Select Outlet"
               options={getTerminalList(outletList,cashbookData)}
               onStatusChange={handleOutletStatusChange}
               value = {outletData.terminal_id}
-              message = {terminalErrMsg}
             />
+            <p className="text-base font-normal ml-2 mt-2 text-red-700">
+              {terminalErrMsg}
+            </p>
           </div>
         }
         <div className="flex flex-col">
@@ -286,8 +291,8 @@ const QuickBookTools = () => {
         </div>
         <div className="flex flex-col">
         <CButton onClick={handleDownload}>
-        {dwnBtnPrefix} Download
-      </CButton>
+          {dwnBtnPrefix} Download
+        </CButton>
         </div>
         
        

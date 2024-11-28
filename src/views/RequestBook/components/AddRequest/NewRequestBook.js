@@ -7,8 +7,8 @@ import RequestBookValidations from "Validations/RequestBookValidations";
 import { getCurrentDate } from "utils/dateFormatter";
 import { apiSaveRequestBook } from "services/TransactionService";
 import { setMainPageLoader } from "QuickBook/store/dataSlice";
-import { setManageModal } from "../store/stateSlice";
 import { setDataSavedModal } from "QuickBook/store/stateSlice";
+import { setManageModal,setManageRequestModal } from "views/RequestBook/store/stateSlice";
 
 
 const AddNewReqBook = () => {
@@ -32,6 +32,7 @@ const AddNewReqBook = () => {
           if(response.message){
             manageLoader(false);
             dispatch(setDataSavedModal(true));
+            dispatch(setManageRequestModal(false));
           }
           manageLoader(false);
       } catch (Err) {

@@ -1,56 +1,28 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import { Select } from "antd";
+import { useSelector } from 'react-redux';
 
 const {Option} = Select;
 
 const AntdSelectFilter = (props) => {
-
     const {
       onStatusChange,
       placeholder,
       options,
-      value: selectedValue,
-      message = "",
-      customData = null,
-      showMessage = true,
+      value
     } = props;
 
     const onStatusFilterChange = (value) => onStatusChange?.(value);
-
-    const selectedFilter = options.find(
-        (option) => option.value === selectedValue
-    )
-
     const caseSensitiveFilterOption = (input, option) => {
-        return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
-    };
-
-    const displayMessage = () => {
-        if(customData){
-            return <span className="text-blue-400 text-base font-normal ml-2">
-            {customData}
-          </span>
-        } else if(message){
-            return <span className="text-base font-normal ml-2 mt-2 text-red-700">
-                {message}
-            </span>
-        } else {
-            return <span
-            className="text-base font-normal ml-2 mt-2"
-            style={{ color: "red" }}
-          >
-            {" "}
-            {selectedFilter?.label || selectedFilter?.Type}
-          </span>
-        }
+      return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
     };
     
     return (
       <>
         <Select
           showSearch
-          className="w-full md:w-48 lg:w-40 xl:w-44 h-10"
+          className="w-full h-10"
           placeholder={placeholder}
           optionFilterProp="children"
           filterOption={caseSensitiveFilterOption}
@@ -62,7 +34,6 @@ const AntdSelectFilter = (props) => {
             </Option>
           ))}
         </Select>
-        {showMessage && displayMessage()}
       </>
     );
 }
@@ -76,12 +47,10 @@ AntdSelectFilter.propTypes = {
     value : PropTypes.number,
     message : PropTypes.string,
     customData : PropTypes.string,
-    showMessage : PropTypes.bool
 };
 
 AntdSelectFilter.defaultProps = {
     message :"",
     customData : null,
-    showMessage : true 
 };
 

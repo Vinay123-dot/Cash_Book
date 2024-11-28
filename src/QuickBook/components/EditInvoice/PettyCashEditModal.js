@@ -17,6 +17,7 @@ import Loader from "../../../components/shared/Loader";
 import Modal from "../../../components/shared/Modal";
 import ErrorModal from "../../../components/ui/ErrorModal";
 import AntdDatePicker from "../../../components/ui/AntdDatePicker/AntdDatePicker";
+import DrawerSlide from "components/shared/Drawer";
 
 
 
@@ -104,7 +105,10 @@ const PettyCashEditModal = (props) => {
     }
   
     return (
-        <Modal openModal={true}  ai={null} height ={400}>
+        <DrawerSlide
+            openDrawer = {true}
+            title = "Edit PettyCash"
+        >
             <>
                 <Formik
                     initialValues={selectedPettyCashObj}
@@ -186,7 +190,7 @@ const PettyCashEditModal = (props) => {
                     eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}  ai ="center"/>
                 }
             </>
-        </Modal>
+        </DrawerSlide>
     )
 }
 

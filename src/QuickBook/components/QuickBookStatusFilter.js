@@ -9,10 +9,11 @@ import dayjs from 'dayjs';
 const {RangePicker} = DatePicker;
 
 const QuickBookStatusFilter = (props) => {
-    const { onDateChange, message,options,isFromReqHistory = false,disableMsg = false } = props
+    const { onDateChange, message,options,isFromReqHistory = false,isFromPayments = false } = props
 
     const { tableData } = useSelector((state) => state.quickbookStore.data);
     const { reqHistoryData } = useSelector(state => state.requestBook.reqData);
+    const { reqPaymentData } = useSelector(state => state.paymentBook.PaymentData);
     const [isDateRange,setIsDateRange] = useState(false);
 
     const onStatusFilterChange = (selected) => {
@@ -45,29 +46,64 @@ const QuickBookStatusFilter = (props) => {
         return current && current >= dayjs().add(1, 'day').startOf('day');
     };
 
-    return (
-        <>
-        {
-            isDateRange ?  
-                <RangePicker 
-                open={true}
-                className='h-10'
-                onChange = {handleDate}
-                disabledDate={disabledDate}
-            /> :
-            <AntdSelectFilter
-                placeholder="Select Duration"
-                // options={daysList}
-                options = {options}
-                onStatusChange={onStatusFilterChange}
-                value = {!isFromReqHistory ? tableData.history_type : reqHistoryData.historyType}
-                message = {message}
-                customData = {getCustomData( !isFromReqHistory ? tableData : reqHistoryData)}
-                showMessage = {!disableMsg}
-            />
+    const getValuesOfFilter = () => {
+        if(isFromReqHistory){
+            return reqHistoryData.historyType
+        }else if(isFromPayments){
+            return reqPaymentData.historyType
+        }else{
+            return tableData.history_type;
         }
-        </>
-    )
+    };
+    
+    const displayMessage = () => {
+      let customData = getCustomData(
+        isFromReqHistory
+          ? reqHistoryData
+          : isFromPayments
+          ? reqPaymentData
+          : tableData
+      );
+      if (customData) {
+        return (
+          <span className="text-blue-400 text-base font-normal ml-2">
+            {customData}
+          </span>
+        );
+      } else if (message) {
+        return (
+          <span className="text-base font-normal ml-2 mt-2 text-red-700">
+            {message}
+          </span>
+        );
+      }
+    };
+
+    return (
+      <>
+        {isDateRange ? (
+          <RangePicker
+            open={true}
+            className="h-10"
+            onChange={handleDate}
+            disabledDate={disabledDate}
+          />
+        ) : (
+          <>
+          <AntdSelectFilter
+            placeholder="Select Duration"
+            // options={daysList}
+            options={options}
+            onStatusChange={onStatusFilterChange}
+            value={getValuesOfFilter()}
+          />
+            {
+              displayMessage()
+            }
+          </>
+        )}
+      </>
+    );
 }
 
 export default QuickBookStatusFilter
@@ -77,10 +113,10 @@ QuickBookStatusFilter.propTypes = {
     message : PropTypes.string,
     options : PropTypes.array,
     isFromReqHistory : PropTypes.bool,
-    disableMsg : PropTypes.bool
+    isFromPayments : PropTypes.bool
 };
 
 QuickBookStatusFilter.defaultProps = {
     isFromReqHistory : false,
-    disableMsg : false
+    isFromPayments : false
 };

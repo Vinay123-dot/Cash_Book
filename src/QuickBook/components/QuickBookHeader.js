@@ -64,7 +64,7 @@ const Header = () => {
             
             
 
-            <AddBookPage openPage={showAddBookPage} />
+            
             {
                 dataSavedModalOpen && 
                 <ErrorModal 

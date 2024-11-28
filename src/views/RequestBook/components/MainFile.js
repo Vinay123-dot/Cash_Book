@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Modal from "components/shared/Modal";
 import Navbar from "./Navbar";
-import AddNewReqBook from "./NewRequestBook";
-import RequestHistory from "./RequestHistory";
+import AddNewReqBook from "./AddRequest/NewRequestBook";
+import RequestHistory from "./History";
 import useFetchMasterData from "utils/hooks/useFetchMasterApis";
 import { setMainPageLoader } from "QuickBook/store/dataSlice";
+import DrawerSlide from "components/shared/Drawer";
 
 const MainFile = () => {
 
@@ -36,10 +36,14 @@ const MainFile = () => {
         }catch(Err){
             dispatch(setMainPageLoader(false));
         }
-    }
+    };
 
     return (
-        <Modal openModal={manageRequestModal} height={"90%"} width={"90%"}  ai = {null}>
+        <DrawerSlide 
+            openDrawer = {manageRequestModal}
+            drawerWidth= {activeTab === 0 && "45%"}
+            title = {activeTab === 0? "New Request" : "History" }
+        >
             <Navbar/>
             {
                 activeTab === 0 && <AddNewReqBook/>
@@ -47,7 +51,7 @@ const MainFile = () => {
             {
                 activeTab === 1 && <RequestHistory/>
             }
-        </Modal>
+        </DrawerSlide>
     )
 };
 

@@ -7,6 +7,7 @@ import AdvanceBookModal from "./AdvanceBookModal";
 import BankDeposit from "./BankDeposit";
 import PettyCashModal from "./PettyCashModal";
 import PaymentCollectionModal from "./PaymentCollectionModal";
+import PaymentCollection from "views/PaymentCollection"
 import {
   setShowAddBookPage,
   setShowDayBookFields,
@@ -22,6 +23,7 @@ import {
   PAYMENTCOLLECTION_ID,
   PETTYCASH_ID,
 } from "constants/app.constant";
+import { setClearAllPaymentPageFields } from "views/PaymentCollection/store/dataSlice";
 
 const { Option } = Select;
 const AddBookPage = (props) => {
@@ -39,7 +41,10 @@ const AddBookPage = (props) => {
   } = useSelector(state => state.quickbookStore.state);
   let userType = localStorage.getItem("mType");
 
-  const handleChange = (value) => dispatch(setSelectedBookType(value));
+  const handleChange = (value) => {
+    dispatch(setSelectedBookType(value));
+    dispatch(setClearAllPaymentPageFields({}));
+  };
 
   if (!openPage) return null;
 
@@ -120,7 +125,7 @@ const AddBookPage = (props) => {
           selectedBookType === PETTYCASH_ID && <PettyCashModal/>
         }
         {
-          selectedBookType === PAYMENTCOLLECTION_ID && <PaymentCollectionModal/>
+          selectedBookType === PAYMENTCOLLECTION_ID && <PaymentCollection/>
         }
         
 

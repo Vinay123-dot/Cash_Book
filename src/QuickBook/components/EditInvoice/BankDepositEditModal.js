@@ -13,10 +13,10 @@ import { BankDepositTypeValidations } from "../../../Validations";
 
 import { apiStoreBankDepositInfo, apiStorePettyCashInfo, apiVerifyAdvancedBookReceipt } from "../../../services/TransactionService";
 import Loader from "../../../components/shared/Loader";
-import Modal from "../../../components/shared/Modal";
 import ErrorModal from "../../../components/ui/ErrorModal";
 import ParagraphTag from "../../../constants/PTag";
 import AntdDatePicker from "../../../components/ui/AntdDatePicker";
+import DrawerSlide from "components/shared/Drawer";
 
 
 const ShowTextBoxInPC = (label, value, ph) => (
@@ -160,7 +160,10 @@ const BankDepositEditModal = (props) => {
     }
 
     return (
-        <Modal openModal={true} ai={null} height={"90%"} width={"60%"}>
+        <DrawerSlide 
+            openDrawer = {true} 
+            title = "Edit Bank Deposit"
+        >
             <>
                 <Formik
                     initialValues={editDayBookObj}
@@ -318,7 +321,7 @@ const BankDepositEditModal = (props) => {
                     eModal.show && <ErrorModal msg = {eModal.eMessage} handleCloseEModal={onEModalCancel}/>
                 }
             </>
-        </Modal>
+        </DrawerSlide>
     )
 }
 

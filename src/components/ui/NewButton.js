@@ -1,5 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
+import classNames from "classnames";
+import { MUTED_STYLE } from "constants/app.styles";
+
 
 const Button = (props) => {
   const {
@@ -7,18 +10,24 @@ const Button = (props) => {
     isDisabled = false,
     className,
     type = "button",
+    style,
+    children,
     ...rest
   } = props;
 
+  const getBtnClsses = classNames(MUTED_STYLE,className);
+
+
   return (
     <button
-      style={{ ...rest.style }}
+      style={style}
       onClick={onClick}
       disabled={isDisabled}
-      className={className}
+      className={getBtnClsses}
       type={type}
+      {...rest}
     >
-      {props.children}
+      {children}
     </button>
   );
 };

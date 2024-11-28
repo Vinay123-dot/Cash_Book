@@ -346,6 +346,19 @@ export async function apiDeleteRequestBook(data){
         headers
     });
     return response;
-}
+};
+
+export async function apiGetPaymentHistory(data) {
+    const { terminal_id,key,history_type = 0,party_code,fromDate,toDate } = data;
+    let tempUrl = `${appConfig.apiPrefix}/v21/day_book/get_dayBook_partycode?party_code=${party_code}&key=${key}&terminal_id=${terminal_id}`
+    let url;
+    if(!fromDate || !toDate){
+        url = `${tempUrl}&history_type=${history_type}`
+    }else{
+        url = `${tempUrl}&history_type=${0}&start_date=${fromDate}&end_date=${toDate}`;
+    }
+    const response = await axios.get(url,{headers});
+    return response;
+};
 
 

@@ -33,6 +33,7 @@ import {
 } from "../../../services/TransactionService";
 
 import { getTotalMoneyInDayBook,convertTONumbers, verifyInputField } from "../CompConstants";
+import DrawerSlide from "components/shared/Drawer";
 
 
 const EditInDayBook = (props) => {
@@ -186,7 +187,10 @@ const EditInDayBook = (props) => {
     }
    
     return (
-      <Modal openModal={true} height={"90%"} width={"90%"} ai={null}>
+      <DrawerSlide
+        openDrawer = {true} 
+        title = "Edit DayBook"
+      >
         <Formik
           initialValues={editDayBookObj}
           validationSchema={DayBookValidations}
@@ -291,7 +295,7 @@ const EditInDayBook = (props) => {
             );
           }}
         </Formik>
-      </Modal>
+      </DrawerSlide>
     );
 }
 

@@ -1,14 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import classNames from "classnames";
 import { Form, useFormikContext } from "formik";
 import AntdDatePicker from "components/ui/AntdDatePicker";
-import ParagraphTag from "constants/PTag";
 import AntdInput from "components/ui/AntdInput";
 import { verifyInputField } from "QuickBook/components/CompConstants";
 import AntdFormikSelect from "components/ui/AntdFormikSelect";
 import Button from "components/ui/NewButton";
-import { setManageRequestModal } from "../store/stateSlice";
+// import { setManageRequestModal } from "../store/stateSlice";
+import { CANCEL_STYLE, DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
+import { setManageRequestModal } from "views/RequestBook/store/stateSlice";
 
 const NewReqBookForm = () => {
   const dispatch = useDispatch();
@@ -43,10 +43,15 @@ const NewReqBookForm = () => {
     setFieldValue(name, val);
   };
 
+  const getDisabledStatus = (valArr) => {
+    const { request_date,book_type,requested_by,reason } = valArr;
+    return !!(request_date && book_type && requested_by && reason);
+  };
+
+
   return (
-    <Form className="h-full flex flex-col p-4">
+    <Form className="h-full flex flex-col">
       <div className="flex-grow overflow-y-auto">
-        <ParagraphTag label="Add New Request Book" />
         <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-2">
           <AntdDatePicker
             isFromAdvance = {true}
@@ -67,23 +72,24 @@ const NewReqBookForm = () => {
             }
             Arr={bookTypeList}
           />
-          {showInputBox({
-            label: "Request Name",
-            val: "requested_by",
-          })}
-          {showInputBox({
-            label: "Reason",
-            val: "reason",
-          })}
+          {
+            showInputBox({
+              label: "Request Name",
+              val: "requested_by",
+            })
+          }
+          {
+            showInputBox({
+              label: "Reason",
+              val: "reason",
+            })
+          }
         </div>
       </div>
 
        <div className="flex-none px-4 flex justify-end items-center gap-5 h-[150px]">
           <Button
-            className={classNames(
-              "relative shadow-lg text-black text-sm font-medium h-10 rounded-md w-36 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl bg-gradient-to-r",
-              "focus:ring-2 focus:ring-offset-2 focus:ring-black cursor-pointer border-2 border-black"
-            )}
+            className={CANCEL_STYLE}
             type="cancel"
             onClick = {() =>dispatch(setManageRequestModal(false))}
           >
@@ -91,10 +97,8 @@ const NewReqBookForm = () => {
           </Button>
           <Button
             type="submit"
-            className={classNames(
-              "relative shadow-lg text-white text-sm font-medium h-10 rounded-md w-36 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl bg-gradient-to-r",
-              "from-[#5A87B2] to-[#5A87B2] hover:from-[#5A87B2] hover:to-[#5A87B2] focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
-            )}
+            className={getDisabledStatus(values) ? ENABLED_STYLE : DISABLED_STYLE}
+            isDisabled = {!getDisabledStatus(values)}
           >
             Save
           </Button>

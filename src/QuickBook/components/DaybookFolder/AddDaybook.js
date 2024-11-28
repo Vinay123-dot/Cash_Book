@@ -58,7 +58,7 @@ const AddDaybook = () => {
 
     const getRequiredDates = async() => {
       try{
-         let response = await fetchRequestedDates({book_name : "Petty Cash"});
+         let response = await fetchRequestedDates({book_name : "Day Transactions"});
          dispatch(setApprovedDates(response || []));
       }catch(Err){
 

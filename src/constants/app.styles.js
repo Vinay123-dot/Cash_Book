@@ -1,0 +1,4 @@
+export const MUTED_STYLE = "relative shadow-lg  text-sm font-medium h-10 rounded-md w-36  transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl bg-gradient-to-r";
+export const DISABLED_STYLE = "from-gray-500 to-gray-700  hover:from-gray-400 hover:to-gray-500  focus:ring-2 text-white focus:ring-offset-2 focus:ring-gray-500 cursor-not-allowed";
+export const ENABLED_STYLE = "from-[#5A87B2] to-[#5A87B2] hover:from-[#5A87B2] hover:to-[#5A87B2] focus:ring-2 text-white focus:ring-offset-2 focus:ring-[#5A87B2] cursor-pointer";
+export const CANCEL_STYLE = "focus:ring-2 focus:ring-offset-2 focus:ring-black cursor-pointer border-2 border-black text-black";

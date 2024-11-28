@@ -96,6 +96,10 @@ const stateSlice = createSlice({
         },
         setSelectedBookType : (state,action) => {
             state.selectedBookType = action.payload;
+        },
+        setCancelButtonFunc : (state,action) => {
+            state.selectedBookType = false;
+            state.showAddBookPage = false;
         }
 
     },
@@ -127,7 +131,7 @@ export const {
     setEditedDaybookObj,
     setAllTerminalsList,
     setSelectedBookType,
-    
+    setCancelButtonFunc
 } = stateSlice.actions
 
 export default stateSlice.reducer

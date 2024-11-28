@@ -23,6 +23,7 @@ import { getToday } from "../../../utils/dateFormatter";
 import AntdDaySelect from "../../../components/ui/AntdDaySelect";
 import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
 import AntdDatePicker from "../../../components/ui/AntdDatePicker";
+import DrawerSlide from "components/shared/Drawer";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -102,7 +103,10 @@ const EditPaymentColFromDashboard = (props) => {
     }
 
     return (
-        <Modal openModal={true} height={"90%"} width={"90%"} ai={null}>
+        <DrawerSlide
+            openDrawer = {true}
+            title = "Edit PaymentCollection"
+        >
             <>
                 <Formik
                     initialValues={editDayBookObj}
@@ -115,7 +119,7 @@ const EditPaymentColFromDashboard = (props) => {
                     {({ setFieldValue, values }) => {
                         return (
                             <Form className="h-full">
-                                <div className="h-[80%] overflow-y-scroll">
+                                <div className="h-[80%] overflow-auto">
                                 <ParagraphTag label="Details" />
                                 <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
 
@@ -193,7 +197,7 @@ const EditPaymentColFromDashboard = (props) => {
 
             </>
 
-        </Modal>
+        </DrawerSlide>
     )
 }
 

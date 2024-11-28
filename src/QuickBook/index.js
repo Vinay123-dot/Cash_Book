@@ -13,6 +13,7 @@ import RequestBook from "views/RequestBook";
 import Loader from "components/shared/Loader";
 import useFetchMasterData from "utils/hooks/useFetchMasterApis";
 import { USER_LIST } from "constants/app.constant";
+import AddBookPage from "./components/AddBookPage";
 
 injectReducer('quickbookStore', reducer);
 
@@ -30,6 +31,9 @@ const Quickbook = () => {
     getCustomerTypeInfo,
     getsalesTypesInfo,
   } = useFetchMasterData();
+  const {
+    showAddBookPage
+} = useSelector(state => state.quickbookStore.state);
   const { 
     mainPageLoader, 
     cashbookData 
@@ -73,6 +77,7 @@ const Quickbook = () => {
         <QuickBookTable />
       </AdaptableCard>
       <RequestBook />
+      <AddBookPage openPage={showAddBookPage} />
       <Loader showLoading={mainPageLoader} />
     </AdaptableCard>
   );
