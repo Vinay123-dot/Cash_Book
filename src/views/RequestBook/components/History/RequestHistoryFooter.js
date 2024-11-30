@@ -3,51 +3,31 @@ import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import Button from "components/ui/NewButton";
 import { CANCEL_STYLE, DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
-import { setCancelButtonFunc } from "QuickBook/store/stateSlice";
-// import { calculateAmount } from "./commonFunc";
-// import { setClearAllPaymentPageFields } from "../store/dataSlice";
+import { TERMINAL_ID } from "constants/app.constant";
+import { setClearAllHistoryFields } from "views/RequestBook/store/dataSlice";
+import { setManageRequestModal } from "views/RequestBook/store/stateSlice";
+
 
 const RequestHistoryFooter = ({handleSavePaymentHistory}) => {
     
     const dispatch = useDispatch();
-    const { paymentColArray } = useSelector(state => state.paymentBook.PaymentData);
+    const { historyArr } = useSelector(state => state.requestBook.reqData);
+    const userType = localStorage.getItem("mType");
 
-    const getSelectedRecordsCount = () => {
-        const selectedRecords = (paymentColArray || []).filter((item) => item.checked);
-        return selectedRecords.length || 0;
-    };
-
-   
     const getDisabledStatus = () => {
-        const findObj = (paymentColArray || []).find((eachDoc) => eachDoc.checked);
-        return !! findObj?.checked ;
+        const findObj = (historyArr || []).find((eachDoc) => eachDoc.isapproved === 1);
+        return findObj ;
     };
 
     const getSaveBtnCls = !getDisabledStatus() ? DISABLED_STYLE : ENABLED_STYLE;
 
     const handleClickCancel = () => {
-        // dispatch(setClearAllPaymentPageFields({}));
-        dispatch(setCancelButtonFunc({}));
+      dispatch(setManageRequestModal(false));
+      dispatch(setClearAllHistoryFields({}));
     }
 
     return (
-      <div className="p-2 flex flex-col items-start md:items-center md:flex-row md:justify-between">
-        <div className="w-full flex flex-row md:items-center gap-2">
-          <p>
-            Selected Records :{" "}
-            <span className="text-base font-medium">
-              {getSelectedRecordsCount()}
-            </span>
-          </p>
-          <p>
-            Amount :{" "}
-            <span className="text-base font-medium">
-              {" "}
-              {/* {calculateAmount(paymentColArray)} */}
-            </span>
-          </p>
-        </div>
-
+      <div className="p-2 flex flex-col items-start md:items-center md:flex-row md:justify-end">
         <div className="flex justify-end items-center gap-5 my-4">
           <Button
             className={CANCEL_STYLE}
@@ -56,14 +36,18 @@ const RequestHistoryFooter = ({handleSavePaymentHistory}) => {
           >
             Cancel
           </Button>
-          <Button
-            type="buttom"
-            className={getSaveBtnCls}
-            isDisabled={!getDisabledStatus()}
-            onClick={handleSavePaymentHistory}
-          >
-            Save
-          </Button>
+          {/* {
+            userType != TERMINAL_ID &&
+            <Button
+              type="buttom"
+              className={getSaveBtnCls}
+              isDisabled={!getDisabledStatus()}
+              onClick={handleSavePaymentHistory}
+            >
+              Save
+            </Button>
+          } */}
+          
         </div>
       </div>
     );

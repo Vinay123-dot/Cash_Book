@@ -1,10 +1,10 @@
-import React from 'react';
+import React,{useState} from 'react';
 import PropTypes from "prop-types";
 import classNames from 'classnames';
-import { useSelector } from 'react-redux';
-import { HiOutlineTrash } from "react-icons/hi";
-import { STATUS_TYPES } from 'constants/app.constant';
-import AntdSelectFilter from 'components/ui/AntdSelect/AntdSelect';
+import { HiOutlinePencil,HiOutlineTrash } from "react-icons/hi";
+import { MERCHANT_ID, TERMINAL_ID } from 'constants/app.constant';
+import UpdateRequestBook from '../UpdateRequest/UpdateRequestBook';
+import useFetchReqBook from '../useFetchReqBook';
 
 let ApprovedObj = {
   "0" : "Pending",
@@ -49,18 +49,41 @@ const getApprovedStatus = (val) => {
 }
 
 
-const HistoryDataTable = ({handleChangeStatus,handleDeleteReport}) => {
+const HistoryDataTable = ({requiredArr,handleDeleteReport}) => {
 
-  const { historyArr } = useSelector(state => state.requestBook.reqData);
+  const { viewRequestReports } = useFetchReqBook();
   const userType = localStorage.getItem("mType");
+  const [requestBookObj,setRequestBookObj] = useState({
+    show : false,
+    reqObj : {}
+  }) ;
 
+  const handleClickRequest = (row) => {
+    setRequestBookObj((prev) => ({
+      ...prev,
+      show : true,
+      reqObj : row
+    }));
+  };
 
+  const onCancelReqBook = () => {
+    setRequestBookObj((prev) => ({
+      ...prev,
+      show : false,
+      reqObj : {}
+    }));
+  }
   return (
-    <table className="min-w-full table-auto border-collapse border border-gray-200">
+    <>
+    <table className="min-w-full table-auto border-collapse border border-gray-200 overflow-auto">
       <thead>
         <tr className="bg-gray-100">
-          {showTableHeader({ label: "Sl.No" })}
-          {showTableHeader({ label: "Book Type" })}
+          {
+            showTableHeader({ label: "Sl.No" })
+          }
+          {
+            showTableHeader({ label: "Book Type" })
+          }
           {showTableHeader({ label: "Requested Date" })}
           {showTableHeader({ label: "Requested By" })}
           {showTableHeader({ label: "Requested On" })}
@@ -73,47 +96,66 @@ const HistoryDataTable = ({handleChangeStatus,handleDeleteReport}) => {
         </tr>
       </thead>
       <tbody>
-        {(historyArr || []).map((row, index) => (
+        {(requiredArr || []).map((row, index) => (
           <tr key={row.id} className="hover:bg-gray-50">
             {showTableData({ value: index + 1 })}
             {showTableData({ value: row.book_type })}
             {showTableData({ value: row.request_date })}
             {showTableData({ value: row.requested_by })}
             {showTableData({ value: row.requested_on })}
-            {showTableData({ value: row.approved_On })}
+
+            {showTableData({ value: row.approved_on })}
             {showTableData({ value: row.approved_by })}
             {showTableData({ value: row.valid_till })}
             {showTableData({ value: row.reason })}
             {showTableData({ value: getApprovedStatus(row.isapproved) })}
-            {userType == 7 && row.isapproved === 0 && (
+
+            {
+              userType == MERCHANT_ID && row.isapproved === 0? 
+              (
+                <td className="border border-gray-300 px-4 py-2">
+                  <HiOutlinePencil
+                    className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                    onClick={() => handleClickRequest(row)}
+                  />
+                </td>
+              )
+             :
               <td className="border border-gray-300 px-4 py-2">
-                <HiOutlineTrash
-                  className="cursor-pointer size-6 text-[#5A87B2] text-start"
-                  onClick={() => handleDeleteReport(row.Id)}
-                />
+                {
+                  userType === TERMINAL_ID && row.isapproved === 0 && (
+                    <HiOutlineTrash
+                      className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                      onClick={() => handleDeleteReport(row.id)}
+                    />
+                  ) 
+                }
               </td>
-            )}
-            {userType == 4 && (
-              <td className="border border-gray-300 px-4 py-2">
-                <AntdSelectFilter
-                  showMessage={false}
-                  placeholder="Select Book Type"
-                  options={STATUS_TYPES}
-                  onStatusChange={(val) => handleChangeStatus(val, row.id)}
-                  value={row.isapproved}
-                />
-              </td>
-            )}
+            }
           </tr>
         ))}
       </tbody>
     </table>
+     {
+          requestBookObj.show &&
+            <UpdateRequestBook
+              reqObj = {requestBookObj.reqObj}
+              handleCancel = {onCancelReqBook}
+              handleClickOk={() =>{
+                onCancelReqBook()
+                viewRequestReports()
+              }}
+            />
+        }
+    </>
+    
   );
 };
 
 export default HistoryDataTable;
 
 HistoryDataTable.propTypes = {
+  requiredArr : PropTypes.array,
   handleChangeStatus : PropTypes.func,
   handleDeleteReport : PropTypes.func
 };

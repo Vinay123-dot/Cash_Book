@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const intialFilterData = {
+const intialHistoryData = {
     book_type: null,
     history_type: null,
+    terminal_id : null,
     book_name : "",
     fromDate: "",
     toDate: "",
@@ -11,19 +12,27 @@ const intialFilterData = {
 const dataSlice = createSlice({
   name: "requestBook/data",
   initialState: {
-    reqHistoryData: intialFilterData,
+    reqHistoryData: intialHistoryData,
     historyArr : [],
-    approvedDates : []
+    approvedDates : [],
+    requstedDates : [],
   },
   reducers: {
     setReqHistoryData : (state, action) => {
-      state.reqHistoryData = { ...intialFilterData, ...action.payload };
+      state.reqHistoryData = { ...intialHistoryData, ...action.payload };
     },
     setHistoryArr : (state,action) => {
         state.historyArr = action.payload;
     },
     setApprovedDates : (state,action) => {
       state.approvedDates = action.payload;
+    },
+    setRequestedDates : (state,action) => {
+      state.requstedDates = action.payload;
+    },
+    setClearAllHistoryFields : (state,action) => {
+      state.historyArr = [];
+      state.reqHistoryData = {...intialHistoryData};
     }
   },
 });
@@ -31,7 +40,9 @@ const dataSlice = createSlice({
 export const {
     setReqHistoryData,
     setHistoryArr,
-    setApprovedDates
+    setApprovedDates,
+    setClearAllHistoryFields,
+    setRequestedDates
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

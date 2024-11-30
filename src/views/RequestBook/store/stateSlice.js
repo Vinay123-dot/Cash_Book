@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { TERMINAL_ID } from "constants/app.constant";
+const userType = localStorage.getItem("mType");
 
 const stateSlice = createSlice({
     name : "requestBook/state",
@@ -7,7 +9,7 @@ const stateSlice = createSlice({
         showErrModal : false,
         ErrModalMsg : "",
         getRequestBook : false,
-        activeTab : 0,
+        activeTab : userType === TERMINAL_ID ? 0 : 1,
     },
     reducers : {
         setManageRequestModal : (state,action) => {

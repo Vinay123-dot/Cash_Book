@@ -1,28 +1,29 @@
-import React,{useState,useEffect} from "react";
+import React from "react";
 import { useDispatch,useSelector } from "react-redux";
-// import PropTypes from "prop-types";
-// import { cloneDeep } from "lodash";
-// import Input from "components/ui/Input";
-import QuickBookStatusFilter from "QuickBook/components/QuickBookStatusFilter";
-// import { setReqPaymentData } from "../store/dataSlice";
-import Button from "components/ui/NewButton";
-import { DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
-// import DatePicker from "components/ui/Datepicker";
-import AntdSelectFilter from "components/ui/AntdSelect/AntdSelect";
-// import { setReqHistoryData } from "../store/dataSlice";
 import { cloneDeep } from "lodash";
+import { DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
 import { setReqHistoryData } from "views/RequestBook/store/dataSlice";
+import QuickBookStatusFilter from "QuickBook/components/QuickBookStatusFilter";
+import Button from "components/ui/NewButton";
+import AntdSelectFilter from "components/ui/AntdSelect/AntdSelect";
+import useFetchReqBook from "../useFetchReqBook";
+import { MERCHANT_ID } from "constants/app.constant";
 
 const RequestHistoryHeader  = () => {
 
     const dispatch = useDispatch();
     const { 
+      viewRequestReports
+    } = useFetchReqBook();
+    const { 
         reqHistoryData 
     } = useSelector(state => state.requestBook.reqData);
     const { 
         dayInfoList,
-        bookTypeList
+        bookTypeList,
+        allTerminalList
     } = useSelector((state) => state.quickbookStore.state);
+    let userType = localStorage.getItem("mType");
 
     const handleDateChange = (val) => {
       const newHistoryData = cloneDeep(reqHistoryData);
@@ -40,6 +41,12 @@ const RequestHistoryHeader  = () => {
        dispatch(setReqHistoryData(newHistoryData));
     };
 
+    const handleOutletStatusChange = (val) => {
+      const newHistoryData = cloneDeep(reqHistoryData);
+      newHistoryData.terminal_id = val;
+      dispatch(setReqHistoryData(newHistoryData));
+   };
+
     const paymentFlag = () => !!(reqHistoryData.fromDate || reqHistoryData.toDate);
     const checkValues = () => !!(reqHistoryData.book_type && reqHistoryData.history_type);
     const getViewBtnCls = checkValues() ? ENABLED_STYLE : DISABLED_STYLE;
@@ -47,7 +54,7 @@ const RequestHistoryHeader  = () => {
 
     return (
       <div className="realtive w-full gap-2 flex flex-row justify-start sm:justify-end flex-wrap">
-        <div className="flex flex-col w-36">
+        <div className="flex flex-col w-40">
             <AntdSelectFilter
               placeholder="Select Book Type"
               options={bookTypeList}
@@ -55,7 +62,7 @@ const RequestHistoryHeader  = () => {
               value={reqHistoryData.book_type}
             />
           </div>
-        <div className="flex flex-col w-36">
+        <div className="flex flex-col w-40">
           <QuickBookStatusFilter
             isFromReqHistory = {paymentFlag()}
             onDateChange = {handleDateChange}
@@ -63,12 +70,23 @@ const RequestHistoryHeader  = () => {
             options = {dayInfoList}
           />
         </div>
+        {
+          userType === MERCHANT_ID &&
+          <div className="flex flex-col w-40">
+            <AntdSelectFilter
+              placeholder="Select Outlet"
+              options={allTerminalList}
+              onStatusChange={handleOutletStatusChange}
+              value = {reqHistoryData.terminal_id}
+            />
+          </div>
+        }
         <div className="self-start">
           <Button
             type="button"
             className={getViewBtnCls}
             isDisabled={!checkValues()}
-            // onClick={handleGetPartyCodeList}
+            onClick={viewRequestReports}
           >
             View
           </Button>

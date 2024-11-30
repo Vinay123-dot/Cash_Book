@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from "prop-types";
 import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch, useSelector } from 'react-redux'
-import { HiOutlinePencil,HiOutlineTrash } from "react-icons/hi";
+import { HiOutlinePencil,HiOutlineTrash,HiArrowsExpand } from "react-icons/hi";
 import PettyCashEditModal from "./PettyCashEditModal";
 import EditDayBookFromDashboard from "./EditModeFromDashboard";
 import EditAdvBookFromDashboard from './EditAdvanceBookFromDashboard';
@@ -23,13 +23,16 @@ import {
 import {
   ADVANCEBOOK_ID,
   BANKDEPOSIT_ID,
+  compareDate,
   DAYTRANSACTIONS_ID,
   PAYMENTCOLLECTION_ID,
   PETTYCASH_ID,
+  TERMINAL_ID,
 } from "constants/app.constant";
+import EditRequestBook from 'views/RequestBook/components/EditRequest/EditRequestBook';
 
 
-
+let datesArr = [getToday(), getYesterDay(), getDaybeforeYesterday()];
 const removeEditAndDelete = ["Invoiced","ORDER CANCELLED"];
 const removeDelete = ["Partially Refunded", "Partially Invoiced"];
 
@@ -49,6 +52,9 @@ const HandleEditInvoice = (props) => {
     const outletData = useSelector((state) => state.quickbookStore.data.outletData);
     const cashbookData = useSelector((state) => state.quickbookStore.data.cashbookData);
     const bookTypeList = useSelector((state) => state.quickbookStore.state.bookTypeList);
+    const { 
+      requstedDates 
+    } = useSelector(state => state.requestBook.reqData);
     const {
         allTerminalList
     } = useSelector(state => state.quickbookStore.state);
@@ -60,6 +66,10 @@ const HandleEditInvoice = (props) => {
         bookType : null,
         selectedId : null
     });
+    const [RequestBookObj,setRequestObj] = useState({
+      show : false,
+      reqObj : {}
+    }) ;
     let userType = localStorage.getItem("mType");
     let uniqueId = localStorage.getItem("uniqueId");
     const { getBankBalance } = useBankBalance(uniqueId);
@@ -169,11 +179,11 @@ const HandleEditInvoice = (props) => {
       }
     };
 
-    const handleCallTransactionAPI = async () => {
+    const handleCallTransactionAPI = async (flag = false) => {
       try {
         const { apiCall } = modalInfo;
         UpdateModalInfo({});
-        if (apiCall) {
+        if (apiCall || flag) {
           const payload = cloneDeep(tableData);
           const newFilterData = cloneDeep(filterData);
           const newCashBookData = cloneDeep(cashbookData);
@@ -207,75 +217,106 @@ const HandleEditInvoice = (props) => {
     const handleClickIcon = () => setSelectedModalVal(cashbookData.book_type);
     const onCancelPettyCash = () => setSelectedModalVal(null);
     const onModalCancel = () => UpdateModalInfo({});
-    const checkForOtherBooks = (sObj) => {
-      let datesArr = [getToday(), getYesterDay(), getDaybeforeYesterday()];
-      let newFlag =
-        cashbookData.book_type !== 1 &&
-        cashbookData.book_type !== 2 &&
-        datesArr.includes(sObj.Date);
-      return !!newFlag;
+
+    // const checkForOtherBooks = (sObj) => {
+    //   let datesArr = [getToday(), getYesterDay(), getDaybeforeYesterday()];
+    //   let newFlag =
+    //     cashbookData.book_type !== ADVANCEBOOK_ID &&
+    //     cashbookData.book_type !== BANKDEPOSIT_ID &&
+    //     datesArr.includes(sObj.Date);
+    //   return !!newFlag;
+    // };
+
+    // const checkForAdvancebook = (sObj) => {
+    //   return !!(
+    //     cashbookData.book_type === ADVANCEBOOK_ID &&
+    //     !removeEditAndDelete.includes(sObj.Status)
+    //   );
+    // };
+
+    // const checkForBankDeposit = (sObj) => {
+    //   const ENABLED_TYPES = [
+    //     "WITHDRAWAL",
+    //     "DEPOSIT",
+    //     "HEAD OFFICE EXPENSES",
+    //     "",
+    //   ];
+    //   return !!(
+    //     cashbookData.book_type === BANKDEPOSIT_ID &&
+    //     ENABLED_TYPES.includes(sObj.Type)
+    //   );
+    // };
+   
+    const showEditAndDeleteButton = (row) => {
+      if (userType !== TERMINAL_ID) return { edit: false, delete: false }; // Ensure everything works only if userType === 7
+      let editFlag = false;
+      let deleteFlag = false;
+      let messageFlag = false;
+    
+      const datesFlag = datesArr.includes(row.Date);
+    
+      if (datesFlag) {
+        editFlag = true;
+        deleteFlag = true;
+      } else {
+        const findObj = (requstedDates || []).find(
+          (eachDoc) => eachDoc.Request_Date === row.Date
+        );
+
+        if (findObj) {
+          if (!findObj.Request_Id) {
+            editFlag = true;
+            deleteFlag = true;
+          } else if (findObj.Request_Id == row.Id) {
+            if(findObj.Isapproved === 0){
+              messageFlag = true;
+            }else if(findObj.Isapproved === 1 && compareDate(findObj.Valid_Till)){
+              editFlag = true;
+              deleteFlag = true;
+            }
+          }
+        }
+      }
+    
+      return { edit: editFlag, delete: deleteFlag,msg : messageFlag };
     };
 
-    const checkForAdvancebook = (sObj) => {
-      return !!(
-        cashbookData.book_type === ADVANCEBOOK_ID &&
-        !removeEditAndDelete.includes(sObj.Status)
-      );
+    const handleClickRequest = () => {
+      setRequestObj((prev) => ({
+        ...prev,
+        show : true,
+        reqObj : row
+      }));
     };
 
-    const checkForBankDeposit = (sObj) => {
-      const ENABLED_TYPES = [
-        "WITHDRAWAL",
-        "DEPOSIT",
-        "HEAD OFFICE EXPENSES",
-        "",
-      ];
-      return !!(
-        cashbookData.book_type === BANKDEPOSIT_ID &&
-        ENABLED_TYPES.includes(sObj.Type)
-      );
-    };
+    const onCancelReqBook = () => {
+      setRequestObj((prev) => ({
+        ...prev,
+        show : false,
+        reqObj : {}
+      }));
+    }
 
     return (
       <>
-        {checkForBankDeposit(row) && (
-          <div className="flex space-x-2 pl-3">
-            <HiOutlinePencil
-              className="cursor-pointer size-6 text-[#5A87B2] text-start"
-              onClick={handleClickIcon}
-            />
-            <HiOutlineTrash
+        {
+          (showEditAndDeleteButton(row).edit || showEditAndDeleteButton(row).delete) ?
+            <div className="flex space-x-2 pl-3">
+              <HiOutlinePencil
                 className="cursor-pointer size-6 text-[#5A87B2] text-start"
-                onClick={handleClickDelete}
+                onClick={handleClickIcon}
               />
-          </div>
-        )}
-        {checkForOtherBooks(row) && (
-          <div className="flex space-x-2 pl-3">
-            <HiOutlinePencil
-              className="cursor-pointer size-6 text-[#5A87B2] text-start"
-              onClick={handleClickIcon}
-            />
-            <HiOutlineTrash
-              className="cursor-pointer size-6 text-[#5A87B2] text-start"
-              onClick={handleClickDelete}
-            />
-          </div>
-        )}
-        {checkForAdvancebook(row) && (
-          <div className="flex space-x-2 pl-3">
-            <HiOutlinePencil
-              className="cursor-pointer size-6 text-[#5A87B2] text-start"
-              onClick={handleClickIcon}
-            />
-            {!removeDelete.includes(row.Status) && (
               <HiOutlineTrash
                 className="cursor-pointer size-6 text-[#5A87B2] text-start"
                 onClick={handleClickDelete}
               />
-            )}
-          </div>
-        )}
+            </div> : showEditAndDeleteButton(row).msg ? "request sent" : 
+            <HiArrowsExpand
+              className="cursor-pointer size-6 text-[#5A87B2] text-start"
+              onClick={handleClickRequest}
+            />
+        }
+     
 
         {selectedModalVal === PETTYCASH_ID && (
           <PettyCashEditModal
@@ -290,6 +331,17 @@ const HandleEditInvoice = (props) => {
             handleCloseEditModal={onCancelPettyCash}
           />
         )}
+        {
+          RequestBookObj.show &&
+            <EditRequestBook
+              reqObj = {RequestBookObj.reqObj}
+              handleCancel = {onCancelReqBook}
+              handleClickOk={() =>{
+                onCancelReqBook()
+                handleCallTransactionAPI(true)
+              }}
+            />
+        }
         {selectedModalVal === ADVANCEBOOK_ID && (
           <EditAdvBookFromDashboard
             editDayBookObj={createNewAdvanceBookObj({ pObj: row })}
@@ -333,3 +385,31 @@ HandleEditInvoice.propTypes = {
 HandleEditInvoice.defaultProps = {
   row : {}
 };
+
+
+   {/* {checkForBankDeposit(row) && (
+          <div className="flex space-x-2 pl-3">
+            <HiOutlinePencil
+              className="cursor-pointer size-6 text-[#5A87B2] text-start"
+              onClick={handleClickIcon}
+            />
+            <HiOutlineTrash
+                className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                onClick={handleClickDelete}
+              />
+          </div>
+        )} */}
+        {/* {checkForAdvancebook(row) && (
+          <div className="flex space-x-2 pl-3">
+            <HiOutlinePencil
+              className="cursor-pointer size-6 text-[#5A87B2] text-start"
+              onClick={handleClickIcon}
+            />
+            {!removeDelete.includes(row.Status) && (
+              <HiOutlineTrash
+                className="cursor-pointer size-6 text-[#5A87B2] text-start"
+                onClick={handleClickDelete}
+              />
+            )}
+          </div>
+        )} */}

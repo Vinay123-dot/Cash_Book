@@ -15,11 +15,13 @@ const DrawerSlide = (props) => {
       // onClose={onClose}
       open={true}
       key={"right"}
+      bodyStyle={{ overflow: "hidden" }}
       style={{ zIndex: 1000 }}
     >
       {children}
     </Drawer>
   );
+
 };
 
 export default DrawerSlide;

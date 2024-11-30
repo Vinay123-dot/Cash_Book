@@ -20,7 +20,9 @@ import {
 import cloneDeep from 'lodash/cloneDeep';
 import appConfig from "configs/app.config";
 import QuickBookStatusFilter from "./QuickBookStatusFilter";
-import { MERCHANT_ID } from "constants/app.constant";
+import { MERCHANT_ID, TERMINAL_ID } from "constants/app.constant";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 
 const QuickBookTools = () => {
@@ -40,6 +42,8 @@ const QuickBookTools = () => {
     dayInfoList,
     allTerminalList
   } = useSelector(state => state.quickbookStore.state);
+  const { fetchRequestedDates } = useFetchReqBook();
+
   let userType = localStorage.getItem("mType");
   let uniqueId = localStorage.getItem("uniqueId");
 
@@ -80,10 +84,18 @@ const QuickBookTools = () => {
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType == 7? uniqueId : outletInStrng.Terminal ,
+      terminal_id: userType === TERMINAL_ID ? uniqueId : outletInStrng.Terminal ,
       key: uniqueId
       }
     dispatch(getTransactions(newObj));
+    if(userType === TERMINAL_ID){
+      let response = await fetchRequestedDates({
+        book_name: bookTypeInStrng?.Type,
+        history_type: newFilterData?.history_type,
+      });
+      dispatch(setApprovedDates(response || []));
+    }
+    
   }
 
 
@@ -126,6 +138,7 @@ const QuickBookTools = () => {
     dispatch(setTableData(newTableData));
     const newCashbookData = cloneDeep(cashbookData);
     newCashbookData.book_type = val;
+    newCashbookData.book_type_id = val;
     dispatch(setCashBookData(newCashbookData));
     setErrorMessage("");
   }

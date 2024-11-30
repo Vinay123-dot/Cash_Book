@@ -16,7 +16,7 @@ dayjs.extend(isSameOrBefore);
 
 const AntdDatePicker = (props) => {
   const { approvedDates } = useSelector(state => state.requestBook.reqData);
-  const { ph,labelText,name,handleChange,isFromAdvance = false,value } = props;
+  const { ph,labelText,name,handleChange,isFromAdvance = false,disabled = false,value } = props;
 
   // const disabledDate = (current) => {
   //   const today = moment().startOf('day');
@@ -61,6 +61,7 @@ const AntdDatePicker = (props) => {
         value={value ? dayjs(value, dateFormat) : null}
         onChange={handleChange}
         placeholderText={ph}
+        disabled = {disabled}
         popupClassName="custom-calendar"
         
       />
@@ -79,10 +80,12 @@ AntdDatePicker.propTypes = {
   value : PropTypes.string,
   handleChange : PropTypes.func,
   isFromAdvance : PropTypes.bool,
+  disabled : PropTypes.bool
 };
 
 AntdDatePicker.defaultProps = {
-  isFromAdvance : false
+  isFromAdvance : false,
+  disabled : false
 };
 
 // prefix={flag && prefix} 

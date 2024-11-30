@@ -225,12 +225,11 @@ export async function apiGetBookTypeServices(data) {
 }
 
 export async function apiGetDayBookExcelData(data) {
-    const {terminal_id,key} = data;
+    const {terminal_id,key,fromDate,toDate} = data;
     let history_type = 0;
-    let startDate = getDaybeforeYesterday();
-    let endDate = getToday();
-    // let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
-    let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
+    // let startDate = getDaybeforeYesterday();
+    // let endDate = getToday();
+    let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${fromDate}&end_date=${toDate}`;
     const response = await axios.get(url,{headers});
     return response;
 }
@@ -327,7 +326,7 @@ export async function apiDeletePettyCash(data){
 
 
 export async function apiGetRequestHistory(data) {
-    const { terminal_id,key,history_type = 4,book_name,fromDate,toDate } = data;
+    const { terminal_id,key,history_type = 5,book_name,fromDate,toDate } = data;
     let tempUrl = `${appConfig.apiPrefix}/v21/request_book/get_RequestBook?book_type=${book_name}&key=${key}&terminal_id=${terminal_id}`
     let url;
     if(!fromDate || !toDate){

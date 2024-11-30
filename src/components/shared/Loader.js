@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Loading from "./Loading";
 
-const loaderStyle = "fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 z-50";
+const loaderStyle = "fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 z-[2000]";
 
 const Loader = (props) => {
     const { showLoading } = props;

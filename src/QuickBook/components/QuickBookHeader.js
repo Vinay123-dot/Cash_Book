@@ -62,9 +62,6 @@ const Header = () => {
                 </CButton>
             </div>
             
-            
-
-            
             {
                 dataSavedModalOpen && 
                 <ErrorModal 

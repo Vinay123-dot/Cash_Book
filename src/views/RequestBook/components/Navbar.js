@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveTab } from "../store/stateSlice";
+import { MERCHANT_ID } from "constants/app.constant";
 
 const MERCHANT_INFO = {
     NEW_REQUEST: 0,
@@ -16,11 +17,20 @@ const Navbar = () => {
 
   const dispatch = useDispatch();
   const { activeTab } = useSelector(state => state.requestBook.reqState);
+  const userType = localStorage.getItem("mType");
+
+  const getFilteredItems = () => {
+    if(userType === MERCHANT_ID){
+      return LIST_ITEMS.filter((eachDoc) => eachDoc.key !== MERCHANT_INFO["NEW_REQUEST"]);
+    }else{
+      return LIST_ITEMS;
+    }
+  };
 
   return (
     <nav>
       <ul className="w-full bg-white sticky top-0 z-10 flex flex-col lg:flex-row cursor-pointer">
-        {LIST_ITEMS.map((eachItem) => (
+        {getFilteredItems().map((eachItem) => (
           <li
             className={`flex-1 py-2 text-base font-semibold flex items-center justify-center
             ${

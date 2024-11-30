@@ -24,6 +24,7 @@ import {
   setCustomerListInfo,
   setSalesType,
 } from "QuickBook/store/stateSlice";
+import { MERCHANT_ID } from "constants/app.constant";
 
 function useFetchMasterData() {
 
@@ -47,7 +48,7 @@ function useFetchMasterData() {
   };
 
   const getOutletsList = async () => {
-    let newId = userType == 4 ? uniqueId : merchantId;
+    let newId = userType === MERCHANT_ID ? uniqueId : merchantId;
     let response = await apiGetTerminal(newId);
     dispatch(setAllTerminalsList(response || []));
   };

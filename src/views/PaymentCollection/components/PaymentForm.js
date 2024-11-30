@@ -42,14 +42,6 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
       dispatch(setReqPaymentData(newPaymentData));
     };
 
-    const onGivenInput = (id, field, value) => {
-      const newPaymentData = cloneDeep(reqPaymentData);
-      newPaymentData[field] = value;
-      dispatch(setReqPaymentData(newPaymentData));
-    };
-
-
-
     const handleDateChange = (val) => {
       const newPaymentData = cloneDeep(reqPaymentData);
       newPaymentData.history_type = val?.historyType;
@@ -100,7 +92,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
                 label="Amount"
                 field="given_amount"
                 val={reqPaymentData.given_amount}
-                handleInputChange={onGivenInput}
+                handleInputChange={onChangeInput}
               />
             </div>
             {[BANK_ID, CHEQUE_ID].includes(reqPaymentData.payment_type) && (
@@ -113,7 +105,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
                     acceptAll={true}
                     disabledIcon={true}
                     val={reqPaymentData.bank_name}
-                    handleInputChange={onGivenInput}
+                    handleInputChange={onChangeInput}
                   />
                 </div>
                 <div className="flex flex-col w-36">
@@ -124,7 +116,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
                     acceptAll={true}
                     disabledIcon={true}
                     val={reqPaymentData.req_transactionNum}
-                    handleInputChange={onGivenInput}
+                    handleInputChange={onChangeInput}
                   />
                 </div>
               </>

@@ -14,7 +14,7 @@ const ErrorModal = (props) => {
   return (
     <div
       className="fixed w-screen h-screen flex justify-center items-center top-0 left-0"
-      style={{ zIndex: 1100, backgroundColor: "rgba(52, 52, 52, 0.6)" }}
+      style={{ zIndex: 5000, backgroundColor: "rgba(52, 52, 52, 0.6)" }}
     >
       <div className="relative w-DialogWidth min-h-modalHeight h-auto flex flex-col bg-white rounded-md animate-modalSlide">
         {/* This div will grow to occupy the available space */}

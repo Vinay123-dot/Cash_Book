@@ -25,28 +25,53 @@ import {
 import DaybookTable from "./DaybookTable";
 import CButton from "components/ui/Button";
 import BillAmountModal from "../DayBookFiles/BillAmountModal";
+import Datepicker from "components/ui/Datepicker";
+import Button from "components/ui/NewButton";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 
 const DaybookExcel = (props) => {
 
     const dispatch = useDispatch();
     const {daybooKData,setDaybookData} = useContext(DaybookDataContext);
+    const { fetchRequestedDates } = useFetchReqBook();
     const {
         customerListInfo
     } = useSelector(state => state.quickbookStore.state);
     let uniqueId = localStorage.getItem("uniqueId");
     const [showBillModal,setShowBillModal] = useState(false);
     const [selectedObj,setSelectedObj] = useState({});
-
+    const [datesObj,setDatesObj] = useState({
+      fromDate : null,
+      toDate : null
+    });
     
     const showLoader = (loaderFlag) =>  setDaybookData((prev) => ({...prev,showDaybookLoader:loaderFlag}));
     
-
     useEffect(() => {
-        if(daybooKData.getUploadExcelData){
-            getExcelTrasaction();
-        }
-    },[daybooKData.getUploadExcelData])
+      getRequiredDates();
+  
+      return () => {
+        dispatch(setApprovedDates([]));
+      }
+    },[])
+
+    const getRequiredDates = async() => {
+      try{
+         let response = await fetchRequestedDates({book_name : "Day Transactions"});
+         dispatch(setApprovedDates(response || []));
+      }catch(Err){
+
+      }
+  }
+
+    // useEffect(() => {
+    //     if(daybooKData.getUploadExcelData){
+    //         getExcelTrasaction();
+    //     }
+    // },[daybooKData.getUploadExcelData])
 
     const getCustomerType = (cType) => {
         if (typeof cType === 'string') {
@@ -66,7 +91,8 @@ const DaybookExcel = (props) => {
         try {
             let newObj = {
                 terminal_id: uniqueId,
-                key: uniqueId
+                key: uniqueId,
+                ...datesObj
             };
             showLoader(true);
             let resposne = await apiGetDayBookExcelData(newObj);
@@ -121,7 +147,12 @@ const DaybookExcel = (props) => {
                     selectedExcelArray : [],
                     receiptsArray : []
                   }));
-                getExcelTrasaction();
+                  setDatesObj((prev) =>({
+                    ...prev,
+                    fromDate : null,
+                    toDate : null
+                  }))
+                // getExcelTrasaction();
             };
             showLoader(false);
         }catch(Err){
@@ -316,9 +347,43 @@ const DaybookExcel = (props) => {
         }
       );
     };
+
+    const onChangeDate = (date,dateString) => {
+      setDatesObj((prev) =>({
+        ...prev,
+        fromDate : dateString,
+        toDate : dateString
+      }));
+    };
+
+    const checkValues = () => !!(datesObj.fromDate && datesObj.toDate);
+    const getViewBtnCls = checkValues() ? ENABLED_STYLE : DISABLED_STYLE;
     
     return (
       <div className="h-full flex flex-col">
+        <div className="realtive w-full gap-2 flex flex-row justify-start sm:justify-end flex-wrap pr-5">
+          <div className="w-36">
+            <Datepicker
+              labelText="Day"
+              name="date"
+              ph="--- Select Day ---"
+              className="h-10"
+              value={datesObj.fromDate}
+              handleChange={onChangeDate}
+            />
+          </div>
+
+          <div className="self-end">
+            <Button
+              type="button"
+              className={getViewBtnCls}
+              isDisabled={!checkValues()}
+              onClick={getExcelTrasaction}
+            >
+              View
+            </Button>
+          </div>
+        </div>
         <div className="flex-grow overflow-auto">
           <DaybookTable
             data={daybooKData.excelArray}

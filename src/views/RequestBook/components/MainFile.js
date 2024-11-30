@@ -6,6 +6,7 @@ import RequestHistory from "./History";
 import useFetchMasterData from "utils/hooks/useFetchMasterApis";
 import { setMainPageLoader } from "QuickBook/store/dataSlice";
 import DrawerSlide from "components/shared/Drawer";
+import { MERCHANT_ID } from "constants/app.constant";
 
 const MainFile = () => {
 
@@ -13,15 +14,18 @@ const MainFile = () => {
     const {
         getBookTypeInfo,
         getDayInfo,
+        getOutletsList
       } = useFetchMasterData();
     const { 
         bookTypeList,
-        dayInfoList
+        dayInfoList,
+        allTerminalList
     } = useSelector((state) => state.quickbookStore.state);
     const { 
             manageRequestModal,
             activeTab 
-        } = useSelector(state => state.requestBook.reqState);
+    } = useSelector(state => state.requestBook.reqState);
+    const userType = localStorage.getItem("mType");
     
     useEffect(() => {
         fetchRequiredApi();
@@ -32,6 +36,7 @@ const MainFile = () => {
             dispatch(setMainPageLoader(true));
             bookTypeList.length <= 0 && await getBookTypeInfo();
             dayInfoList.length <= 0 && await getDayInfo();
+            (allTerminalList.length <= 0 && userType === MERCHANT_ID && await getOutletsList());
             dispatch(setMainPageLoader(false));
         }catch(Err){
             dispatch(setMainPageLoader(false));
