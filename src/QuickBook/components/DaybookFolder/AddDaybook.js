@@ -1,33 +1,34 @@
 import React, { useContext, useEffect, useRef,useState } from "react";
+import { useDispatch } from "react-redux";
 import { Formik, Form } from "formik";
-import { dayBookIntialObj } from "../../intialValuesFol";
-import { DayBookValidations } from "../../../Validations";
-import ParagraphTag from "../../../constants/PTag";
-import AntdDatePicker from "../../../components/ui/AntdDatePicker";
-import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
-import { DaybookDataContext } from "../../../context/DaybookContext";
-import AntdInput from "../../../components/ui/AntdInput";
+import { dayBookIntialObj } from "QuickBook/intialValuesFol";
+import { DayBookValidations } from "Validations";
+import ParagraphTag from "constants/PTag";
+import AntdDatePicker from "components/ui/AntdDatePicker";
+import AntdFormikSelect from "components/ui/AntdFormikSelect";
+import { DaybookDataContext } from "context/DaybookContext";
+import AntdInput from "components/ui/AntdInput";
 import CashTypes from "../DayBookFiles/CashTypes";
 import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
 import ShowPaymentTypes from "../DayBookFiles/ShowPaymentTypes";
 import BillAmountModal from "../DayBookFiles/BillAmountModal";
-import CButton from "../../../components/ui/Button";
+import CButton from "components/ui/Button";
 import { convertTONumbers, getTotalMoneyInDayBook, verifyInputField } from "../CompConstants";
-import { apiGetTerminal, apiStoreDayBookInfo } from "../../../services/TransactionService";
+import { apiGetTerminal, apiStoreDayBookInfo } from "services/TransactionService";
 import { 
     setSelectedBookType, 
     setShowAddBookPage, 
     setShowDayBookFields,
     setDataSavedModal
 } from "../../store/stateSlice";
-import { useDispatch } from "react-redux";
-
-
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 const AddDaybook = () => {
 
     const dispatch = useDispatch();
     const addBookRef = useRef();
+    const { fetchRequestedDates } = useFetchReqBook();
     const { daybooKData, setDaybookData } = useContext(DaybookDataContext);
     const [billNum,setBillNum] = useState("");
     const [showBillModal,setShowBillModal] = useState(false);
@@ -36,6 +37,11 @@ const AddDaybook = () => {
 
   useEffect(() => {
     getTerminal();
+    getRequiredDates();
+
+    return () => {
+      dispatch(setApprovedDates([]));
+    }
   },[])
 
     const getTerminal = async() => {
@@ -49,6 +55,15 @@ const AddDaybook = () => {
             setDaybookData((prev) => ({...prev,showDaybookLoader : false}));
         }
     }
+
+    const getRequiredDates = async() => {
+      try{
+         let response = await fetchRequestedDates({book_name : "Day Transactions"});
+         dispatch(setApprovedDates(response || []));
+      }catch(Err){
+
+      }
+  }
 
   const handleChangeSalesType = (name, sValue) => {
     addBookRef?.current?.setFieldValue(name, sValue);
@@ -208,7 +223,7 @@ const AddDaybook = () => {
                   showAddBeforeValue = {
                     billNum +"/" +(values.sales_code ? values.sales_code + "/" : "")
                   }
-                  disableInput = {!values.sales_type && true}
+                  disableInput = {!values.sales_type}
                 />
                 {
                     showSelectBox("Customer Type","customer_type","--Select Customer Type--",

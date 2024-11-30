@@ -1,51 +1,54 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import { Select } from "antd";
 import { useSelector } from 'react-redux';
 
 const {Option} = Select;
 
 const AntdSelectFilter = (props) => {
-
-    const { onStatusChange,placeholder,options,value:selectedValue,message ="",customData = null } = props;
+    const {
+      onStatusChange,
+      placeholder,
+      options,
+      value
+    } = props;
 
     const onStatusFilterChange = (value) => onStatusChange?.(value);
-
-    const selectedFilter = options.find(
-        (option) => option.value === selectedValue
-    )
-
     const caseSensitiveFilterOption = (input, option) => {
-        return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
+      return (option?.children ?? '').toLowerCase().includes(input.toLowerCase());
     };
-
+    
     return (
-        <>
-            <Select
-                showSearch
-                className = "w-full md:w-48 lg:w-40 xl:w-44 h-10"
-                placeholder = {placeholder}
-                optionFilterProp = "children"
-                filterOption={caseSensitiveFilterOption}
-                // filterSort={(optionA, optionB) =>
-                //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                // }
-                onChange = {onStatusFilterChange}
-            >
-                {(options || []).map((eachOpt, i) => (
-                            <Option key={i} value={eachOpt.Id}>
-                                {eachOpt.Type || eachOpt.Terminal}
-                            </Option>
-                ))}
-            </Select>
-            {
-                customData ? <span className="text-blue-400 text-base font-normal ml-2">{customData}</span> :
-                message  ?  <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} >{message}</span> :
-                <span className="text-base font-normal ml-2 mt-2" style={{color:"red"}} > {(selectedFilter?.label || selectedFilter?.Type)}</span>
-            }
-         
-        </>
-    )
+        <Select
+          showSearch
+          className="w-full h-10"
+          placeholder={placeholder}
+          optionFilterProp="children"
+          filterOption={caseSensitiveFilterOption}
+          onChange={onStatusFilterChange}
+        >
+          {(options || []).map((eachOpt, i) => (
+            <Option key={eachOpt.Id} value={eachOpt.MMS_Terminal_ID || eachOpt.Id}>
+              {eachOpt.Type || eachOpt.Terminal}
+            </Option>
+          ))}
+        </Select>
+    );
 }
 
 export default AntdSelectFilter;
+
+AntdSelectFilter.propTypes = {
+    onStatusChange : PropTypes.func,
+    placeholder : PropTypes.string,
+    options : PropTypes.array,
+    value : PropTypes.number,
+    message : PropTypes.string,
+    customData : PropTypes.string,
+};
+
+AntdSelectFilter.defaultProps = {
+    message :"",
+    customData : null,
+};
 

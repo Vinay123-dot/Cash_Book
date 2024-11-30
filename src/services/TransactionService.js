@@ -112,7 +112,20 @@ export async function apiStorePettyCashInfo(data){
     let url = `${appConfig.apiPrefix}/v21/petty_cash/save_PettyCash`;
     const response = await axios.post(url,JSON.stringify(data),{headers});
     return response.data;
+};
+
+export async function apiSaveRequestBook(data) {
+    let url = `${appConfig.apiPrefix}/v21/request_book/save_RequestBook`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
 }
+
+export const apiVerifyReturnOrder = async(data) => {
+    console.log("d",data)
+    let url = `${appConfig.apiPrefix}/v21/day_book/verify_daybook?key=${data.key}&Bill_No=${data.Bill_No}`;
+    const response = await axios.post(url,JSON.stringify(data),{headers});
+    return response.data;
+};
 
 
 
@@ -212,13 +225,11 @@ export async function apiGetBookTypeServices(data) {
 }
 
 export async function apiGetDayBookExcelData(data) {
-    const {terminal_id,key} = data;
-    let book_type = "Day Transactions";
+    const {terminal_id,key,fromDate,toDate} = data;
     let history_type = 0;
-    let startDate = getDaybeforeYesterday();
-    let endDate = getToday();
-    // let url = `${appConfig.apiPrefix}/v21/book_type/view_BookData?book_type=${book_type}&history_type=${history_type}&key=${key}&terminal_id=${terminal_id}`;
-    let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${startDate}&end_date=${endDate}`;
+    // let startDate = getDaybeforeYesterday();
+    // let endDate = getToday();
+    let url = `${appConfig.apiPrefix}/v21/day_book/get_dayBook?history_type=${history_type}&key=${key}&terminal_id=${terminal_id}&start_date=${fromDate}&end_date=${toDate}`;
     const response = await axios.get(url,{headers});
     return response;
 }
@@ -260,13 +271,7 @@ export async function apiGetPettyCashReason(id){
     return response.data;
 }
 
-// export async function apiGetBookTypeServices(data) {
-//     return ApiService.fetchData({
-//         url: '/v21/book_type/get_BookType',
-//         method: 'get',
-//         data,
-//     })
-// }
+
 
 export async function apiCreateSession(data){
     let url = `${appConfig.apiPrefix}/v21/session/add_Session`;
@@ -300,5 +305,59 @@ export async function apiDeletePaymentModal(data){
     });
     return response;
 }
+
+export async function apiDeleteBankDeposit(data){
+    let url = `${appConfig.apiPrefix}/v21/bank_deposit/delete_BankDeposit`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+}
+
+export async function apiDeletePettyCash(data){
+    let url = `${appConfig.apiPrefix}/v21/petty_cash/delete_pettycash`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+};
+
+
+export async function apiGetRequestHistory(data) {
+    const { terminal_id,key,history_type = 5,book_name,fromDate,toDate } = data;
+    let tempUrl = `${appConfig.apiPrefix}/v21/request_book/get_RequestBook?book_type=${book_name}&key=${key}&terminal_id=${terminal_id}`
+    let url;
+    if(!fromDate || !toDate){
+        url = `${tempUrl}&history_type=${history_type}`
+    }else{
+        url = `${tempUrl}&history_type=${0}&fromDate=${fromDate}&toDate=${toDate}`;
+    }
+    const response = await axios.get(url,{headers});
+    return response;
+};
+
+export async function apiDeleteRequestBook(data){
+    let url = `${appConfig.apiPrefix}/v21/request_book/delete_RequestBook`;
+    const response = await axios.delete(url,{
+        data,
+        headers
+    });
+    return response;
+};
+
+export async function apiGetPaymentHistory(data) {
+    const { terminal_id,key,history_type = 0,party_code,fromDate,toDate } = data;
+    let tempUrl = `${appConfig.apiPrefix}/v21/day_book/get_dayBook_partycode?party_code=${party_code}&key=${key}&terminal_id=${terminal_id}`
+    let url;
+    if(!fromDate || !toDate){
+        url = `${tempUrl}&history_type=${history_type}`
+    }else{
+        url = `${tempUrl}&history_type=${0}&start_date=${fromDate}&end_date=${toDate}`;
+    }
+    const response = await axios.get(url,{headers});
+    return response;
+};
 
 

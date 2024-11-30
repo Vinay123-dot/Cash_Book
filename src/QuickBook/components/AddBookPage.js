@@ -1,22 +1,29 @@
-import React, { useState} from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import { Select } from "antd";
 import DaybookPage from "./DaybookFolder";
 import AdvanceBookModal from "./AdvanceBookModal";
-import BankDepositModal from "./BankDepositModal";
+import BankDeposit from "./BankDeposit";
 import PettyCashModal from "./PettyCashModal";
 import PaymentCollectionModal from "./PaymentCollectionModal";
-import { apiGetCommonOpeningBalance } from "../../services/TransactionService";
-import { getToday, getTomorrowDate } from "../../utils/dateFormatter";
+import PaymentCollection from "views/PaymentCollection"
 import {
   setShowAddBookPage,
-  setCommonCashBalance,
   setShowDayBookFields,
   setShowUploadInvoice,
   setSelectedBookType
 } from '../store/stateSlice';
-import CButton from "../../components/ui/Button";
-import amountFormatter from "../../utils/amountFormatter";
+import CButton from "components/ui/Button";
+import amountFormatter from "utils/amountFormatter";
+import {
+  ADVANCEBOOK_ID,
+  BANKDEPOSIT_ID,
+  DAYTRANSACTIONS_ID,
+  PAYMENTCOLLECTION_ID,
+  PETTYCASH_ID,
+} from "constants/app.constant";
+import { setClearAllPaymentPageFields } from "views/PaymentCollection/store/dataSlice";
 
 const { Option } = Select;
 const AddBookPage = (props) => {
@@ -32,10 +39,12 @@ const AddBookPage = (props) => {
     bookTypeList,
     selectedBookType
   } = useSelector(state => state.quickbookStore.state);
-  let uniqueId = localStorage.getItem("uniqueId");
   let userType = localStorage.getItem("mType");
 
-  const handleChange = (value) => dispatch(setSelectedBookType(value));
+  const handleChange = (value) => {
+    dispatch(setSelectedBookType(value));
+    dispatch(setClearAllPaymentPageFields({}));
+  };
 
   if (!openPage) return null;
 
@@ -73,10 +82,6 @@ const AddBookPage = (props) => {
           style={{ width: 220, height: 40 }}
           placeholder="Search to Select"
           optionFilterProp="children"
-          // filterOption={(input, option) => (option?.children ?? '').includes(input)}
-          // filterSort={(optionA, optionB) =>
-          //   (optionA?.children ?? '').toLowerCase().localeCompare((optionB?.children ?? '').toLowerCase())
-          // }
           filterOption={caseSensitiveFilterOption}
           onChange={handleChange}
         >
@@ -90,15 +95,15 @@ const AddBookPage = (props) => {
         {
           userType == 7 && [2,4].includes(selectedBookType) &&
           <div className="flex flex-col">
-            <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Opening Balance</label>
-            <p className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCash : bankBalance)}</p>
+            <label htmlFor = "open_bal" className="text-blue-600 text-lg font-medium tracking-wide mb-1">Opening Balance</label>
+            <p id="open_bal" className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCash : bankBalance)}</p>
           </div>
         }
         {
           userType == 7 && [2,4].includes(selectedBookType) && 
           <div className="flex flex-col">
-            <label className="text-blue-600 text-lg font-medium tracking-wide mb-1">Remaining Balance</label>
-            <p className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCashRem : remainingOpeningBal)}</p>
+            <label  htmlFor = "rem_bal" className="text-blue-600 text-lg font-medium tracking-wide mb-1">Remaining Balance</label>
+            <p id = "rem_bal" className="text-2xl">{amountFormatter(selectedBookType === 4 ? pettyCashRem : remainingOpeningBal)}</p>
           </div>
         }
         {
@@ -107,21 +112,25 @@ const AddBookPage = (props) => {
       </div>
 
       <div className=" mx-3 bg-white rounded-lg relative  h-[calc(100vh-7rem)]">
-
-        <PettyCashModal showPettyCash={selectedBookType === 4}/>
-        <BankDepositModal showBankDeposit={selectedBookType === 2} />
-        <AdvanceBookModal showAdvanceBook={selectedBookType === 1} />
         {
-          selectedBookType === 3 && <DaybookPage/>
+          selectedBookType === ADVANCEBOOK_ID && <AdvanceBookModal/>
         }
-        {/* <DayBookModal 
-          showDaybookModal={selectedBookType === 3}
-        /> */}
-        <PaymentCollectionModal showPaymentColModal = {selectedBookType === 5} />
+        {
+          selectedBookType === BANKDEPOSIT_ID && <BankDeposit/>
+        }
+        {
+          selectedBookType === DAYTRANSACTIONS_ID && <DaybookPage/>
+        }
+        {
+          selectedBookType === PETTYCASH_ID && <PettyCashModal/>
+        }
+        {
+          selectedBookType === PAYMENTCOLLECTION_ID && <PaymentCollection/>
+        }
+        
 
       </div>
       {
-        // (!selectedValue || selectedValue === 3) && showBtnsForDbook &&
         !selectedBookType &&
         <div className= "absolute flex flex-row-reverse gap-10  bottom-10 right-10">
           <CButton
@@ -148,3 +157,7 @@ const AddBookPage = (props) => {
 }
 
 export default AddBookPage;
+
+AddBookPage.propTypes = {
+  openPage : PropTypes.bool.isRequired,
+};

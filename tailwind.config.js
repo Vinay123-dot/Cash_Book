@@ -32,6 +32,7 @@ module.exports = {
         },
         black: '#000000',
         white: '#FFFFFF',
+        swinkpayBlue : '#5A87B2'
     },
     width : {
       'DialogWidth' : "420px"
@@ -52,6 +53,10 @@ module.exports = {
       modalSlide: {
         '0%': { transform: 'translateY(-100%)', opacity: 0 },
         '100%': { transform: 'translateY(0)', opacity: 1 },
+      },
+      dialogSlide : {
+        '0%': { transform: 'translateX(-100%)', opacity: 0 },
+        '100%': { transform: 'translateX(0)', opacity: 1 },
       },
     },
     animation: {

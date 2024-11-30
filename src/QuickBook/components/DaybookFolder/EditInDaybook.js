@@ -1,18 +1,29 @@
 
 import React, { useState,memo,useRef,useContext } from "react";
+import { useDispatch } from "react-redux";
+import PropTypes from "prop-types";
 import { Formik, Form } from 'formik';
-import CButton from "../../../components/ui/Button";
-import AntdFormikSelect from "../../../components/ui/AntdFormikSelect";
-import AntdInput from "../../../components/ui/AntdInput";
-import { useDispatch,useSelector } from "react-redux";
+import CButton from "components/ui/Button";
+import AntdFormikSelect from "components/ui/AntdFormikSelect";
+import AntdInput from "components/ui/AntdInput";
+import ParagraphTag from "constants/PTag";
+import ShowPaymentTypes from "../DayBookFiles/ShowPaymentTypes";
+import BillAmountModal from "../DayBookFiles/BillAmountModal";
+import { DayBookValidations } from "Validations";
+import CashTypes from "../DayBookFiles/CashTypes";
+import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
+import Modal from "components/shared/Modal";
+import { getToday } from "utils/dateFormatter";
+import AntdDaySelect from "components/ui/AntdDaySelect";
+import AntdDatePicker from "components/ui/AntdDatePicker";
+import { DaybookDataContext } from "context/DaybookContext";
 import {
     setCommonCashBalance,
-    setShowUploadInvoice,
     setRemainingCommonBalance,
     setPettyCashBalance,
     setPettyCashRemainingBalance
 } from '../../store/stateSlice';
-import ParagraphTag from "../../../constants/PTag";
+
 import {
     apiStoreDayBookInfo,
     apiGetCommonOpeningBalance,
@@ -20,21 +31,9 @@ import {
     apiGetPettyCashCommonBalance,
     apiGetPettyCashRemainingBalance
 } from "../../../services/TransactionService";
-import Loader from "../../../components/shared/Loader";
+
 import { getTotalMoneyInDayBook,convertTONumbers, verifyInputField } from "../CompConstants";
-import ShowPaymentTypes from "../DayBookFiles/ShowPaymentTypes";
-import BillAmountModal from "../DayBookFiles/BillAmountModal";
-import { DayBookValidations } from "../../../Validations";
-import CashTypes from "../DayBookFiles/CashTypes";
-import AdvanceBillDetails from "../DayBookFiles/AdvanceBillDetails";
-import Modal from "../../../components/shared/Modal";
-import { getToday } from "../../../utils/dateFormatter";
-import AntdDaySelect from "../../../components/ui/AntdDaySelect";
-import AntdDatePicker from "../../../components/ui/AntdDatePicker"
-import ErrorModal from "../../../components/ui/ErrorModal";
-import { DaybookDataContext } from "../../../context/DaybookContext";
-
-
+import DrawerSlide from "components/shared/Drawer";
 
 
 const EditInDayBook = (props) => {
@@ -188,124 +187,125 @@ const EditInDayBook = (props) => {
     }
    
     return (
-        <Modal openModal={true} height={"90%"} width={"90%"}  ai = {null}>
-            <>
-                <Formik
-                    initialValues = {editDayBookObj}
-                    validationSchema = {DayBookValidations}
-                    onSubmit={(values, { setSubmitting }) => {
-                        handleSubmit(values, validateModal)
+      <DrawerSlide
+        openDrawer = {true} 
+        title = "Edit DayBook"
+      >
+        <Formik
+          initialValues={editDayBookObj}
+          validationSchema={DayBookValidations}
+          onSubmit={(values, { setSubmitting }) => {
+            handleSubmit(values, validateModal);
+          }}
+        >
+          {({ setFieldValue, values }) => {
+            return (
+              <Form className="h-full flex flex-col">
+                <div className="flex-grow overflow-y-auto">
+                  <ParagraphTag label="Details" />
+                  <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
+                    <AntdDatePicker
+                      labelText="Day"
+                      name="date"
+                      ph="--- Select Day ---"
+                      value={values["date"]}
+                      handleChange={(date, dateString) =>
+                        setFieldValue("date", dateString)
+                      }
+                    />
+                    <AntdFormikSelect
+                      labelText="Sale Type"
+                      name="sales_type"
+                      ph="--Select Sale Type--"
+                      handleChange={(name, selectedValue) =>
+                        handleChangeSalesType(name, selectedValue)
+                      }
+                      Arr={daybooKData.salesType}
+                    />
+                    <AntdInput
+                      text="Bill Number"
+                      value="bill_no"
+                      ph="Enter Bill Number"
+                      showAddBefore={true}
+                      disableInput={true}
+                    />
+                    {showSelectBox(
+                      "Customer Type",
+                      "customer_type",
+                      "--Select CustomerType--",
+                      getCustomerList(daybooKData.customerListInfo, values)
+                    )}
+                    {showInputBox({
+                      label: "Bill Total Value",
+                      val: "bill_value",
+                      values: values,
+                      validation: false,
+                      prefix: true,
+                      onlyNum: true,
+                    })}
+                    {showInputBox({
+                      label: "Party Code",
+                      val: "party_code",
+                      values: values,
+                    })}
+                    {showInputBox({
+                      label: "Party Name",
+                      val: "party_name",
+                      values: values,
+                    })}
+                  </div>
+                  {values.sales_type === 1 && (
+                    <>
+                      <CashTypes
+                        valObj={values}
+                        paymentListInfo={daybooKData.paymentListInfo}
+                        upiTypeInfo={daybooKData.upiTypeInfo}
+                      />
+
+                      <AdvanceBillDetails values={values} />
+                    </>
+                  )}
+
+                  <ShowPaymentTypes paymentValues={values} />
+                  <BillAmountModal
+                    billModal={showBillModal}
+                    valuesObj={values}
+                    handleSubmitBillModal={() => handleSubmit(values, false)}
+                    handleCancelBillModal={() => {
+                      setShowBillModal(false);
+                      setValidateModal(true);
                     }}
-                    
-                >
-                    {({ setFieldValue, values }) => {
-                        return (
-                          <Form className="h-full flex flex-col">
-                            <div className="flex-grow overflow-y-auto">
-                              <ParagraphTag label="Details" />
-                              <div className="grid grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-3 md:grid-cols-2">
-                                <AntdDatePicker
-                                  labelText="Day"
-                                  name="date"
-                                  ph="--- Select Day ---"
-                                  value={values["date"]}
-                                  handleChange={(date, dateString) =>setFieldValue("date", dateString)}
-                                />
-                                <AntdFormikSelect
-                                  labelText="Sale Type"
-                                  name="sales_type"
-                                  ph="--Select Sale Type--"
-                                  handleChange={(name, selectedValue) =>handleChangeSalesType(name,selectedValue)}
-                                  Arr = {daybooKData.salesType}
-                                />
-                                <AntdInput
-                                  text="Bill Number"
-                                  value="bill_no"
-                                  ph="Enter Bill Number"
-                                  showAddBefore={true}
-                                  disableInput={true}
-                                />
-                                {
-                                    showSelectBox("Customer Type","customer_type","--Select CustomerType--",
-                                        getCustomerList(daybooKData.customerListInfo, values)
-                                    )
-                                }
-                                {
-                                    showInputBox({
-                                        label: "Bill Total Value",
-                                        val: "bill_value",
-                                        values: values,
-                                        validation: false,
-                                        prefix: true,
-                                        onlyNum: true,
-                                    })
-                                }
-                                {
-                                    showInputBox({
-                                        label: "Party Code",
-                                        val: "party_code",
-                                        values: values,
-                                    })
-                                }
-                                {
-                                    showInputBox({
-                                        label: "Party Name",
-                                        val: "party_name",
-                                        values: values,
-                                    })
-                                }
-                              </div>
-                              {values.sales_type === 1 && (
-                                <>
-                                  <CashTypes
-                                    valObj={values}
-                                    paymentListInfo = {daybooKData.paymentListInfo}
-                                    upiTypeInfo = {daybooKData.upiTypeInfo}
-                                  />
+                  />
+                </div>
 
-                                  <AdvanceBillDetails 
-                                    values={values} 
-                                    />
-                                </>
-                              )}
-
-                              <ShowPaymentTypes paymentValues={values} />
-                              <BillAmountModal
-                                billModal={showBillModal}
-                                valuesObj={values}
-                                handleSubmitBillModal={() =>
-                                  handleSubmit(values, false)
-                                }
-                                handleCancelBillModal={() => {
-                                  setShowBillModal(false);
-                                  setValidateModal(true);
-                                }}
-                              />
-                            </div>
-
-                            <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
-                              <CButton btnType="submit">Save</CButton>
-                              <CButton
-                                onClick={() => {
-                                  ErrModal({});
-                                  handleCancelDBook();
-                                  // dispatch(setShowAddBookPage(false))
-                                }}
-                                type="cancel"
-                              >
-                                Cancel
-                              </CButton>
-                            </div>
-                          </Form>
-                        );
+                <div className="flex flex-row-reverse items-center gap-10 px-4 h-[20%]">
+                  <CButton btnType="submit">Save</CButton>
+                  <CButton
+                    onClick={() => {
+                      ErrModal({});
+                      handleCancelDBook();
+                      // dispatch(setShowAddBookPage(false))
                     }}
-                </Formik>
-
-            </>
-
-        </Modal>
-    )
+                    type="cancel"
+                  >
+                    Cancel
+                  </CButton>
+                </div>
+              </Form>
+            );
+          }}
+        </Formik>
+      </DrawerSlide>
+    );
 }
 
 export default memo(EditInDayBook);
+
+EditInDayBook.propTypes  = {
+  editDayBookObj : PropTypes.object,
+  isEditDayBookModal : PropTypes.bool,
+  handleCancelDBook : PropTypes.func,
+  handleSaveEditDayBook : PropTypes.func
+};
+
 

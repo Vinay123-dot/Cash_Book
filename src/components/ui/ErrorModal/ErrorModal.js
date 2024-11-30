@@ -1,24 +1,3 @@
-// import React from "react";
-// import Modal from "../../shared/Modal";
-// import CButton from "../Button";
-
-// const ErrorModal = ({handleCloseEModal,msg = "",jc = null,ai = "center"}) => {
-//     return  <Modal openModal= {true} height = {250} width={350} jc = {jc} ai = {ai}>
-//     {/* <img src={SucessIcon} style={{ width: 59, height: 59, marginTop: 20 }} /> */}
-//     <p style={{ fontSize: 16, fontWeight: 500, color: "#959595", marginTop: 20,textAlign :"center" }}> 
-//         {msg}</p>
-//     <CButton 
-//         onClick={handleCloseEModal}
-//         style={{ position: 'absolute', bottom: 20 }}
-//     >
-//         Ok
-//     </CButton>
-
-// </Modal>
-// };
-
-// export default ErrorModal;
-
 import React, { useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
 import SucessIcon from "../../../assets/SucessIcon.png";
@@ -35,7 +14,7 @@ const ErrorModal = (props) => {
   return (
     <div
       className="fixed w-screen h-screen flex justify-center items-center top-0 left-0"
-      style={{ zIndex: 999, backgroundColor: "rgba(52, 52, 52, 0.6)" }}
+      style={{ zIndex: 5000, backgroundColor: "rgba(52, 52, 52, 0.6)" }}
     >
       <div className="relative w-DialogWidth min-h-modalHeight h-auto flex flex-col bg-white rounded-md animate-modalSlide">
         {/* This div will grow to occupy the available space */}

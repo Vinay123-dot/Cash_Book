@@ -41,7 +41,7 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 
 const AdvanceBookModal = (props) => {
 
-    const { showAdvanceBook } = props;
+
     const dispatch = useDispatch();
     const [clickCount, setClickCount] = useState([0]);
     const [paymentListInfo, setPaymentListInfo] = useState([]);
@@ -82,7 +82,6 @@ const AdvanceBookModal = (props) => {
         } catch (e) { }
     }
 
-    if (!showAdvanceBook) return null;
 
 
     const handleSubmit = async (values,validateModal) => {

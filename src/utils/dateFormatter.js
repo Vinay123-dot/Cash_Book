@@ -54,3 +54,7 @@ export function convertToNormalFormat(datetimeString) {
     const date = new Date(datetimeString);
     return formatDate(date);
 }
+
+export function getCurrentDate(){
+    return (dayjs()).format('YYYY-MM-DD');
+}

@@ -26,6 +26,8 @@ import { PaymentCollectionValidations } from "../../Validations";
 import CashTypes from "./DayBookFiles/CashTypes";
 import ErrorModal from "../../components/ui/ErrorModal";
 import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -39,8 +41,8 @@ const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
 
 const PaymentCollectionModal = (props) => {
 
-    const { showPaymentColModal } = props;
     const dispatch = useDispatch();
+    const { fetchRequestedDates } = useFetchReqBook();
     const [paymentListInfo, setPaymentListInfo] = useState([]);
     const [upiTypeInfo, setUpiTypeInfo] = useState([]);
     const [customerListInfo, setCustomerListInfo] = useState([]);
@@ -54,6 +56,11 @@ const PaymentCollectionModal = (props) => {
 
     useEffect(() => {
         fetchReqTypesInDayBook();
+        getRequiredDates();
+        
+        return () => {
+            dispatch(setApprovedDates([]));
+        }
     }, []);
 
     const fetchReqTypesInDayBook = async () => {
@@ -66,13 +73,17 @@ const PaymentCollectionModal = (props) => {
             setUpiTypeInfo(upiArray?.data || []);
             setCustomerListInfo(customerArr?.data || []);
         } catch (e) { }
+
     }
 
-  
+    const getRequiredDates = async() => {
+        try{
+           let response = await fetchRequestedDates({book_name : "Payment Collection"});
+           dispatch(setApprovedDates(response || []));
+        }catch(Err){
 
-    if (!showPaymentColModal) return null;
-
-  
+        }
+    }
 
     const handleSubmit = async (values, validateModal) => {
         try {

@@ -23,17 +23,10 @@ export const getTransactions = createAsyncThunk(
 )
 
 export const initialTableData = {
-    // type: 0,
-    // history_type: historyType,
     history_type: 0,
-    // pageNumber: 0,
-    // recordsPerPage: 10,
     filter_value: '',
-    // sort: 1,
     book_type : 0,
     terminal_id : -1,
-    // fromDate: getFromDate(),
-    // toDate: getToDate(),
     fromDate: "",
     toDate: "",
 }

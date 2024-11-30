@@ -1,4 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
+
+const selectedDocument = {
+    selObj : {},
+    showEditRequestBookModal : false
+};
 
 const stateSlice = createSlice({
     name: 'quickbookStore/state',
@@ -25,7 +30,9 @@ const stateSlice = createSlice({
         customerListInfo : [],
         salesType : [],
         allTerminalList : [],
-        selectedBookType : null
+        selectedBookType : null,
+        editRequestBookModal : selectedDocument
+
     },
     reducers: {
         setSelectedCustomer: (state, action) => {
@@ -96,6 +103,13 @@ const stateSlice = createSlice({
         },
         setSelectedBookType : (state,action) => {
             state.selectedBookType = action.payload;
+        },
+        setCancelButtonFunc : (state,action) => {
+            state.selectedBookType = false;
+            state.showAddBookPage = false;
+        },
+        setEdtiRequestBook : (state,action) => {
+            state.editRequestBookModal = {...selectedDocument,...action.payload};
         }
 
     },
@@ -127,7 +141,8 @@ export const {
     setEditedDaybookObj,
     setAllTerminalsList,
     setSelectedBookType,
-    
+    setCancelButtonFunc,
+    setEdtiRequestBook
 } = stateSlice.actions
 
 export default stateSlice.reducer

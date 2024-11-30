@@ -1,8 +1,10 @@
 import React,{useState,useEffect, useContext} from "react";
 import { useDispatch ,useSelector} from "react-redux";
-import DaybookTable from "./DaybookTable";
-import CButton from "../../../components/ui/Button";
-import { convertTONumbers, getConvertedObj, getTotalMoneyInDayBook } from "../CompConstants";
+import {
+  convertTONumbers,
+  getConvertedObj,
+  getTotalMoneyInDayBook
+} from "../CompConstants"
 import { 
     setSelectedBookType, 
     setShowAddBookPage, 
@@ -10,34 +12,66 @@ import {
     setShowUploadInvoice ,
     setDataSavedModal
 } from "../../store/stateSlice";
-import { DaybookDataContext } from "../../../context/DaybookContext";
-import { apiGetDayBookExcelData, apiStoreDayBookInfo } from "../../../services/TransactionService";
-import { INDEPENDENT_WORKSHOP, INDEPENDENTWORKSHOP, slicedCustomerTypeObj } from "../../../constants/app.constant";
+import { DaybookDataContext } from "context/DaybookContext";
+import {
+  apiGetDayBookExcelData,
+  apiStoreDayBookInfo,
+} from "services/TransactionService";
+import {
+  INDEPENDENT_WORKSHOP,
+  INDEPENDENTWORKSHOP,
+  slicedCustomerTypeObj
+} from "constants/app.constant";
+import DaybookTable from "./DaybookTable";
+import CButton from "components/ui/Button";
 import BillAmountModal from "../DayBookFiles/BillAmountModal";
-
-
+import Datepicker from "components/ui/Datepicker";
+import Button from "components/ui/NewButton";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
+import { DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
 
 
 const DaybookExcel = (props) => {
 
     const dispatch = useDispatch();
     const {daybooKData,setDaybookData} = useContext(DaybookDataContext);
+    const { fetchRequestedDates } = useFetchReqBook();
     const {
         customerListInfo
     } = useSelector(state => state.quickbookStore.state);
     let uniqueId = localStorage.getItem("uniqueId");
     const [showBillModal,setShowBillModal] = useState(false);
     const [selectedObj,setSelectedObj] = useState({});
-
+    const [datesObj,setDatesObj] = useState({
+      fromDate : null,
+      toDate : null
+    });
     
     const showLoader = (loaderFlag) =>  setDaybookData((prev) => ({...prev,showDaybookLoader:loaderFlag}));
     
-
     useEffect(() => {
-        if(daybooKData.getUploadExcelData){
-            getExcelTrasaction();
-        }
-    },[daybooKData.getUploadExcelData])
+      getRequiredDates();
+  
+      return () => {
+        dispatch(setApprovedDates([]));
+      }
+    },[])
+
+    const getRequiredDates = async() => {
+      try{
+         let response = await fetchRequestedDates({book_name : "Day Transactions"});
+         dispatch(setApprovedDates(response || []));
+      }catch(Err){
+
+      }
+  }
+
+    // useEffect(() => {
+    //     if(daybooKData.getUploadExcelData){
+    //         getExcelTrasaction();
+    //     }
+    // },[daybooKData.getUploadExcelData])
 
     const getCustomerType = (cType) => {
         if (typeof cType === 'string') {
@@ -57,7 +91,8 @@ const DaybookExcel = (props) => {
         try {
             let newObj = {
                 terminal_id: uniqueId,
-                key: uniqueId
+                key: uniqueId,
+                ...datesObj
             };
             showLoader(true);
             let resposne = await apiGetDayBookExcelData(newObj);
@@ -112,7 +147,12 @@ const DaybookExcel = (props) => {
                     selectedExcelArray : [],
                     receiptsArray : []
                   }));
-                getExcelTrasaction();
+                  setDatesObj((prev) =>({
+                    ...prev,
+                    fromDate : null,
+                    toDate : null
+                  }))
+                // getExcelTrasaction();
             };
             showLoader(false);
         }catch(Err){
@@ -256,10 +296,7 @@ const DaybookExcel = (props) => {
           }
           let diffInAmount = Number(bill_value) - getTotalMoneyInDayBook(selObj);
           let modalFlag = (diffInAmount > 10 || diffInAmount < -10);
-          if (modalFlag) {
-            setShowBillModal(true);
-            return;
-        }
+          modalFlag && setShowBillModal(true);
     }
 
     const getSelectedRecordsCount = () => {
@@ -268,7 +305,7 @@ const DaybookExcel = (props) => {
     }
     const getDisabledStatus = () => {
         const findObj = (daybooKData.excelArray || []).find((eachDoc) => eachDoc.checked === true);
-        return findObj?.checked ? true : false;
+        return !! findObj?.checked ;
     }
 
     const calculateSums = (transactions) => {
@@ -310,9 +347,43 @@ const DaybookExcel = (props) => {
         }
       );
     };
+
+    const onChangeDate = (date,dateString) => {
+      setDatesObj((prev) =>({
+        ...prev,
+        fromDate : dateString,
+        toDate : dateString
+      }));
+    };
+
+    const checkValues = () => !!(datesObj.fromDate && datesObj.toDate);
+    const getViewBtnCls = checkValues() ? ENABLED_STYLE : DISABLED_STYLE;
     
     return (
       <div className="h-full flex flex-col">
+        <div className="realtive w-full gap-2 flex flex-row justify-start sm:justify-end flex-wrap pr-5">
+          <div className="w-36">
+            <Datepicker
+              labelText="Day"
+              name="date"
+              ph="--- Select Day ---"
+              className="h-10"
+              value={datesObj.fromDate}
+              handleChange={onChangeDate}
+            />
+          </div>
+
+          <div className="self-end">
+            <Button
+              type="button"
+              className={getViewBtnCls}
+              isDisabled={!checkValues()}
+              onClick={getExcelTrasaction}
+            >
+              View
+            </Button>
+          </div>
+        </div>
         <div className="flex-grow overflow-auto">
           <DaybookTable
             data={daybooKData.excelArray}
@@ -331,29 +402,7 @@ const DaybookExcel = (props) => {
             <p>P_Gateway : {calculateSums(daybooKData.excelArray).pGateway}</p>
             <p>Ref Order : {calculateSums(daybooKData.excelArray).refOrder}</p>
             <p>Cheque : {calculateSums(daybooKData.excelArray).cheque}</p>
-           
           </div>
-          {/* <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-9 bg-blue-500">
-            <p className="col-span-2 bg-red-500">Selected Records : {getSelectedRecordsCount()}</p>
-            <p>Cash : {getSelectedRecordsCount()}</p>
-            <p>Upi : {getSelectedRecordsCount()}</p>
-            <p>Card : {getSelectedRecordsCount()}</p>
-            <p>Bank : {getSelectedRecordsCount()}</p>
-            <p>P_Gateway : {getSelectedRecordsCount()}</p>
-            <p>Ref Order : {getSelectedRecordsCount()}</p>
-            <p>Cheque : {getSelectedRecordsCount()}</p>
-
-            <div className="flex items-center">
-            <input
-              type="checkbox"
-              className="cursor-pointer w-5 h-5"
-              // checked={eachDoc.checked}
-              // onChange={() => handleClickCheckbox(eachDoc)}
-            />
-            <p className="ml-0.5">Select All</p>
-            </div>
-           
-          </div> */}
 
           <div className="flex space-x-4">
             <CButton

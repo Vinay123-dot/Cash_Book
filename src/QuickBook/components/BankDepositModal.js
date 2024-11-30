@@ -1,28 +1,30 @@
 import React, { useEffect,useState } from "react";
-import { Formik, Form } from 'formik';
-import CButton from "../../components/ui/Button";
-import AntdFormikSelect from "../../components/ui/AntdFormikSelect";
-import AntdInput from "../../components/ui/AntdInput";
-import AntdTextArea from "../../components/ui/AntdTextArea";
-import { BankDepositTypeValidations } from "../../Validations";
 import { useDispatch,useSelector } from "react-redux";
+import PropTypes from "prop-types";
+import { Formik, Form } from 'formik';
+import CButton from "components/ui/Button";
+import AntdFormikSelect from "components/ui/AntdFormikSelect";
+import AntdInput from "components/ui/AntdInput";
+import AntdTextArea from "components/ui/AntdTextArea";
+import ParagraphTag from "constants/PTag";
+import Loader from "components/shared/Loader";
+import ErrorModal from "components/ui/ErrorModal";
+import AntdDatePicker from "components/ui/AntdDatePicker";
+import { BankDepositTypeValidations } from "Validations";
+import { getStatusOfCurrentDate } from "Constants";
 import {
-    setShowAddBookPage,
-    setDataSavedModal,
-    setSelectedBookType
-  } from '../store/stateSlice';
-import ParagraphTag from "../../constants/PTag";
-import { getStatusOfCurrentDate } from "../../Constants";
-import { 
-    apiGetDepositModeInfo, 
+    apiGetDepositModeInfo,
     apiGetDepositTypeInfo,
     apiStoreBankDepositInfo,
     apiVerifyAdvancedBookReceipt,
     apiGetReturnType
-    } from "../../services/TransactionService";
-import Loader from "../../components/shared/Loader";
-import ErrorModal from "../../components/ui/ErrorModal";
-import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
+} from "services/TransactionService";
+import {
+    setShowAddBookPage,
+    setDataSavedModal,
+    setSelectedBookType
+} from '../store/stateSlice';
+
 
 const ShowTextBoxInPC = (label, value, ph) => (
     <AntdTextArea
@@ -36,7 +38,6 @@ const DEPOSIT_ID = 2;
 const ORDER_CANCEL_ID = 3;
 const HEAD_OFFICE_ID = 5;
 
-const checkArr = ["",null];
 const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 const initialValues = {
     id : 0,
@@ -71,9 +72,7 @@ const BankDepositModal = (props) => {
     const [verifyBtnLdng,setVerifyBtnLdng] = useState(false);
     const [eModal,setEModal] = useState({
         eMessage : "",show : false
-    })
-    const [selectedDate,setSelectedDate] = useState(null);
-    const [selectedType,setSelectedType] = useState(null);
+    });
     let uniqueId = localStorage.getItem("uniqueId");
 
  
@@ -169,7 +168,6 @@ const BankDepositModal = (props) => {
     }
 
     const handleChangeType = (name,val,setFieldValue) => {
-        setSelectedType(val);
         setFieldValue(name,val);
         setFieldValue("date",null);
         setFieldValue("deposit_mode",null);
@@ -262,7 +260,6 @@ const BankDepositModal = (props) => {
                                     value={values["date"]}
                                     handleChange={(date, dateString) => {
                                         setFieldValue("date", dateString);
-                                        setSelectedDate(dateString);
                                     }}
                                         
                                 />
@@ -346,11 +343,23 @@ const BankDepositModal = (props) => {
                                         disableInput = {values.receipt_type_id === 1}
                                         
                                     />
+                                    
+                                    <div className="flex">
                                     <AntdInput
                                         text="Bill Number"
                                         value = 'bill_number'
                                         ph= "Bill Number"
                                     />
+                                    
+                                        <CButton
+                                            className = "ml-5 mt-10"
+                                            style = {{width : 100,height : 32}}
+                                            isLoading = {verifyBtnLdng}
+                                            onClick = {() => handleVerifyAdvanceMoney(values,setFieldValue)}
+                                        >
+                                            Verify
+                                        </CButton>
+                                    </div>
                                     <AntdFormikSelect
                                         labelText="Store Id"
                                         name="store_id"
@@ -421,4 +430,8 @@ const BankDepositModal = (props) => {
 }
 
 export default BankDepositModal;
+
+BankDepositModal.propTypes = {
+    showBankDeposit : PropTypes.object
+};
 

@@ -24,6 +24,7 @@ import Modal from "../../../components/shared/Modal";
 import { selectedValType } from "../CompConstants";
 import ErrorModal from "../../../components/ui/ErrorModal";
 import AntdDatePicker from "../../../components/ui/AntdDatePicker";
+import DrawerSlide from "components/shared/Drawer";
 
 const showSelectBox = (label, name, ph, dynamicArray, setFieldValue) => (
     <AntdFormikSelect
@@ -166,7 +167,10 @@ const EditDayBookFromDashboard = (props) => {
     }
   
     return (
-        <Modal openModal={true} height={"90%"} width={"90%"}  ai = {null}>
+        <DrawerSlide
+            openDrawer = {true}
+            title = "Edit DayBook"
+        >
             <>
                 <Formik
                     initialValues = {editDayBookObj}
@@ -279,7 +283,7 @@ const EditDayBookFromDashboard = (props) => {
 
             </>
 
-        </Modal>
+        </DrawerSlide>
     )
 }
 

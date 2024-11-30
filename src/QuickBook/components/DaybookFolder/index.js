@@ -1,6 +1,6 @@
 import React from "react";
 import MainDaybookPage from "./MainDaybookPage";
-import { DaybookDataProvider } from "../../../context/DaybookContext";
+import { DaybookDataProvider } from "context/DaybookContext";
 
 const Daybook =() => {
     return (

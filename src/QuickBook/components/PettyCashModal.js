@@ -20,6 +20,8 @@ import { apiStorePettyCashInfo } from "../../services/TransactionService";
 import Loader from "../../components/shared/Loader";
 import AntdDatePicker from "../../components/ui/AntdDatePicker/AntdDatePicker";
 import ErrorModal from "../../components/ui/ErrorModal";
+import { setApprovedDates } from "views/RequestBook/store/dataSlice";
+import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
 
 const initialValues = {
     id: 0,
@@ -64,10 +66,9 @@ const ShowTextBoxInPC = (label, value, ph) => (
 
 const PettyCashModal = (props) => {
 
-    const { showPettyCash } = props;
     const dispatch = useDispatch();
     const pettyCashRef = useRef();
-
+    const { fetchRequestedDates } = useFetchReqBook();
     const [pettyCashArr, setPettyCashArr] = useState([]);
     const [selectObjDetails, setSelectedObjDetails] = useState({
         showModal: false, selectedObj: {}
@@ -86,8 +87,22 @@ const PettyCashModal = (props) => {
     })
     const [storedPettyCash,setStoredPettyCash] = useState(commonPettyCash || 0);
 
+    useEffect(() => {
+        getRequiredDates();
+        
+        return () => {
+            dispatch(setApprovedDates([]));
+        }
+    }, []);
 
-    if (!showPettyCash) return null;
+    const getRequiredDates = async() => {
+        try{
+           let response = await fetchRequestedDates({book_name : "Petty Cash"});
+           dispatch(setApprovedDates(response || []));
+        }catch(Err){
+
+        }
+    }
 
     const handleSubmit = async (values) => {
 

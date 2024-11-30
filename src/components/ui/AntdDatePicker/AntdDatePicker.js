@@ -1,18 +1,49 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 import { DatePicker } from "antd";
-import { Field, ErrorMessage } from "formik";
+import { ErrorMessage } from "formik";
 import moment from "moment";
 import dayjs from "dayjs";
-import {dateFormat } from "../../../Constants";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { dateFormat } from "Constants";
 import './customStyles.css';
 
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+
+
 const AntdDatePicker = (props) => {
-  const { error,ph,labelText,name,handleChange,isFromAdvance = false,value } = props;
+  const { approvedDates } = useSelector(state => state.requestBook.reqData);
+  const { ph,labelText,name,handleChange,isFromAdvance = false,disabled = false,value } = props;
+
+  // const disabledDate = (current) => {
+  //   const today = moment().startOf('day');
+  //   console.log("t",today,"c",current);
+  //   return current < today.subtract(2, 'days') || current > moment().endOf('day');
+  // };
 
   const disabledDate = (current) => {
-    const today = moment().startOf('day');
-    return current < today.subtract(2, 'days') || current > moment().endOf('day');
+    const today = dayjs().startOf("day");
+
+    const allowedDayjsDates = (approvedDates || []).map((date) =>
+      dayjs(date, "YYYY-MM-DD").startOf("day")
+    );
+
+    // Check if the current date is in the allowed dates
+    const isInAllowedDates = allowedDayjsDates.some((allowedDate) =>
+      current.isSame(allowedDate, "day")
+    );
+
+    // Allow today, yesterday, day before yesterday, and specific allowed dates
+    return !(
+      (current.isSameOrAfter(today.subtract(2, "day")) &&
+        current.isSameOrBefore(dayjs().endOf("day"))) ||
+      isInAllowedDates
+    );
   };
+  
 
   const disabledDateForABModal = (current) => {
     const startDate = moment('2024-01-01').startOf('day');
@@ -30,6 +61,7 @@ const AntdDatePicker = (props) => {
         value={value ? dayjs(value, dateFormat) : null}
         onChange={handleChange}
         placeholderText={ph}
+        disabled = {disabled}
         popupClassName="custom-calendar"
         
       />
@@ -40,5 +72,20 @@ const AntdDatePicker = (props) => {
 }
 
 export default AntdDatePicker;
+
+AntdDatePicker.propTypes = {
+  ph : PropTypes.string,
+  labelText : PropTypes.string,
+  name : PropTypes.string,
+  value : PropTypes.string,
+  handleChange : PropTypes.func,
+  isFromAdvance : PropTypes.bool,
+  disabled : PropTypes.bool
+};
+
+AntdDatePicker.defaultProps = {
+  isFromAdvance : false,
+  disabled : false
+};
 
 // prefix={flag && prefix} 
