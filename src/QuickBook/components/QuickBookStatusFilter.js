@@ -56,26 +56,36 @@ const QuickBookStatusFilter = (props) => {
         }
     };
     
-    const displayMessage = () => {
-      let customData = getCustomData(
-        isFromReqHistory
-          ? reqHistoryData
-          : isFromPayments
-          ? reqPaymentData
-          : tableData
-      );
-      if (customData) {
+  
+    const generateMsg = (cData) => {
+      if (cData) {
         return (
           <span className="text-blue-400 text-base font-normal ml-2">
-            {customData}
+            {cData}
           </span>
         );
-      } else if (message) {
-        return (
-          <span className="text-base font-normal ml-2 mt-2 text-red-700">
-            {message}
-          </span>
-        );
+      }
+    };
+
+    const displayMessage = () => {
+      if(isFromReqHistory){
+          let customData = getCustomData(reqHistoryData);
+          return generateMsg(customData);
+      } else if (isFromPayments){
+        let customData = getCustomData(reqPaymentData);
+        return generateMsg(customData);
+      } else {
+          let customData = getCustomData(tableData);
+          if(customData){
+            return generateMsg(customData);
+          }
+          if (message) {
+            return (
+              <span className="text-base font-normal ml-2 mt-2 text-red-700">
+                {message}
+              </span>
+            );
+          }
       }
     };
 

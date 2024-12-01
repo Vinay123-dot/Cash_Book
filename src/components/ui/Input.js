@@ -6,7 +6,7 @@ const Input = (props) => {
   const {
     id,
     label,
-    val,
+    val = "",
     field,
     readonly,
     keyNum,
@@ -16,7 +16,7 @@ const Input = (props) => {
     disabledIcon = false,
     showLabel = true
   } = props;
-console.log("v",val,"field",field);
+
   return (
     <>
       {
@@ -31,7 +31,7 @@ console.log("v",val,"field",field);
         <input
           className="w-full h-full rounded-md px-2 focus:outline-none "
           type="text"
-          value={val}
+          value={val ?? ""}
           disabled={disabled}
           onChange={(e) => handleInputChange(id, field, e.target.value)}
           onKeyDown={(event) => {
@@ -62,6 +62,7 @@ Input.propTypes = {
     id : PropTypes.string.isRequired,
     label : PropTypes.string.isRequired,
     field : PropTypes.string.isRequired,
+    val: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     // val : PropTypes.oneOfType([PropTypes.string, PropTypes.number,PropTypes.oneOf([undefined])]),
     readonly : PropTypes.bool,
     keyNum : PropTypes.number,
@@ -75,7 +76,8 @@ Input.defaultProps = {
     acceptAll : false,
     disabled : false,
     disabledIcon : false,
-    showLabel : true
+    showLabel : true,
+    val : ""
 };
  
  

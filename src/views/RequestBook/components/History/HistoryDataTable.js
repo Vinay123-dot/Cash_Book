@@ -87,8 +87,8 @@ const HistoryDataTable = ({requiredArr,handleDeleteReport}) => {
           {showTableHeader({ label: "Requested Date" })}
           {showTableHeader({ label: "Requested By" })}
           {showTableHeader({ label: "Requested On" })}
-          {showTableHeader({ label: "Approved On" })}
           {showTableHeader({ label: "Approved by" })}
+          {showTableHeader({ label: "Approved On" })}
           {showTableHeader({ label: "Valid till" })}
           {showTableHeader({ label: "Reason" })}
           {showTableHeader({ label: "Status" })}
@@ -103,9 +103,9 @@ const HistoryDataTable = ({requiredArr,handleDeleteReport}) => {
             {showTableData({ value: row.request_date })}
             {showTableData({ value: row.requested_by })}
             {showTableData({ value: row.requested_on })}
+            {showTableData({ value: row.approved_by })}
 
             {showTableData({ value: row.approved_on })}
-            {showTableData({ value: row.approved_by })}
             {showTableData({ value: row.valid_till })}
             {showTableData({ value: row.reason })}
             {showTableData({ value: getApprovedStatus(row.isapproved) })}

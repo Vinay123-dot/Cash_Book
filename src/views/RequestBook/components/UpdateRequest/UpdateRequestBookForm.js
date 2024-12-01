@@ -44,11 +44,10 @@ const UpdateRequestBookForm = ({handleCancel}) => {
   // };
 
   const getDisabledStatus = (valArr) => {
-    const { request_date,book_type,requested_by,reason } = valArr;
-    return !!(request_date && book_type && requested_by && reason);
+    const { approved_by,valid_till,isapproved } = valArr;
+    return !!(isapproved && valid_till && approved_by);
   };
 
-console.log("vv",values);
   return (
     <Form className="h-full flex flex-col">
       <div className="flex-grow overflow-y-auto">

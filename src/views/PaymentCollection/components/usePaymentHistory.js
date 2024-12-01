@@ -47,7 +47,7 @@ const usePaymentReports = () => {
           return Object.keys(item).reduce((acc, key) => {
             const newKey = key.toLowerCase();
             acc[newKey] = item[key];
-            acc["input_amount"] = null;
+            acc["input_amount"] = "";
             acc["customer_type"] = typeof item["Customer_Type"] === 'string' ? getCustomerId(item["Customer_Type"]) : item["Customer_Type"];
            
             return acc;

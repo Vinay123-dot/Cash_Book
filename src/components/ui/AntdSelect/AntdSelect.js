@@ -28,7 +28,7 @@ const AntdSelectFilter = (props) => {
           onChange={onStatusFilterChange}
         >
           {(options || []).map((eachOpt, i) => (
-            <Option key={eachOpt.Id} value={eachOpt.MMS_Terminal_ID || eachOpt.Id}>
+            <Option key={eachOpt.Id} value={eachOpt.Id}>
               {eachOpt.Type || eachOpt.Terminal}
             </Option>
           ))}

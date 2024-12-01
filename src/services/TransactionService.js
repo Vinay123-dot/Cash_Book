@@ -327,6 +327,7 @@ export async function apiDeletePettyCash(data){
 
 export async function apiGetRequestHistory(data) {
     const { terminal_id,key,history_type = 5,book_name,fromDate,toDate } = data;
+    
     let tempUrl = `${appConfig.apiPrefix}/v21/request_book/get_RequestBook?book_type=${book_name}&key=${key}&terminal_id=${terminal_id}`
     let url;
     if(!fromDate || !toDate){

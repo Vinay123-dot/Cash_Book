@@ -3,11 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const intialPaymentData = {
     given_date : null,
     payment_type : null,
-    party_code : null,
+    party_code : "",
     history_type: null,
     fromDate: "",
     toDate: "",
-    given_amount : null,
+    given_amount : "",
     bank_name : "",
     transaction_num : ""
 };

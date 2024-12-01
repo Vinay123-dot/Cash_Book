@@ -25,10 +25,10 @@ const PaymentData = () => {
 
     const onClickCheckbox = (selObj) => {
         const { pending_balance,input_amount} = selObj;
-        const newBillModalData = cloneDeep(billModalData);
-        newBillModalData.showBillModal = false;
-        newBillModalData.billModalObj = selObj;
-        dispatch(setBillModalData(newBillModalData));
+        // const newBillModalData = cloneDeep(billModalData); //Not required...
+        // newBillModalData.showBillModal = false;
+        // newBillModalData.billModalObj = selObj;
+        // dispatch(setBillModalData(newBillModalData));
 
         let isUpdateArr = Number(input_amount) > 0 && Number(input_amount) <= Number(pending_balance);
         isUpdateArr && UpdatePaymentArray(selObj);

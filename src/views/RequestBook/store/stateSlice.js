@@ -9,7 +9,7 @@ const stateSlice = createSlice({
         showErrModal : false,
         ErrModalMsg : "",
         getRequestBook : false,
-        activeTab : userType === TERMINAL_ID ? 0 : 1,
+        activeTab : 0
     },
     reducers : {
         setManageRequestModal : (state,action) => {
