@@ -90,6 +90,7 @@ const BankDepositMainPage = (props) => {
               newObj.store_id = dummyObj.Terminal || newObj.store_id
             }
             newObj.key = uniqueId;
+            newObj.daybook_id = newObj.daybook_id ? newObj.daybook_id : null;
             let bankResponse = await apiStoreBankDepositInfo([newObj]);
             onUpdateReducer({
               showErrModal : !!bankResponse?.message,

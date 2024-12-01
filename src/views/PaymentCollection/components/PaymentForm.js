@@ -115,7 +115,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
                     field="transaction_num"
                     acceptAll={true}
                     disabledIcon={true}
-                    val={reqPaymentData.req_transactionNum}
+                    val={reqPaymentData.transaction_num}
                     handleInputChange={onChangeInput}
                   />
                 </div>
@@ -129,7 +129,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
             Select Duration
           </label>
           <QuickBookStatusFilter
-            isFromPayments={paymentFlag()}
+            isFromPayments={true}
             onDateChange={handleDateChange}
             message={""}
             options={dayInfoList}
@@ -146,7 +146,7 @@ const PaymentForm  = ({handleGetPartyCodeList}) => {
             handleInputChange={onChangeInput}
           />
         </div>
-        <div className="self-start">
+        <div className="self-start mt-7">
           <Button
             type="button"
             className={getViewBtnCls}

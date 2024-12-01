@@ -43,14 +43,32 @@ const RequestHistoryHeader  = () => {
 
     const handleOutletStatusChange = (val) => {
       const newHistoryData = cloneDeep(reqHistoryData);
-      newHistoryData.terminal_id = val;
+      let outletInStrng = (allTerminalList || []).find((eachItem) => eachItem.Id === val);
+      newHistoryData.terminal_id = outletInStrng?.MMS_Terminal_ID;
       dispatch(setReqHistoryData(newHistoryData));
    };
 
     const paymentFlag = () => !!(reqHistoryData.fromDate || reqHistoryData.toDate);
-    const checkValues = () => !!(reqHistoryData.book_type && reqHistoryData.history_type);
+    // const checkValues = () => !!(reqHistoryData.book_type && reqHistoryData.history_type && reqHistoryData.terminal_id);
+    const checkValues = () => {
+      const { book_type, history_type, terminal_id } = reqHistoryData;
+      let valFlag = false;
+    
+      if (book_type && history_type) {
+        if (userType === MERCHANT_ID) {
+          // Check if terminal_id is present
+          if (terminal_id) {
+            valFlag = true;
+          }
+        } else {
+          valFlag = true;
+        }
+      }
+    
+      return valFlag;
+    };
+    
     const getViewBtnCls = checkValues() ? ENABLED_STYLE : DISABLED_STYLE;
-  
 
     return (
       <div className="realtive w-full gap-2 flex flex-row justify-start sm:justify-end flex-wrap">
@@ -64,7 +82,7 @@ const RequestHistoryHeader  = () => {
           </div>
         <div className="flex flex-col w-40">
           <QuickBookStatusFilter
-            isFromReqHistory = {paymentFlag()}
+            isFromReqHistory = {true}
             onDateChange = {handleDateChange}
             message = {""}
             options = {dayInfoList}

@@ -87,7 +87,7 @@ const PaymentPage = () => {
         let updatedList = getUpdatedList();
         let response = await savePaymentReports(updatedList);
         if(response?.statusCode === 200) {
-          dispatch(setClearAllPaymentPageFields({}));
+          // dispatch(setClearAllPaymentPageFields({}));
           setTimeout(() => {
             viewPaymentReports();
           },100);

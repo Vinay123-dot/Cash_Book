@@ -28,6 +28,17 @@ const PaymentDataTable = (props) => {
   
           {/* Table Body */}
           <tbody>
+            {
+              requiredArr?.length <= 0 && 
+                <tr>
+                  <td
+                    colSpan="12"
+                    className="text-lg text-swinkpayBlue font-medium p-4 text-center"
+                  >
+                    No records
+                  </td>
+                </tr>
+            }
             {(requiredArr || []).map((eachDoc, index) => (
               <React.Fragment key={eachDoc.id}>
                 <tr>
@@ -75,7 +86,7 @@ const PaymentDataTable = (props) => {
 export default PaymentDataTable;
 
 PaymentDataTable.propTypes = {
-  requiredArr: PropTypes.object,
+  requiredArr: PropTypes.array,
   handleClickCheckbox: PropTypes.func,
   handleInputChange: PropTypes.func,
 };

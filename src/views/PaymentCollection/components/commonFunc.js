@@ -20,7 +20,7 @@ export const paymentTypes = (selDoc,p_type = null) => {
     } else if(TYPE_OF_PAYMENT[p_type] === UPI){
 
       selDoc[UPI_AMOUNT] = finalAmout;
-      selDoc[UPI_TYPE] = "Swinkpay";
+      selDoc[UPI_TYPE] = 1;
       selDoc[UPI_TRANS_NO] = "";
 
     } else if(TYPE_OF_PAYMENT[p_type] === BANK){

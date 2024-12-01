@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch, useSelector } from 'react-redux'
 import { HiOutlinePencil,HiOutlineTrash,HiArrowsExpand } from "react-icons/hi";
+import { BiMessageEdit } from "react-icons/bi";
 import PettyCashEditModal from "./PettyCashEditModal";
 import EditDayBookFromDashboard from "./EditModeFromDashboard";
 import EditAdvBookFromDashboard from './EditAdvanceBookFromDashboard';
@@ -297,26 +298,42 @@ const HandleEditInvoice = (props) => {
       }));
     }
 
+    const showEditAndDelBtn = () => {
+      if(userType === TERMINAL_ID){
+        return showEditAndDeleteButton(row).edit ||
+        showEditAndDeleteButton(row).delete ? (
+        <div className="flex space-x-2 pl-3">
+          <HiOutlinePencil
+            className="cursor-pointer size-6 text-[#5A87B2] text-start"
+            onClick={handleClickIcon}
+          />
+          <HiOutlineTrash
+            className="cursor-pointer size-6 text-[#5A87B2] text-start"
+            onClick={handleClickDelete}
+          />
+        </div>
+      ) : (
+        <div className="flex justify-start">
+          {showEditAndDeleteButton(row).msg ? (
+            <p className='text-orange-900 text-base font-medium'>Request Sent</p>
+            
+          ) : (
+            <BiMessageEdit
+              className="cursor-pointer size-6 text-[#5A87B2] ml-7"
+              onClick={handleClickRequest}
+            />
+          )}
+        </div>
+      );
+      }
+      
+    };
+
     return (
       <>
         {
-          (showEditAndDeleteButton(row).edit || showEditAndDeleteButton(row).delete) ?
-            <div className="flex space-x-2 pl-3">
-              <HiOutlinePencil
-                className="cursor-pointer size-6 text-[#5A87B2] text-start"
-                onClick={handleClickIcon}
-              />
-              <HiOutlineTrash
-                className="cursor-pointer size-6 text-[#5A87B2] text-start"
-                onClick={handleClickDelete}
-              />
-            </div> : showEditAndDeleteButton(row).msg ? "request sent" : 
-            <HiArrowsExpand
-              className="cursor-pointer size-6 text-[#5A87B2] text-start"
-              onClick={handleClickRequest}
-            />
+          showEditAndDelBtn()
         }
-     
 
         {selectedModalVal === PETTYCASH_ID && (
           <PettyCashEditModal

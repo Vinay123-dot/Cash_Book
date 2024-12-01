@@ -6,7 +6,8 @@ import RequestHistory from "./History";
 import useFetchMasterData from "utils/hooks/useFetchMasterApis";
 import { setMainPageLoader } from "QuickBook/store/dataSlice";
 import DrawerSlide from "components/shared/Drawer";
-import { MERCHANT_ID } from "constants/app.constant";
+import { MERCHANT_ID, TERMINAL_ID } from "constants/app.constant";
+import { setActiveTab } from "../store/stateSlice";
 
 const MainFile = () => {
 
@@ -29,6 +30,7 @@ const MainFile = () => {
     
     useEffect(() => {
         fetchRequiredApi();
+        dispatch(setActiveTab(userType === TERMINAL_ID ? 0 : 1))
     },[]);
 
     const fetchRequiredApi = async() => {

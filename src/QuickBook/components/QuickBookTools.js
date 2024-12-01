@@ -77,14 +77,15 @@ const QuickBookTools = () => {
     setTerminalErrMsg("");
     const newTableData = cloneDeep(payload);
     let bookTypeInStrng = bookTypeList.find((eachDoc) => eachDoc.Id === newCashBookData.book_type);
-    let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id === newOutletData.terminal_id);
+    let outletInStrng = (outletList || []).find((eachItem) => eachItem.Id == newOutletData.terminal_id);
+    console.log("o",outletInStrng,"oList",outletList,"newOutletData",newOutletData)
     let newObj = { 
       ...newTableData, 
       ...newFilterData,
       ...newCashBookData,
       ...newOutletData,
       book_type:bookTypeInStrng?.Type,
-      terminal_id: userType === TERMINAL_ID ? uniqueId : outletInStrng.Terminal ,
+      terminal_id: userType === TERMINAL_ID ? uniqueId : outletInStrng.Terminal,
       key: uniqueId
       }
     dispatch(getTransactions(newObj));
@@ -92,6 +93,8 @@ const QuickBookTools = () => {
       let response = await fetchRequestedDates({
         book_name: bookTypeInStrng?.Type,
         history_type: newFilterData?.history_type,
+        fromDate : newTableData?.fromDate,
+        toDate : newTableData?.toDate
       });
       dispatch(setApprovedDates(response || []));
     }
