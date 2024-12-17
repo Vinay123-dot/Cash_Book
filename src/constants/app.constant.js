@@ -98,6 +98,23 @@ export const ALLOW_REMAINNG_FIELDS = [WITHDRAW_ID,DEPOSIT_ID];
 
 export const statusArr = ["Partially Refunded","Invoiced","ORDERCANCEL",""];
 
+export const PAYMENTCOMBOS = [
+  { Id: 1,Type: "UPI"},
+  { Id: 2,Type: "Cash"},
+  { Id: 5,Type: "Card"},
+  { Id: 8,Type: "UPI & Cash"},
+  { Id: 9,Type: "UPI & Card"},
+  { Id: 10,Type: "Cash & Card" },
+  { Id : 11 , Type : "Advance Receipt & Cash"},
+  { Id : 12 ,Type : "Advance Receipt & UPI"},
+  { Id : 13 ,Type : "Advance Receipt"},
+  { Id: 3,Type: "Bank" },
+  { Id: 6,Type: "Payment Gateway Order"},
+  { Id: 7, Type: "Reference Order"},
+  { Id: 4,Type: "Cheque"},
+];
+
+
 export const compareDate = (givenDate) => {
     const today = dayjs().startOf("day");
     const given = dayjs(givenDate, "YYYY-MM-DD");

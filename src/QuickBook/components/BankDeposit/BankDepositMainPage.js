@@ -56,7 +56,7 @@ const BankDepositMainPage = (props) => {
 
     const getRequiredDates = async() => {
       try{
-         let response = await fetchRequestedDates({book_name : "Bank Deposits"});
+         let response = await fetchRequestedDates({book_name : "Bank Deposit"});
          dispatch(setApprovedDates(response || []));
       }catch(Err){
 

@@ -10,7 +10,8 @@ import {
     setShowAddBookPage, 
     setShowDayBookFields, 
     setShowUploadInvoice ,
-    setDataSavedModal
+    setDataSavedModal,
+    setPaymentFilter
 } from "../../store/stateSlice";
 import { DaybookDataContext } from "context/DaybookContext";
 import {
@@ -20,6 +21,7 @@ import {
 import {
   INDEPENDENT_WORKSHOP,
   INDEPENDENTWORKSHOP,
+  PAYMENTCOMBOS,
   slicedCustomerTypeObj
 } from "constants/app.constant";
 import DaybookTable from "./DaybookTable";
@@ -30,6 +32,7 @@ import Button from "components/ui/NewButton";
 import useFetchReqBook from "views/RequestBook/components/useFetchReqBook";
 import { DISABLED_STYLE, ENABLED_STYLE } from "constants/app.styles";
 import { setApprovedDates } from "views/RequestBook/store/dataSlice";
+import AntdSelectFilter from "components/ui/AntdSelect/AntdSelect";
 
 
 const DaybookExcel = (props) => {
@@ -38,7 +41,8 @@ const DaybookExcel = (props) => {
     const {daybooKData,setDaybookData} = useContext(DaybookDataContext);
     const { fetchRequestedDates } = useFetchReqBook();
     const {
-        customerListInfo
+        customerListInfo,
+        paymentFilter
     } = useSelector(state => state.quickbookStore.state);
     let uniqueId = localStorage.getItem("uniqueId");
     const [showBillModal,setShowBillModal] = useState(false);
@@ -55,6 +59,7 @@ const DaybookExcel = (props) => {
   
       return () => {
         dispatch(setApprovedDates([]));
+        dispatch(setPaymentFilter(null));
       }
     },[])
 
@@ -358,10 +363,26 @@ const DaybookExcel = (props) => {
 
     const checkValues = () => !!(datesObj.fromDate && datesObj.toDate);
     const getViewBtnCls = checkValues() ? ENABLED_STYLE : DISABLED_STYLE;
+
+    const handleSelectPayment = (val) => dispatch(setPaymentFilter(val));
     
     return (
       <div className="h-full flex flex-col">
         <div className="realtive w-full gap-2 flex flex-row justify-start sm:justify-end flex-wrap pr-5">
+          {/* {daybooKData.excelArray.length > 0 && (
+            <div className="flex flex-col w-36">
+              <label htmlFor={"p_type"} className="text-start mb-1 text-black">
+                Payment Filter
+              </label>
+              <AntdSelectFilter
+                placeholder="Select Payment Type"
+                options={PAYMENTCOMBOS}
+                onStatusChange={handleSelectPayment}
+                value={paymentFilter}
+              />
+            </div>
+          )} */}
+
           <div className="w-36">
             <Datepicker
               labelText="Day"

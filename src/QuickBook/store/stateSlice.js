@@ -31,7 +31,8 @@ const stateSlice = createSlice({
         salesType : [],
         allTerminalList : [],
         selectedBookType : null,
-        editRequestBookModal : selectedDocument
+        editRequestBookModal : selectedDocument,
+        paymentFilter : null
 
     },
     reducers: {
@@ -110,6 +111,9 @@ const stateSlice = createSlice({
         },
         setEdtiRequestBook : (state,action) => {
             state.editRequestBookModal = {...selectedDocument,...action.payload};
+        },
+        setPaymentFilter : (state,action) => {
+            state.paymentFilter = action.payload;
         }
 
     },
@@ -142,7 +146,8 @@ export const {
     setAllTerminalsList,
     setSelectedBookType,
     setCancelButtonFunc,
-    setEdtiRequestBook
+    setEdtiRequestBook,
+    setPaymentFilter
 } = stateSlice.actions
 
 export default stateSlice.reducer
